@@ -1,0 +1,44 @@
+/** @format */
+
+.text {
+  --text-width: 750px;
+  max-width: var(--text-width);
+  width: 100%;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  padding: 0px 8px;
+
+}
+
+
+
+.left {
+  text-align: left;
+}
+
+.center {
+  text-align: center;
+}
+
+.right {
+  text-align: right;
+}
+
+/* Enable hover only on non-touch devices */
+@media (hover: hover) and (pointer: fine) {}
+
+@media (prefers-reduced-motion) {}
+
+/* Mobile */
+
+@media (max-width: 800px) {
+
+  .text {
+    padding: 0px 24px 18px 24px;
+  }
+}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 601px) and (max-width: 1120px) {}
+
+@media (prefers-color-scheme: dark) {}

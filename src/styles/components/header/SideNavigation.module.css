@@ -1,0 +1,161 @@
+/** @format */
+
+@keyframes slide-in {
+  from {
+    transform: translateX(calc(var(--sideNav-final-width) * -1 - 16px));
+  }
+
+  to {
+    transform: translateX(0px);
+  }
+
+}
+
+@keyframes slide-out {
+  from {
+    transform: translateX(0px);
+  }
+
+  to {
+    transform: translateX(calc(var(--sideNav-final-width) * -1 - 16px));
+  }
+}
+
+.sideNavMenu {
+  --sideNav-final-width: min(90vw, var(--sideNav-width));
+  width: var(--sideNav-final-width);
+  height: min(80vh, fit-content);
+  padding: 24px 16px;
+  overflow-y: auto;
+  gap: 32px;
+
+  z-index: 21;
+
+  position: fixed;
+  top: calc(var(--header-height) - 6px);
+  left: 16px;
+
+  display: flex;
+  opacity: 0;
+  flex-wrap: nowrap;
+  flex-direction: column;
+
+
+  background-color: var(--bg-color-translucent-10);
+  backdrop-filter: blur(5px);
+  border-radius: var(--border-radius);
+  box-shadow: 6px 2px 12px hsla(196, 3%, 3%, 0.5);
+
+  border: 1px solid var(--bg-color-30);
+
+  transform: translateX(calc(var(--sideNav-final-width) * -1 - 16px));
+  transform-origin: left;
+  transition: opacity 100ms ease-in;
+}
+
+.sideNavMenu.isActive {
+  transform: translateX(0);
+  animation: slide-in 1ms ease;
+  opacity: 1;
+}
+
+.sideNavMenu.isDisabled {
+  transform: translateX(calc(var(--sideNav-final-width) * -1 - 16px));
+  animation: slide-out 1ms ease;
+  animation-delay: 100ms;
+  box-shadow: none;
+
+  opacity: 0;
+}
+
+.sideNavLink {
+  font-size: medium;
+  width: fit-content;
+  color: var(--color-accent-10) !important;
+}
+
+.menuCard {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  width: 100%;
+  gap: 12px;
+  padding: 24px;
+}
+
+.menuCard h4 {
+  width: 100%;
+  border-bottom: 1px solid var(--bg-color-40);
+}
+
+
+@media screen and (max-width: 600px) {
+
+  .sideNavMenu {
+    --sideNav-final-width: min(90vw, var(--sideNav-width));
+    width: var(--sideNav-final-width);
+    height: 100vh;
+    padding: 24px 16px;
+    overflow-y: auto;
+    gap: 32px;
+
+    z-index: 21;
+
+    position: fixed;
+    top: var(--header-height);
+    left: 0px;
+
+    flex-wrap: nowrap;
+    flex-direction: column;
+
+
+    background-color: var(--bg-color-translucent-10);
+    backdrop-filter: blur(5px);
+    border: none;
+    border-right: 1px solid var(--bg-color-30);
+    border-radius: 0;
+    box-shadow: none;
+
+    transform: translateX(calc(var(--sideNav-final-width) * -1));
+    transform-origin: left;
+    transition: transform 300ms ease-in;
+  }
+
+  .sideNavMenu.isActive {
+    transform: translateX(0);
+    animation: slide-in 300ms ease-in;
+  }
+
+  .sideNavMenu.isDisabled {
+    transform: translateX(calc(var(--sideNav-final-width) * -1));
+    animation: slide-out 300ms ease-out;
+    animation-duration: 300ms;
+    box-shadow: none;
+  }
+
+  .menuCard {
+    background-color: var(--bg-color-05) !important;
+    border-color: var(--bg-color-40) !important;
+    width: 100%;
+    gap: 12px;
+    padding: 24px;
+  }
+}
+
+@media (min-width: 601px) {
+  .sideNavMenu > *:nth-child(1) {
+    display: none;
+  }
+}
+
+/* Enable hover only on non-touch devices */
+@media (hover: hover) and (pointer: fine) {}
+
+@media (prefers-reduced-motion) {}
+
+/* Mobile */
+@media (max-width: 700px) {}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 701px) and (max-width: 1120px) {}
+
+@media (prefers-color-scheme: dark) {}

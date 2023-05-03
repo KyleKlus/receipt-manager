@@ -1,0 +1,63 @@
+/** @format */
+
+button.navLink {
+  text-decoration: none;
+  position: relative;
+  font-size: large;
+  box-shadow: none;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+a.navLink {
+  box-shadow: none;
+  text-decoration: none;
+  position: relative;
+  font-size: large;
+  color: var(--bg-color-90);
+}
+
+.navLink::after {
+  content: '';
+  position: absolute;
+  background-color: var(--color-accent-10);
+  height: 2px;
+  bottom: -4px;
+  left: 0px;
+  right: 0px;
+  visibility: hidden;
+  transform-origin: 50% 0;
+  transform: scale(0);
+  transition: transform 200ms ease;
+}
+
+.navLink.isCurrentWindow::after {
+  visibility: visible;
+  transform: scaleX(1);
+}
+
+/* Enable hover only on non-touch devices */
+@media (hover: hover) and (pointer: fine) {
+
+  .navLink:hover::after {
+    transform-origin: 0 50%;
+    visibility: visible;
+    transform: scaleX(1);
+    background-color: var(--color-accent-00);
+  }
+}
+
+@media (prefers-reduced-motion) {
+  .navLink::after {
+    transition-duration: 200ms;
+  }
+}
+
+/* Mobile */
+@media (max-width: 700px) {}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 701px) and (max-width: 1120px) {}
+
+@media (prefers-color-scheme: dark) {}

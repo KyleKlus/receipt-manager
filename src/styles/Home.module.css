@@ -1,0 +1,354 @@
+/** @format */
+
+.heroPage,
+.aboutPage {
+    justify-content: center;
+    position: relative;
+}
+
+
+.heroPage,
+.aboutPage,
+.portfolioPage {
+    scroll-snap-align: start;
+}
+
+.aboutPageBGColor {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 900px;
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+
+    background-color: var(--bg-color-translucent-05);
+}
+
+.portfolioPage {
+    background-color: var(--bg-color-00);
+    position: relative;
+}
+
+.portfolioPageBG {
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.06) 5%,
+            transparent 5%);
+    background-position: 0% 0%;
+    background-size: 4vmin 4vmin;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: 0;
+}
+
+
+.portfolioCardWrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 64px;
+    margin: 48px 0px 128px 0px;
+    z-index: 1;
+}
+
+.portfolioCard {
+    width: 750px;
+    padding: 42px;
+    transition: box-shadow 300ms ease;
+    box-shadow: 4px 3px 4px rgba(0, 0, 0, 0.3);
+}
+
+.portfolioCard:hover {
+    box-shadow: 6px 5px 6px rgba(0, 0, 0, 0.5);
+}
+
+.portfolioCardImgWrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    line-height: 1.5rem;
+}
+
+.portfolioCardImg {
+    width: 65%;
+    height: 100%;
+}
+
+.portfolioCardText {
+    padding: 0px;
+}
+
+.blurredImageWrapper {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.heroPageBG,
+.aboutPageBG {
+    width: 100%;
+    height: 100%;
+    filter: brightness(var(--filter-brightness)) blur(var(--filter-blur));
+    transform: scale(1.1);
+    object-fit: cover;
+}
+
+.slideInWrapper {
+    overflow-x: hidden;
+    width: 100%;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.slideInWrapper > p.slideInLeft {
+    transform: translateX(calc(100vw / -2 - min(800px, 100%) / -2));
+    transform-origin: left;
+    animation-name: slide-in-left;
+    animation-timing-function: ease-in;
+}
+
+.slideInWrapper > p.slideInLeftToCenter {
+    transform: translateX(0);
+    animation-duration: 980ms;
+    transform-origin: left;
+    animation-name: slide-in-left-to-center;
+    animation-timing-function: ease-in;
+}
+
+.slideInWrapper > p.slideInRight {
+    transform: translateX(calc(calc(calc(100vw - min(800px, 100%)) / 2)));
+    transform-origin: right;
+    animation-name: slide-in-right;
+    animation-timing-function: ease-in;
+}
+
+.slideInWrapper > p:is(.slideInRight, .slideInLeft):nth-child(n) {
+    animation-duration: 1050ms;
+}
+
+.slideInWrapper > p:is(.slideInRight, .slideInLeft):nth-child(3n) {
+    animation-duration: 900ms;
+}
+
+.slideInWrapper > p:is(.slideInRight, .slideInLeft):nth-child(2n) {
+    animation-duration: 1000ms;
+}
+
+.slideInWrapper > p:is(.slideInRight, .slideInLeft):nth-child(5n) {
+    animation-duration: 980ms;
+}
+
+.slideInWrapper > p:is(.slideInRight, .slideInLeft):nth-child(6n) {
+    animation-duration: 1060ms;
+}
+
+.slideInWrapper > p:is(.slideInRight, .slideInLeft):nth-child(4n) {
+    animation-duration: 930ms;
+}
+
+.xxLarge {
+    font-size: 2.8rem;
+}
+
+.xLarge {
+    font-size: 1.8rem;
+}
+
+.large {
+    font-size: 1.3rem;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slide-in-left {
+    from {
+        transform: translateX(calc(100vw * -1));
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(calc(calc(100vw - min(800px, 100%)) / -2));
+        opacity: 1;
+    }
+}
+
+@keyframes slide-in-left-to-center {
+    from {
+        transform: translateX(calc(100vw * -1));
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slide-in-right {
+    from {
+        transform: translateX(calc(100vw * 1));
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(calc(calc(100vw - min(800px, 100%)) / 2));
+        opacity: 1;
+    }
+
+}
+
+
+/* Enable hover only on non-touch devices */
+@media (hover: hover) and (pointer: fine) {}
+
+@media (prefers-reduced-motion) {}
+
+
+
+/* Mobile */
+@media (max-width: 820px) {
+
+    .slideInWrapper {
+        padding: 0px 24px 18px 24px;
+    }
+}
+
+@media (max-width: 800px) {
+    .xxLarge {
+        font-size: 2.6rem;
+    }
+
+    .xLarge {
+        font-size: 1.6rem;
+    }
+
+    .large {
+        font-size: 1.1rem;
+    }
+
+    .portfolioCardWrapper {
+        gap: 48px;
+        margin: 24px 0px 128px 0px;
+    }
+
+
+    .portfolioCard {
+        width: 85%;
+        padding: 16px;
+    }
+
+    .portfolioCard > h2 {
+        text-align: center;
+    }
+
+    .portfolioCardImgWrapper {
+        flex-direction: column;
+    }
+
+    .portfolioCardImg {
+        height: 65%;
+        width: 100%;
+    }
+
+    .portfolioCardText {
+        padding: 0px;
+    }
+}
+
+@media (max-width: 720px) {
+    .xxLarge {
+        font-size: 2.4rem;
+    }
+
+    .xLarge {
+        font-size: 1.4rem;
+    }
+
+    .large {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 620px) {
+    .xxLarge {
+        font-size: 1.7rem;
+    }
+
+    .xLarge {
+        font-size: 1.2rem;
+    }
+
+    .large {
+        font-size: 1rem;
+    }
+
+
+}
+
+@media (max-width: 520px) {
+    .xxLarge {
+        font-size: 1.3rem;
+    }
+
+    .xLarge {
+        font-size: 1.1rem;
+    }
+
+    .large {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 470px) {
+    .xxLarge {
+        font-size: 1.1rem;
+    }
+
+    .xLarge {
+        font-size: 1rem;
+    }
+
+    .large {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 376px) {
+    .xxLarge {
+        font-size: 1.0rem;
+    }
+
+    .xLarge {
+        font-size: 0.9rem;
+    }
+
+    .large {
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 1000px) {
+    .aboutPageBGColor {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        width: 100%;
+    }
+}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 601px) and (max-width: 1120px) {}
+
+@media (prefers-color-scheme: dark) {}

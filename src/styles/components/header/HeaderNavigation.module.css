@@ -1,0 +1,29 @@
+/** @format */
+
+.nav {
+  height: fit-content;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+}
+
+
+
+/* Enable hover only on non-touch devices */
+@media (hover: hover) and (pointer: fine) {}
+
+@media (prefers-reduced-motion) {}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .nav {
+    gap: 0px;
+  }
+}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 701px) and (max-width: 1120px) {}
+
+@media (prefers-color-scheme: dark) {}

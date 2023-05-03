@@ -1,0 +1,44 @@
+/** @format */
+
+.languageButton {
+  --toggle-width: 24px;
+  --toggle-height: 24px;
+  --button-padding: 0px;
+  border: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 1.5rem;
+  line-height: 1;
+  width: var(--toggle-width);
+  height: var(--toggle-height);
+  border-radius: 50%;
+  background: var(--bg-color-00);
+  box-shadow: 2px 2px 1px 0px hsla(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: background 0.25s ease-in-out;
+  padding: var(--button-padding);
+  outline: 1px solid var(--bg-color-20);
+}
+
+/* Enable hover only on non-touch devices */
+@media (hover: hover) and (pointer: fine) {
+  .languageButton:hover {
+    background: var(--bg-color-10);
+    box-shadow: 2px 2px 1px 0px hsla(0, 0, 0, 0.4);
+    outline: 1.5px solid var(--bg-color-40);
+  }
+}
+
+@media (prefers-reduced-motion) {}
+
+/* Mobile */
+@media (max-width: 700px) {}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 701px) and (max-width: 1120px) {}
+
+@media (prefers-color-scheme: dark) {}

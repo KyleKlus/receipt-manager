@@ -1,0 +1,22 @@
+{
+    "recommendations": [
+        "formulahendry.auto-close-tag",
+        "formulahendry.auto-rename-tag",
+        "pranaygp.vscode-css-peek",
+        "ecmel.vscode-html-css",
+        "wix.vscode-import-cost",
+        "zignd.html-css-class-completion",
+        "dsznajder.es7-react-js-snippets",
+        "ms-vscode.js-debug-nightly",
+        "xabikos.javascriptsnippets",
+        "ritwickdey.liveserver",
+        "swellaby.node-pack",
+        "idered.npm",
+        "christian-kohler.npm-intellisense",
+        "esbenp.prettier-vscode",
+        "syler.sass-indented",
+        "sibiraj-s.vscode-scss-formatter",
+        "mrmlnc.vscode-scss",
+        "pflannery.vscode-versionlens"
+    ]
+}

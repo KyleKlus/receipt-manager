@@ -1,0 +1,75 @@
+/** @format */
+
+.logoWrapper {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  padding-right: 5px;
+  transition: filter 200ms ease;
+}
+
+.logoWrapper > img {
+  border-radius: 50%;
+}
+
+.logoWrapper > p {
+  font-size: x-large;
+}
+
+/* Enable hover only on non-touch devices */
+@media (hover: hover) and (pointer: fine) {
+  .logoWrapper:hover > p {
+    filter: invert(1) brightness(0.09);
+  }
+
+  body[data-theme='dark'] .logoWrapper:hover > p {
+    filter: brightness(0.8);
+  }
+
+  .logoWrapper:hover > img {
+    filter: brightness(1.2);
+  }
+
+  body[data-theme='dark'] .logoWrapper:hover > img {
+    filter: brightness(0.8);
+  }
+
+
+}
+
+@media (max-width: 350px) {
+  .logoWrapper > p {
+    font-size: large;
+  }
+
+  .logoWrapper > img {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+@media (max-width: 300px) {
+  .logoWrapper > p {
+    font-size: medium;
+  }
+
+  .logoWrapper > img {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+
+@media (prefers-reduced-motion) {}
+
+/* Mobile */
+@media (max-width: 700px) {}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 701px) and (max-width: 1120px) {}
+
+@media (prefers-color-scheme: dark) {}

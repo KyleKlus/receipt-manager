@@ -1,0 +1,54 @@
+/** @format */
+
+a.navLink {
+  text-decoration: none;
+  position: relative;
+  font-size: large;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.navLink::after {
+  content: '';
+  position: absolute;
+  background-color: var(--color-accent-10);
+  height: 2px;
+  bottom: -4px;
+  left: 0px;
+  right: 0px;
+  visibility: hidden;
+  transform: scale(0);
+  transform-origin: 0 50%;
+  transition: transform 200ms ease;
+}
+
+.navLink.isCurrentWindow::after {
+  visibility: visible;
+  transform: scaleX(1);
+}
+
+/* Enable hover only on non-touch devices */
+@media (hover: hover) and (pointer: fine) {
+
+  .navLink:focus-within::after,
+  .navLink:hover::after {
+    visibility: visible;
+    transform: scaleX(1);
+    background-color: var(--color-accent-00);
+  }
+
+}
+
+@media (prefers-reduced-motion) {
+  .navLink::after {
+    transition-duration: 200ms;
+  }
+}
+
+/* Mobile */
+@media (max-width: 700px) {}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 701px) and (max-width: 1120px) {}
+
+@media (prefers-color-scheme: dark) {}

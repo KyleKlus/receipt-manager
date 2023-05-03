@@ -1,0 +1,126 @@
+/** @format */
+
+@keyframes slide-in {
+  from {
+    transform: translateY(calc(var(--header-height) * -1));
+  }
+
+  to {
+    transform: translateY(0px);
+  }
+
+}
+
+@keyframes slide-out {
+  from {
+    transform: translateY(0px);
+  }
+
+  to {
+    transform: translateY(calc(var(--header-height) * -1));
+  }
+}
+
+@keyframes fade-out {
+  from {
+    background-color: var(--bg-color-15) !important;
+    border-color: var(--bg-color-40);
+  }
+
+  to {
+    background-color: var(--bg-color-translucent-05);
+    border-color: transparent;
+  }
+}
+
+.header {
+  height: var(--header-height);
+  width: 100vw;
+  background-color: transparent;
+
+  padding: 0px 32px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  top: 0px;
+  z-index: 20;
+  transform: translateY(0px);
+  border-bottom: 1px solid transparent;
+  transition: box-shadow 300ms ease, border-color 300ms ease, background-color 300ms ease;
+}
+
+.header.isVisible.slideIn {
+  transform: translateY(0px);
+  animation: slide-in 400ms ease;
+}
+
+.header.isVisible {
+  backdrop-filter: blur(6px);
+  background-color: var(--bg-color-translucent-05);
+  border-bottom: 1px solid var(--bg-color-30);
+  box-shadow: 6px 2px 12px hsla(196, 3%, 3%, 0.5);
+}
+
+.header.isHidden {
+  transform: translateY(calc(var(--header-height) * -1));
+  animation: slide-out 250ms ease;
+}
+
+.headerConfigButtonsWrapper {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+
+.sideNavigationNegativeSpace {
+  --sideNavNegativeWidth: calc(100vw - min(var(--sideNav-width), 90vw));
+  position: absolute;
+  top: var(--header-height);
+  left: 0px;
+  width: 100vw;
+  height: 100vh;
+  transform: translateX(calc(100vw *2));
+  transform-origin: right;
+}
+
+.sideNavigationNegativeSpace.isWrapperActive {
+  transform: translateX(0);
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Enable hover only on non-touch devices */
+@media (hover: hover) and (pointer: fine) {}
+
+@media (prefers-reduced-motion) {}
+
+/* Mobile */
+@media (max-width: 600px) {
+
+  .header {
+    backdrop-filter: blur(6px);
+    background-color: var(--bg-color-translucent-05);
+    border-bottom: 1px solid var(--bg-color-30);
+    box-shadow: 6px 2px 12px hsla(196, 3%, 3%, 0.5);
+
+  }
+
+  .headerNavLink {
+    display: none;
+  }
+}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 601px) and (max-width: 1120px) {}
+
+@media (prefers-color-scheme: dark) {}

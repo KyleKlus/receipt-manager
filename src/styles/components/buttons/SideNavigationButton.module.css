@@ -1,0 +1,52 @@
+/** @format */
+
+.sideNav {
+  --toggle-width: 32px;
+  --toggle-height: 32px;
+  --button-padding: 6px;
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 1.5rem;
+  line-height: 1;
+  width: var(--toggle-width);
+  height: var(--toggle-height);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 200ms ease-in-out;
+  padding: var(--button-padding);
+}
+
+.bar {
+  display: block;
+  background-color: var(--bg-color-90);
+  height: 1px;
+  width: calc(100% - var(--button-padding));
+  border-radius: 2px;
+}
+
+.bar:first-of-type,
+.bar:last-of-type {
+  height: 2px;
+}
+
+/* Enable hover only on non-touch devices */
+@media (hover: hover) and (pointer: fine) {
+  .sideNav:hover {
+    background: var(--bg-color-15);
+    outline: 1px solid var(--bg-color-40);
+  }
+}
+
+@media (prefers-reduced-motion) {}
+
+/* Mobile */
+@media (max-width: 700px) {}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 701px) and (max-width: 1120px) {}
+
+@media (prefers-color-scheme: dark) {}

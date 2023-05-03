@@ -1,0 +1,12 @@
+/** @format */
+
+.card {
+  border: 1px solid var(--bg-color-40);
+  border-radius: var(--border-radius);
+  background-color: var(--bg-color-10);
+  padding: 16px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}

@@ -1,0 +1,59 @@
+/** @format */
+
+.scrollButton {
+  --button-padding: 18px;
+  --button-width: 36px;
+  --position-bottom: calc(var(--button-width));
+  cursor: pointer;
+  border: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: var(--button-width);
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  padding: var(--button-padding);
+  box-shadow: 2px 2px 4px hsla(196, 3%, 3%, 0.8);
+
+
+  z-index: 22;
+
+  background-color: var(--bg-color-05);
+  position: fixed;
+  right: var(--button-width);
+  bottom: var(--position-bottom);
+  outline: 1px solid var(--bg-color-40);
+  transform: translateY(calc(var(--position-bottom) + var(--button-width)));
+  opacity: 0;
+  transition: background 200ms ease, transform 400ms ease, opacity 1200ms ease;
+}
+
+.scrollButton.isVisible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.scrollButton .image {
+  position: absolute;
+}
+
+/* Enable hover only on non-touch devices */
+@media (hover: hover) and (pointer: fine) {
+  .scrollButton:hover {
+    background: var(--bg-color-10);
+    outline: 1.5px solid var(--bg-color-40);
+  }
+}
+
+@media (prefers-reduced-motion) {}
+
+/* Mobile */
+@media (max-width: 700px) {}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 701px) and (max-width: 1120px) {}
+
+@media (prefers-color-scheme: dark) {}
