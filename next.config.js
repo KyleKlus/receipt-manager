@@ -5,9 +5,9 @@
 
 const nextConfig = {
   reactStrictMode: true,
-  basePath: '',
+  basePath: '/receipt-manager',
   env: {
-    basePath: '',
+    basePath: '/receipt-manager',
   },
 };
 
