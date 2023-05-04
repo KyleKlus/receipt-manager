@@ -96,17 +96,17 @@ export default function Home() {
         const result = reader.result;
 
         if (result !== null && result !== undefined) {
-          const bonsHeader: string[] = result.toString().split('\n')[0].split(',');
-          const bonHeaderCount: number = bonsHeader.length;
-          const itemHeader: string[] = bonsHeader.reverse()[0].split('|');
+          const receiptsHeader: string[] = result.toString().split('\n')[0].split(',');
+          const receiptHeaderCount: number = receiptsHeader.length;
+          const itemHeader: string[] = receiptsHeader.reverse()[0].split('|');
           const itemHeaderCount: number = itemHeader.length;
-          const bons: string[] = result.toString().split('\n').slice(1).filter((item) => { return item.length > 1 });
+          const receipts: string[] = result.toString().split('\n').slice(1).filter((item) => { return item.length > 1 });
 
-          for (let i: number = 0; i < bons.length; i++) {
-            const bon: string[] = bons[i].split(',');
-            const bonItems: string[][] = listToMatrix(bon.slice(bonHeaderCount).join('').replaceAll('"', '').split('|'), itemHeaderCount).filter((item) => { return item.length > 1 });
+          for (let i: number = 0; i < receipts.length; i++) {
+            const receipt: string[] = receipts[i].split(',');
+            const receiptItems: string[][] = listToMatrix(receipt.slice(receiptHeaderCount).join('').replaceAll('"', '').split('|'), itemHeaderCount).filter((item) => { return item.length > 1 });
 
-            let parsedItems = bonItems.map(list => {
+            let parsedItems = receiptItems.map(list => {
               const amount: number = list[5] === '' ? 1 : Math.floor(parseFloat(list[5]) * 100) / 100
               let name = list[0].slice(1)
               name = list[0][0].toUpperCase() + name
@@ -121,8 +121,8 @@ export default function Home() {
             })
 
             parsedItems = parsedItems.reverse()
-            let name = bon[3].slice(1)
-            name = bon[3][0].toUpperCase() + name
+            let name = receipt[3].slice(1)
+            name = receipt[3][0].toUpperCase() + name
             parsedItems.push({
               name: name,
               price: 0,
