@@ -8,6 +8,8 @@
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
+
+    justify-content: center;
     gap: 32px;
 }
 
@@ -20,12 +22,39 @@
     margin-bottom: 24px;
 }
 
+
+
+
+.personHeader button {
+    padding: 4px 8px;
+    background-color: var(--bg-color-25);
+    border: 1px solid var(--bg-color-50);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    box-shadow:
+        0 0 0 1px hsla(0, 0%, 0%, .6),
+        0 2px 3px hsla(0, 0%, 0%, .6);
+    transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.personHeader button:hover {
+    background-color: var(--bg-color-30);
+    border-color: var(--bg-color-70);
+    box-shadow:
+        0 0 0 1px hsla(0, 0%, 0%, .6),
+        0 2px 3px hsla(0, 0%, 0%, .6),
+        0 4px 3px hsla(0, 0%, 0%, .4);
+}
+
 .personTable {
     border-spacing: 0px;
+    margin-bottom: 64px;
+    width: 100%;
 }
 
 .personTable th {
-    border-bottom: 1px solid var(--bg-color-70);
+    border-bottom: 1px solid var(--bg-color-90);
+    font-size: large;
     padding: 12px 4px;
 }
 
@@ -33,9 +62,69 @@
     border-bottom: 1px solid var(--bg-color-40);
     padding: 8px 4px;
     text-align: center;
+}
+
+.personTable td div {
+    text-align: left;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.personTable td input[type='radio'] {
+    background-color: var(--bg-color-25);
+    border-radius: 10px;
+    outline: 1px solid var(--bg-color-80);
+    box-shadow:
+        0 0 0 1px hsla(0, 0%, 0%, .6),
+        0 2px 3px hsla(0, 0%, 0%, .6);
+    cursor: pointer;
+    display: inline-block;
+    height: 15px;
+    position: relative;
+    width: 15px;
+    appearance: none;
+    transition: background-color 200ms ease, outline-color 200ms ease, box-shadow 200ms ease;
+}
+
+.personTable td input[type='radio']:checked {
+    cursor: default;
+}
+
+.personTable td input[type='radio']:not(:checked):hover {
+    background-color: var(--bg-color-30);
+    outline-color: var(--bg-color-90);
+    box-shadow:
+        0 0 0 1px hsla(0, 0%, 0%, .6),
+        0 2px 3px hsla(0, 0%, 0%, .6),
+        0 4px 3px hsla(0, 0%, 0%, .4);
+}
+
+.personTable td input[type='radio']:disabled {
+    display: none;
+}
+
+.personTable td input[type='radio']:after {
+    background-color: var(--bg-color-25);
+    border-radius: 25px;
+    content: '';
+    display: block;
+    height: 11px;
+    left: 2px;
+    position: relative;
+    top: 2px;
+    width: 11px;
+    transition: background-color 200ms ease;
+}
+
+.personTable td input[type='radio']:checked:after {
+    background-color: var(--color-accent-10);
+}
+
+td.personTableCellHeader {
+    padding: 10px 5px !important;
+    font-weight: bold;
+    border-bottom-color: var(--bg-color-70);
 }
 
 .personTableSum {
@@ -57,21 +146,68 @@
 
 
 /* Mobile */
-@media (max-width: 820px) {}
+@media (max-width: 650px) {
+    .personCell {
+        font-size: small;
+    }
 
-@media (max-width: 800px) {}
+    .personTable th {
+        font-size: small;
+    }
 
-@media (max-width: 720px) {}
+    .personTable td input[type='radio'] {
+        border-radius: 10px;
+        height: 10px;
+        width: 10px;
+    }
 
-@media (max-width: 620px) {}
+    .personTable td input[type='radio']:after {
+        border-radius: 15px;
+        height: 6px;
+        left: 2px;
+        top: 2px;
+        width: 6px;
+    }
 
-@media (max-width: 520px) {}
+    .personHeader button {
+        padding: 4px 4px;
+        font-size: small;
+    }
 
-@media (max-width: 470px) {}
+}
 
-@media (max-width: 376px) {}
+@media (max-width: 550px) {
+    .personCell {
+        font-size: x-small;
+    }
 
-@media (max-width: 1000px) {}
+    .personTable th {
+        font-size: smaller;
+    }
+
+    .personTable td {
+        padding: 6px 3px;
+    }
+
+    .personHeader button {
+        padding: 3px 3px;
+        font-size: 0.5rem;
+    }
+}
+
+@media (max-width: 400px) {
+
+    .personTable td div {
+        max-width: 100px;
+    }
+}
+
+@media (max-width: 300px) {
+
+    .personTable td div {
+        max-width: 80px;
+    }
+}
 
 /* Tablet and Smaller Desktop */
 @media (min-width: 601px) and (max-width: 1120px) {}
