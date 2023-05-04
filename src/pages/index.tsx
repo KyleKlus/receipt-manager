@@ -56,6 +56,15 @@ export default function Home() {
     isFirstList ? setFirstList([...updatedList]) : setSecondList([...updatedList]);
   }
 
+  function toggleMyItem(index: number, isFirstList: boolean) {
+    const updatedList: IListItem[] = isFirstList ? firstList : secondList;
+
+    updatedList[index].shared = !updatedList[index].shared && !updatedList[index].rejected;
+    updatedList[index].rejected = false;
+
+    isFirstList ? setFirstList([...updatedList]) : setSecondList([...updatedList]);
+  }
+
   function listToMatrix(list: string[], elementsPerSubArray: number) {
     const matrix: string[][] = [];
     let k = -1;
@@ -87,22 +96,44 @@ export default function Home() {
         const result = reader.result;
 
         if (result !== null && result !== undefined) {
-          const firstHeaderCount = result.toString().split('\n')[0].split(',').length;
-          const secondHeaderCount = result.toString().split('\n')[0].split(',').reverse()[0].split('|').length
+          const receiptsHeader: string[] = result.toString().split('\n')[0].split(',');
+          const receiptHeaderCount: number = receiptsHeader.length;
+          const itemHeader: string[] = receiptsHeader.reverse()[0].split('|');
+          const itemHeaderCount: number = itemHeader.length;
+          const receipts: string[] = result.toString().split('\n').slice(1).filter((item) => { return item.length > 1 });
 
-          const dataString = result.toString().split('\n')[1].split(',').slice(firstHeaderCount).join('').replaceAll('"', '')
-          const data = dataString.toString().split('|');
-          const dataItems = listToMatrix(data, secondHeaderCount).filter(list => list.length > 1);
+          for (let i: number = 0; i < receipts.length; i++) {
+            const receipt: string[] = receipts[i].split(',');
+            const receiptItems: string[][] = listToMatrix(receipt.slice(receiptHeaderCount).join('').replaceAll('"', '').split('|'), itemHeaderCount).filter((item) => { return item.length > 1 });
 
-          items = dataItems.map(list => {
-            return {
-              name: list[0],
-              price: Math.floor(parseFloat(list[2]) * -100) / 100,
-              amount: Math.floor(parseFloat(list[5]) * 100) / 100,
-              shared: true,
+            let parsedItems = receiptItems.map(list => {
+              const amount: number = list[5] === '' ? 1 : Math.floor(parseFloat(list[5]) * 100) / 100
+              let name = list[0].slice(1)
+              name = list[0][0].toUpperCase() + name
+
+              return {
+                name: name,
+                price: Math.floor(parseFloat(list[2]) * -100) / 100,
+                amount: amount,
+                shared: true,
+                rejected: false
+              }
+            })
+
+            parsedItems = parsedItems.reverse()
+            let name = receipt[3].slice(1)
+            name = receipt[3][0].toUpperCase() + name
+            parsedItems.push({
+              name: name,
+              price: 0,
+              amount: 0,
+              shared: false,
               rejected: false
-            }
-          })
+            })
+            parsedItems = parsedItems.reverse()
+
+            items = items.concat(parsedItems)
+          }
         }
 
         resolve(items);
@@ -253,8 +284,9 @@ export default function Home() {
         <th>Name</th>
         <th>Price</th>
         <th>Amount</th>
-        <th>Reject</th>
+        <th>P 1</th>
         <th>Share</th>
+        <th>P 2</th>
       </tr>
     );
   }
@@ -264,13 +296,22 @@ export default function Home() {
 
     for (let i = 0; i < list.length; i++) {
       const item: IListItem = list[i];
+
+      const isHeader = item.price === 0
+      const isShared = isHeader ? false : item.shared
+      const isRejected = isHeader ? false : item.rejected
+      const isMine = isHeader ? false : !item.shared && !item.rejected
+
+      const cellHeaderClass = isHeader ? styles.personTableCellHeader : ''
+
       rows.push(
         <tr key={i}>
-          <td>{item.name}</td>
-          <td>{item.price} €</td>
-          <td>{item.amount}</td>
-          <td><input checked={item.rejected} type='checkbox' onChange={() => { toggleRejectItem(i, isFirstList) }}></input></td>
-          <td><input checked={item.shared} type='checkbox' onChange={() => { toggleShareItem(i, isFirstList) }}></input></td>
+          <td className={[cellHeaderClass].join(' ')}><div>{item.name}</div></td>
+          <td className={[cellHeaderClass].join(' ')}>{isHeader ? '' : item.price + ' €'}</td>
+          <td className={[cellHeaderClass].join(' ')}>{isHeader ? '' : item.amount}</td>
+          <td className={[cellHeaderClass].join(' ')}><input disabled={isHeader} checked={isMine} type='radio' onChange={() => { toggleMyItem(i, isFirstList) }}></input></td>
+          <td className={[cellHeaderClass].join(' ')}><input disabled={isHeader} checked={isShared} type='radio' onChange={() => { toggleShareItem(i, isFirstList) }}></input></td>
+          <td className={[cellHeaderClass].join(' ')}><input disabled={isHeader} checked={isRejected} type='radio' onChange={() => { toggleRejectItem(i, isFirstList) }}></input></td>
         </tr>
       )
     }
@@ -385,11 +426,11 @@ export default function Home() {
                 <div>{calcShared(secondList)} €</div>
               </div>
               <div className={[styles.personTableSum].join(' ')}>
-                <div>Total rejected: </div>
+                <div>Total Person 2: </div>
                 <div>{calcRejected(secondList)} €</div>
               </div>
               <div className={[styles.personTableSum].join(' ')}>
-                <div>Person 2 personal stuff: </div>
+                <div>Total Person 1: </div>
                 <div>{calcTotal(secondList)} €</div>
               </div>
               <hr />
