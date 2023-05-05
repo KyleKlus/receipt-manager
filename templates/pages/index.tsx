@@ -131,6 +131,7 @@ export default function Home() {
             displayText="About"
           />
           <Link href={'https://github.com/MajorEnkidu'} className={footerStyles.footerNavLink}>GitHub</Link>
+          <Link href={'https://www.linkedin.com/in/kyle-klus-9a2588275'} className={footerStyles.footerNavLink}>LinkedIn</Link>
           <Link href={'https://ko-fi.com/majorenkidu'} className={footerStyles.footerNavLink}>Ko-fi</Link>
           <Link href={'mailto:kyle.klus.2@gmail.com'} className={footerStyles.footerNavLink}>Contact</Link>
           <NavLink
