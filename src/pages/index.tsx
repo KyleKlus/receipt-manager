@@ -26,7 +26,7 @@ const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
 });
 
 
-interface IListItem {
+export interface IListItem {
   name: string;
   price: number;
   amount: number;
@@ -36,7 +36,16 @@ interface IListItem {
 
 export default function Home() {
   const [firstList, setFirstList] = useState<IListItem[]>([]);
+  const [firstItemName, setFirstItemName] = useState<string>('');
+  const [firstItemPrice, setFirstItemPrice] = useState<number>(NaN);
+  const [firstItemAmount, setFirstItemAmount] = useState<number>(NaN);
+
   const [secondList, setSecondList] = useState<IListItem[]>([]);
+  const [secondItemName, setSecondItemName] = useState<string>('');
+  const [secondItemPrice, setSecondItemPrice] = useState<number>(NaN);
+  const [secondItemAmount, setSecondItemAmount] = useState<number>(NaN);
+
+
 
   function toggleRejectItem(index: number, isFirstList: boolean) {
     const updatedList: IListItem[] = isFirstList ? firstList : secondList;
@@ -284,9 +293,9 @@ export default function Home() {
         <th>Name</th>
         <th>Price</th>
         <th>Amount</th>
-        <th>P 1</th>
+        <th contentEditable={true}>P 1</th>
         <th>Share</th>
-        <th>P 2</th>
+        <th contentEditable={true}>P 2</th>
       </tr>
     );
   }
@@ -379,7 +388,7 @@ export default function Home() {
           <div className={['applyHeaderOffset', styles.split].join(' ')}>
             <div className={[styles.personCell].join(' ')}>
               <div className={[styles.personHeader].join(' ')}>
-                <h2>Person 1</h2>
+                <h2 contentEditable={true}>Person 1</h2>
                 <button onClick={() => {
                   if (typeof window !== null && typeof window !== undefined) {
                     window.document.getElementById('firstUpload')!.click()
@@ -405,14 +414,39 @@ export default function Home() {
                 <div>Result: </div>
                 <div>{calcResult(firstList, true)} €</div>
               </div>
+
+              <div className={[styles.personAddItemWrapper].join(' ')}>
+                <input placeholder='Name' type='text' value={firstItemName} onChange={(e) => { setFirstItemName(e.target.value) }}></input>
+                <input placeholder='Price' type='number' value={firstItemPrice} onChange={(e) => { setFirstItemPrice(e.target.valueAsNumber) }}></input>
+                <input placeholder='Amount' type='number' value={firstItemAmount} step="1" min="1" onChange={(e) => { setFirstItemAmount(e.target.valueAsNumber) }}></input>
+                <button onClick={() => {
+                  if (firstItemName === '' || firstItemPrice === 0 || firstItemAmount < 0.01 || !Number.isInteger(firstItemAmount)) { return }
+                  const tmpList = firstList;
+                  tmpList.push({
+                    name: firstItemName,
+                    price: firstItemPrice,
+                    amount: firstItemAmount,
+                    shared: true,
+                    rejected: false,
+                  })
+                  setFirstList([...tmpList])
+                  setFirstItemName('')
+                  setFirstItemPrice(NaN)
+                  setFirstItemAmount(NaN)
+                }}>+ Add</button>
+              </div>
+
               <table className={[styles.personTable].join(' ')}>
                 <thead>{generateTableHeader()}</thead>
-                <tbody>{...generateTableRows(firstList, true)}</tbody>
+                <tbody>
+                  {
+                    ...generateTableRows(firstList, true)
+                  }</tbody>
               </table>
             </div>
             <div className={[styles.personCell].join(' ')}>
               <div className={[styles.personHeader].join(' ')}>
-                <h2>Person 2</h2>
+                <h2 contentEditable={true}>Person 2</h2>
                 <button onClick={() => {
                   if (typeof window !== null && typeof window !== undefined) {
                     window.document.getElementById('secondUpload')!.click()
@@ -438,9 +472,32 @@ export default function Home() {
                 <div>Result: </div>
                 <div>{calcResult(secondList, false)} €</div>
               </div>
+
+              <div className={[styles.personAddItemWrapper].join(' ')}>
+                <input placeholder='Name' type='text' value={secondItemName} onChange={(e) => { setSecondItemName(e.target.value) }}></input>
+                <input placeholder='Price' type='number' value={secondItemPrice} onChange={(e) => { setSecondItemPrice(e.target.valueAsNumber) }}></input>
+                <input placeholder='Amount' type='number' value={secondItemAmount} step="1" min="1" onChange={(e) => { setSecondItemAmount(e.target.valueAsNumber) }}></input>
+                <button onClick={() => {
+                  if (secondItemName === '' || secondItemPrice === 0 || secondItemAmount < 0.01 || !Number.isInteger(secondItemAmount)) { return }
+                  const tmpList = secondList;
+                  tmpList.push({
+                    name: secondItemName,
+                    price: secondItemPrice,
+                    amount: secondItemAmount,
+                    shared: true,
+                    rejected: false,
+                  })
+                  setSecondList([...tmpList])
+                  setSecondItemName('')
+                  setSecondItemPrice(NaN)
+                  setSecondItemAmount(NaN)
+                }}>+ Add</button>
+              </div>
               <table className={[styles.personTable].join(' ')}>
                 <thead>{generateTableHeader()}</thead>
-                <tbody>{...generateTableRows(secondList, false)}</tbody>
+                <tbody>
+                  {...generateTableRows(secondList, false)}
+                </tbody>
               </table>
             </div>
           </div>
