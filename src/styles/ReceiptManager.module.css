@@ -5,12 +5,19 @@
 }
 
 .split {
+    width: 100%;
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
 
     justify-content: center;
     gap: 32px;
+    padding-left: 32px;
+    padding-right: 32px;
+}
+
+.personCell {
+    flex-grow: 1;
 }
 
 .personHeader {
@@ -21,9 +28,6 @@
 
     margin-bottom: 24px;
 }
-
-
-
 
 .personHeader button {
     padding: 4px 8px;
@@ -48,9 +52,73 @@
 
 .personTable {
     border-spacing: 0px;
+    margin-top: 32px;
     margin-bottom: 64px;
     width: 100%;
+    border: 1px solid var(--bg-color-25);
+    border-radius: var(--border-radius);
+    overflow: hidden;
 }
+
+.personAddItemWrapper {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-around;
+
+    margin-top: 32px;
+    margin-bottom: 32px;
+}
+
+.personAddItemWrapper button {
+    padding: 4px 8px;
+    background-color: var(--bg-color-25);
+    border: 1px solid var(--bg-color-50);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    box-shadow:
+        0 0 0 1px hsla(0, 0%, 0%, .6),
+        0 2px 3px hsla(0, 0%, 0%, .6);
+    transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.personAddItemWrapper button:hover {
+    background-color: var(--bg-color-30);
+    border-color: var(--bg-color-70);
+    box-shadow:
+        0 0 0 1px hsla(0, 0%, 0%, .6),
+        0 2px 3px hsla(0, 0%, 0%, .6),
+        0 4px 3px hsla(0, 0%, 0%, .4);
+}
+
+.personAddItemWrapper input[type='text'],
+.personAddItemWrapper input[type='number'] {
+    appearance: none;
+    padding: 0 4px;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px dotted var(--bg-color-70);
+    transition: border 200ms ease;
+}
+
+.personAddItemWrapper input[type='text']:is(:hover, :focus-visible),
+.personAddItemWrapper input[type='number']:is(:hover, :focus-visible) {
+    outline: none;
+    border-bottom-color: var(--bg-color-90);
+}
+
+.personAddItemWrapper > *:nth-child(1) {
+    width: 25ch;
+}
+
+.personAddItemWrapper > *:nth-child(2) {
+    width: 8ch;
+}
+
+.personAddItemWrapper > *:nth-child(3) {
+    width: 8ch;
+}
+
 
 .personTable th {
     border-bottom: 1px solid var(--bg-color-90);
@@ -62,6 +130,18 @@
     border-bottom: 1px solid var(--bg-color-40);
     padding: 8px 4px;
     text-align: center;
+}
+
+.personTable :is(td, th):nth-child(4) {
+    background-color: hsla(0, 39%, 29%, 0.253);
+}
+
+.personTable :is(td, th):nth-child(5) {
+    background-color: hsla(56, 39%, 29%, 0.253);
+}
+
+.personTable :is(td, th):nth-child(6) {
+    background-color: hsla(118, 39%, 29%, 0.253);
 }
 
 .personTable td div {
