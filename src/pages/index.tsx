@@ -3,8 +3,7 @@ import Head from 'next/head';
 import Footer from '@/components/footer/Footer';
 import Header from '@/components/header/Header';
 import Content from '@/components/Content';
-import Text from '@/components/Text';
-import Image from 'next/image';
+import { ExportToCsv } from 'export-to-csv';
 
 import Main from '@/components/Main';
 
@@ -19,7 +18,8 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import NavLink from '@/components/header/NavLink';
 import Card from '@/components/Card';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, SyntheticEvent, useState } from 'react';
+import useStorage from '@/hooks/useStorage';
 
 const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
   ssr: false,
@@ -30,22 +30,69 @@ export interface IListItem {
   name: string;
   price: number;
   amount: number;
+  category: Category;
   shared: boolean;
   rejected: boolean;
 }
 
+export enum Category {
+  Food,
+  Household,
+  Cleaning,
+  Cosmetics,
+  Hardware,
+  Pet,
+  Travel,
+  Dates,
+  Misc
+}
+
 export default function Home() {
-  const [firstList, setFirstList] = useState<IListItem[]>([]);
+  const { getItem, removeItem, setItem } = useStorage();
+  const [firstPersonName, setFirstPersonName] = useState<string>('Person 1');
+  const [secondPersonName, setSecondPersonName] = useState<string>('Person 2');
+
+
+
+  let firstStoredListString = null;
+  let firstStoredList: IListItem[] = [];
+
+  let secondStoredListString = null;
+  let secondStoredList: IListItem[] = [];
+
+  // firstStoredListString = getItem('firstList', 'session');
+  // if (firstStoredListString !== null && firstStoredListString !== undefined && firstStoredListString !== '' && firstStoredListString !== 'undefined') {
+  //   console.log(firstStoredListString);
+  //   firstStoredList = JSON.parse(firstStoredListString) as IListItem[];
+
+  // }
+
+  // secondStoredListString = getItem('secondList', 'session');
+  // if (secondStoredListString !== null && secondStoredListString !== undefined && secondStoredListString !== '' && secondStoredListString !== 'undefined') {
+
+  //   secondStoredList = JSON.parse(secondStoredListString) as IListItem[];
+  // }
+
+  const [firstList, setFirstList] = useState<IListItem[]>(firstStoredListString === null ? [] : firstStoredList);
   const [firstItemName, setFirstItemName] = useState<string>('');
   const [firstItemPrice, setFirstItemPrice] = useState<number>(NaN);
   const [firstItemAmount, setFirstItemAmount] = useState<number>(NaN);
 
-  const [secondList, setSecondList] = useState<IListItem[]>([]);
+  const [secondList, setSecondList] = useState<IListItem[]>(secondStoredListString === null ? [] : secondStoredList);
   const [secondItemName, setSecondItemName] = useState<string>('');
   const [secondItemPrice, setSecondItemPrice] = useState<number>(NaN);
   const [secondItemAmount, setSecondItemAmount] = useState<number>(NaN);
 
+  function selectCategory(index: number, isFirstList: boolean, e: SyntheticEvent<HTMLSelectElement, Event>) {
+    const updatedList: IListItem[] = isFirstList ? firstList : secondList;
 
+    const categoryName: string = e.currentTarget.value;
+    const categoryIndex: number = (Object.keys(Category) as Array<keyof typeof Category>).slice((Object.keys(Category).length / 2)).map((key) => { return key.toString() }).indexOf(categoryName);
+    const selectedCategory: Category = categoryIndex
+    updatedList[index].category = selectedCategory;
+
+    isFirstList ? setFirstList([...updatedList]) : setSecondList([...updatedList]);
+  }
 
   function toggleRejectItem(index: number, isFirstList: boolean) {
     const updatedList: IListItem[] = isFirstList ? firstList : secondList;
@@ -125,7 +172,8 @@ export default function Home() {
                 price: Math.floor(parseFloat(list[2]) * -100) / 100,
                 amount: amount,
                 shared: true,
-                rejected: false
+                rejected: false,
+                category: Category.Misc
               }
             })
 
@@ -133,11 +181,12 @@ export default function Home() {
             let name = receipt[3].slice(1)
             name = receipt[3][0].toUpperCase() + name
             parsedItems.push({
-              name: name,
+              name: name === undefined || name === '' || name.length < 1 ? 'Unknown Shop or Item' : name,
               price: 0,
               amount: 0,
               shared: false,
-              rejected: false
+              rejected: false,
+              category: Category.Misc
             })
             parsedItems = parsedItems.reverse()
 
@@ -162,8 +211,20 @@ export default function Home() {
         items = items.concat(await parseFileToIListItems(files[i]));
       }
 
-      isFirstList ? setFirstList([...items]) : setSecondList([...items]);
+      if (isFirstList) {
+        setFirstList([...items])
+        // removeItem('firstList'), 'session'
+        // setItem('firstList', JSON.stringify([...items]), 'session')
+
+
+      } else {
+        setSecondList([...items])
+        // removeItem('secondList', 'session')
+        // setItem('secondList', JSON.stringify([...items]), 'session')
+
+      }
     }
+    e.target.value = '';
   }
 
   function handleFirstFileUpload(e: ChangeEvent<HTMLInputElement>) { uploadFile(e, true); }
@@ -291,11 +352,12 @@ export default function Home() {
     return (
       <tr>
         <th>Name</th>
-        <th>Price</th>
-        <th>Amount</th>
-        <th contentEditable={true}>P 1</th>
-        <th>Share</th>
-        <th contentEditable={true}>P 2</th>
+        <th>€</th>
+        <th>Amt.</th>
+        <th >{firstPersonName[0] === secondPersonName[0] ? firstPersonName[0] + ' 1' : firstPersonName[0]}</th>
+        <th>Sh.</th>
+        <th >{firstPersonName[0] === secondPersonName[0] ? secondPersonName[0] + ' 2' : secondPersonName[0]}</th>
+        <th >Categ.</th>
       </tr>
     );
   }
@@ -318,9 +380,14 @@ export default function Home() {
           <td className={[cellHeaderClass].join(' ')}><div>{item.name}</div></td>
           <td className={[cellHeaderClass].join(' ')}>{isHeader ? '' : item.price + ' €'}</td>
           <td className={[cellHeaderClass].join(' ')}>{isHeader ? '' : item.amount}</td>
-          <td className={[cellHeaderClass].join(' ')}><input disabled={isHeader} checked={isMine} type='radio' onChange={() => { toggleMyItem(i, isFirstList) }}></input></td>
-          <td className={[cellHeaderClass].join(' ')}><input disabled={isHeader} checked={isShared} type='radio' onChange={() => { toggleShareItem(i, isFirstList) }}></input></td>
-          <td className={[cellHeaderClass].join(' ')}><input disabled={isHeader} checked={isRejected} type='radio' onChange={() => { toggleRejectItem(i, isFirstList) }}></input></td>
+          <td className={[cellHeaderClass].join(' ')}>{!isHeader && <input disabled={isHeader} checked={isMine} type='radio' onChange={() => { toggleMyItem(i, isFirstList) }}></input>}</td>
+          <td className={[cellHeaderClass].join(' ')}>{!isHeader && <input disabled={isHeader} checked={isShared} type='radio' onChange={() => { toggleShareItem(i, isFirstList) }}></input>}</td>
+          <td className={[cellHeaderClass].join(' ')}>{!isHeader && <input disabled={isHeader} checked={isRejected} type='radio' onChange={() => { toggleRejectItem(i, isFirstList) }}></input>}</td>
+          <td className={[cellHeaderClass].join(' ')}>{!isHeader && <select disabled={isHeader} defaultValue={Category[item.category]} onChange={(e) => {
+            selectCategory(i, isFirstList, e)
+          }}>
+            {(Object.keys(Category) as Array<keyof typeof Category>).slice((Object.keys(Category).length / 2)).map((key, n) => { return (<option key={n} value={key}>{key}</option>) })}
+          </select>}</td>
         </tr>
       )
     }
@@ -388,12 +455,22 @@ export default function Home() {
           <div className={['applyHeaderOffset', styles.split].join(' ')}>
             <div className={[styles.personCell].join(' ')}>
               <div className={[styles.personHeader].join(' ')}>
-                <h2 contentEditable={true}>Person 1</h2>
-                <button onClick={() => {
-                  if (typeof window !== null && typeof window !== undefined) {
-                    window.document.getElementById('firstUpload')!.click()
-                  }
-                }}>Upload CSV</button>
+                <input className={[styles.personName].join(' ')} type={'text'} value={firstPersonName} placeholder={'1. Person Name'} onChange={(e) => {
+                  setFirstPersonName(e.currentTarget.value);
+                }} />
+                <div>
+                  <button className={[styles.fancyButton].join('')} onClick={() => {
+                    setFirstList([]);
+                    // removeItem('firstList', 'session')
+
+                  }}>Clear CSV</button>
+                  <button className={[styles.fancyButton].join('')} onClick={() => {
+                    if (typeof window !== null && typeof window !== undefined) {
+                      window.document.getElementById('firstUpload')!.click()
+                    }
+                  }}>Upload CSV</button>
+                </div>
+
                 <input type='file' id='firstUpload' accept='.csv' multiple={true} onChange={handleFirstFileUpload} style={{ display: 'none' }}></input>
               </div>
               <hr />
@@ -406,7 +483,7 @@ export default function Home() {
                 <div>{calcRejected(firstList)} €</div>
               </div>
               <div className={[styles.personTableSum].join(' ')}>
-                <div>Person 1 personal Stuff: </div>
+                <div>{firstPersonName} personal Stuff: </div>
                 <div>{calcTotal(firstList)} €</div>
               </div>
               <hr />
@@ -417,9 +494,9 @@ export default function Home() {
 
               <div className={[styles.personAddItemWrapper].join(' ')}>
                 <input placeholder='Name' type='text' value={firstItemName} onChange={(e) => { setFirstItemName(e.target.value) }}></input>
-                <input placeholder='Price' type='number' value={firstItemPrice} onChange={(e) => { setFirstItemPrice(e.target.valueAsNumber) }}></input>
-                <input placeholder='Amount' type='number' value={firstItemAmount} step="1" min="1" onChange={(e) => { setFirstItemAmount(e.target.valueAsNumber) }}></input>
-                <button onClick={() => {
+                <input placeholder='Price' type='number' value={Number.isNaN(firstItemPrice) ? '' : firstItemPrice} onChange={(e) => { setFirstItemPrice(e.target.valueAsNumber) }}></input>
+                <input placeholder='Amount' type='number' value={Number.isNaN(firstItemAmount) ? '' : firstItemAmount} step="1" min="1" onChange={(e) => { setFirstItemAmount(e.target.valueAsNumber) }}></input>
+                <button className={[styles.fancyButton].join('')} onClick={() => {
                   if (firstItemName === '' || firstItemPrice === 0 || firstItemAmount < 0.01 || !Number.isInteger(firstItemAmount)) { return }
                   const tmpList = firstList;
                   tmpList.push({
@@ -428,6 +505,7 @@ export default function Home() {
                     amount: firstItemAmount,
                     shared: true,
                     rejected: false,
+                    category: Category.Misc
                   })
                   setFirstList([...tmpList])
                   setFirstItemName('')
@@ -446,12 +524,24 @@ export default function Home() {
             </div>
             <div className={[styles.personCell].join(' ')}>
               <div className={[styles.personHeader].join(' ')}>
-                <h2 contentEditable={true}>Person 2</h2>
-                <button onClick={() => {
-                  if (typeof window !== null && typeof window !== undefined) {
-                    window.document.getElementById('secondUpload')!.click()
-                  }
-                }}>Upload CSV</button>
+                <input className={[styles.personName].join(' ')} type={'text'} value={secondPersonName} placeholder={'2. Person Name'} onChange={(e) => {
+                  setSecondPersonName(e.currentTarget.value);
+                }} />
+                <div>
+                  <button className={[styles.fancyButton].join('')} onClick={() => {
+                    setSecondList([]);
+                    // removeItem('secondList', 'session')
+
+
+                  }}>Clear CSV</button>
+                  <button className={[styles.fancyButton].join('')} onClick={() => {
+                    if (typeof window !== null && typeof window !== undefined) {
+                      window.document.getElementById('secondUpload')!.click()
+
+                    }
+                  }}>Upload CSV</button>
+                </div>
+
                 <input type='file' id='secondUpload' accept='.csv' multiple={true} onChange={handleSecondFileUpload} style={{ display: 'none' }}></input>
               </div>
               <hr />
@@ -460,11 +550,11 @@ export default function Home() {
                 <div>{calcShared(secondList)} €</div>
               </div>
               <div className={[styles.personTableSum].join(' ')}>
-                <div>Total Person 2: </div>
+                <div>Total rejected: </div>
                 <div>{calcRejected(secondList)} €</div>
               </div>
               <div className={[styles.personTableSum].join(' ')}>
-                <div>Total Person 1: </div>
+                <div>{secondPersonName} personal stuff: </div>
                 <div>{calcTotal(secondList)} €</div>
               </div>
               <hr />
@@ -475,9 +565,9 @@ export default function Home() {
 
               <div className={[styles.personAddItemWrapper].join(' ')}>
                 <input placeholder='Name' type='text' value={secondItemName} onChange={(e) => { setSecondItemName(e.target.value) }}></input>
-                <input placeholder='Price' type='number' value={secondItemPrice} onChange={(e) => { setSecondItemPrice(e.target.valueAsNumber) }}></input>
-                <input placeholder='Amount' type='number' value={secondItemAmount} step="1" min="1" onChange={(e) => { setSecondItemAmount(e.target.valueAsNumber) }}></input>
-                <button onClick={() => {
+                <input placeholder='Price' type='number' value={Number.isNaN(secondItemPrice) ? '' : secondItemPrice} onChange={(e) => { setSecondItemPrice(e.target.valueAsNumber) }}></input>
+                <input placeholder='Amount' type='number' value={Number.isNaN(secondItemAmount) ? '' : secondItemAmount} step="1" min="1" onChange={(e) => { setSecondItemAmount(e.target.valueAsNumber) }}></input>
+                <button className={[styles.fancyButton].join('')} onClick={() => {
                   if (secondItemName === '' || secondItemPrice === 0 || secondItemAmount < 0.01 || !Number.isInteger(secondItemAmount)) { return }
                   const tmpList = secondList;
                   tmpList.push({
@@ -486,6 +576,7 @@ export default function Home() {
                     amount: secondItemAmount,
                     shared: true,
                     rejected: false,
+                    category: Category.Misc
                   })
                   setSecondList([...tmpList])
                   setSecondItemName('')
@@ -501,6 +592,84 @@ export default function Home() {
               </table>
             </div>
           </div>
+          <div>
+            <button className={[styles.fancyButton].join('')} onClick={() => {
+              const options = {
+                fieldSeparator: ',',
+                quoteStrings: '"',
+                decimalSeparator: '.',
+                showLabels: true,
+                showTitle: false,
+                title: firstPersonName + '_report',
+                useTextFile: false,
+                useBom: true,
+                useKeysAsHeaders: true,
+                // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
+              };
+              const csvExporter = new ExportToCsv(options);
+              csvExporter.generateCsv(firstList.filter(e => e.amount !== 0).map((e) => {
+                return {
+                  name: e.name,
+                  price: e.price,
+                  amount: e.amount,
+                  category: Category[e.category],
+                  shared: e.shared,
+                  rejected: e.rejected,
+                }
+              }));
+            }}>Download {firstPersonName} CSV</button>
+            <button className={[styles.fancyButton].join('')} onClick={() => {
+              const options = {
+                fieldSeparator: ',',
+                quoteStrings: '"',
+                decimalSeparator: '.',
+                showLabels: true,
+                showTitle: false,
+                title: secondPersonName + '_report',
+                useTextFile: false,
+                useBom: true,
+                useKeysAsHeaders: true,
+                // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
+              };
+              const csvExporter = new ExportToCsv(options);
+              csvExporter.generateCsv(secondList.filter(e => e.amount !== 0).map((e) => {
+                return {
+                  name: e.name,
+                  price: e.price,
+                  amount: e.amount,
+                  category: Category[e.category],
+                  shared: e.shared,
+                  rejected: e.rejected,
+                }
+              }));
+            }}>Download {secondPersonName} CSV</button>
+            <button className={[styles.fancyButton].join('')} onClick={() => {
+              const options = {
+                fieldSeparator: ',',
+                quoteStrings: '"',
+                decimalSeparator: '.',
+                showLabels: true,
+                showTitle: false,
+                title: 'total_report',
+                useTextFile: false,
+                useBom: true,
+                useKeysAsHeaders: true,
+                // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
+              };
+              const csvExporter = new ExportToCsv(options);
+              csvExporter.generateCsv(firstList.concat(secondList).filter(e => e.amount !== 0).map((e) => {
+                return {
+                  name: e.name,
+                  price: e.price,
+                  amount: e.amount,
+                  category: Category[e.category],
+                  shared: e.shared,
+                  rejected: e.rejected,
+                }
+              }));
+            }}>Download total CSV</button>
+          </div>
+          <br />
         </Content>
         <Footer>
           <ScrollNavLink
