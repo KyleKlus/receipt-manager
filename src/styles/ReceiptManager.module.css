@@ -25,12 +25,20 @@
     flex-wrap: wrap;
     flex-direction: row;
     justify-content: space-between;
-
+    align-items: center;
     margin-bottom: 24px;
 }
 
-.personHeader button {
+.personName {
+    background-color: transparent;
+    border: none;
+    font-size: x-large;
+    max-width: 10ch;
+}
+
+.fancyButton {
     padding: 4px 8px;
+    margin: 0 8px;
     background-color: var(--bg-color-25);
     border: 1px solid var(--bg-color-50);
     border-radius: var(--border-radius);
@@ -41,7 +49,7 @@
     transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
 }
 
-.personHeader button:hover {
+.fancyButton:hover {
     background-color: var(--bg-color-30);
     border-color: var(--bg-color-70);
     box-shadow:
@@ -132,16 +140,32 @@
     text-align: center;
 }
 
-.personTable :is(td, th):nth-child(4) {
-    background-color: hsla(0, 39%, 29%, 0.253);
+.personTable :is(td, th):nth-child(1) {
+    max-width: 20ch;
 }
 
-.personTable :is(td, th):nth-child(5) {
-    background-color: hsla(56, 39%, 29%, 0.253);
+.personTable :is(td, th):nth-child(4) {
+    background-color: hsla(0, 50%, 50%, 0.253);
+}
+
+.personTable :is(td, th):nth-child(4) input:checked::after {
+    background-color: hsla(0, 50%, 50%, 1) !important;
 }
 
 .personTable :is(td, th):nth-child(6) {
-    background-color: hsla(118, 39%, 29%, 0.253);
+    background-color: hsla(56, 50%, 50%, 0.253);
+}
+
+.personTable :is(td, th):nth-child(6) input:checked::after {
+    background-color: hsla(56, 50%, 50%, 1) !important;
+}
+
+.personTable :is(td, th):nth-child(5) {
+    background-color: hsla(118, 50%, 50%, 0.253);
+}
+
+.personTable :is(td, th):nth-child(5) input:checked::after {
+    background-color: hsla(118, 50%, 50%, 1) !important;
 }
 
 .personTable td div {
