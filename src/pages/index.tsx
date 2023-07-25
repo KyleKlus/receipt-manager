@@ -231,6 +231,84 @@ export default function Home() {
 
   function handleSecondFileUpload(e: ChangeEvent<HTMLInputElement>) { uploadFile(e, false); }
 
+  function downloadCSV(name: string, data: string[]) {
+    if (name === undefined || data === undefined || name === '' || data.length === 0 || data[0] === '') { return; }
+    const link = document.createElement('a');
+    const fileBlob = new Blob(data, { type: 'text/csv' });
+    link.href = URL.createObjectURL(fileBlob);
+    link.download = name + '.csv';
+    document.body.appendChild(link);
+    link.click();
+  }
+
+  function prepCSVdData(myList: IListItem[], otherList: IListItem[]): string {
+    let dataString: string = '';
+
+    if (myList === undefined || otherList === undefined) { return dataString; }
+    if (myList.length === 0 && otherList.length === 0) { return dataString; }
+
+    let filteredList: IListItem[] = myList.slice(0);
+    let otherFilteredList: IListItem[] = otherList.slice(0);
+
+    filteredList = filteredList.filter(e => e.amount !== 0 && !e.rejected).slice(0);
+    filteredList = filteredList.map((item) => {
+      if (item.shared) {
+        item.price = item.price / 2;
+      }
+      return item;
+    }).slice(0);
+
+    otherFilteredList = otherFilteredList.filter(e => e.amount !== 0 && (e.rejected || e.shared)).slice(0);
+    otherFilteredList = otherFilteredList.map((item) => {
+      if (item.shared) {
+        item.price = item.price / 2;
+      }
+
+      return item;
+    }).slice(0);
+
+    const data = filteredList.concat(otherFilteredList).slice(0).map((e) => {
+      return {
+        name: e.name,
+        price: e.price,
+        amount: e.amount,
+        category: Category[e.category],
+        shared: e.shared,
+        rejected: e.rejected,
+      }
+    }).slice(0);
+
+    if (data.length === 0) { return dataString; }
+
+    const options = {
+      fieldSeparator: ',',
+      quoteStrings: '"',
+      decimalSeparator: '.',
+      showLabels: true,
+      showTitle: false,
+      title: 'expenses',
+      useTextFile: false,
+      useBom: true,
+      useKeysAsHeaders: true,
+      // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
+    };
+    const csvExporter = new ExportToCsv(options);
+    dataString = csvExporter.generateCsv(data, true);
+
+    return dataString;
+  }
+
+  // const handleFirstPersonDownload = () => {
+  //   const rawData = firstList.filter((item) => { return !item.rejected });
+  //   let dataString: string;
+  //   downloadCSV(firstPersonName + '_expenses', dataString);
+  // };
+
+  // const handleSecondPersonDownload = () => {
+  //   const data = secondList;
+  //   downloadCSV(secondPersonName + '_expenses', data);
+  // };
+
   function calcTotal(list: IListItem[]): number {
     let myTotal: number = 0;
 
@@ -380,9 +458,14 @@ export default function Home() {
           <td className={[cellHeaderClass].join(' ')}><div>{item.name}</div></td>
           <td className={[cellHeaderClass].join(' ')}>{isHeader ? '' : item.price + ' €'}</td>
           <td className={[cellHeaderClass].join(' ')}>{isHeader ? '' : item.amount}</td>
-          <td className={[cellHeaderClass].join(' ')}>{!isHeader && <input disabled={isHeader} checked={isMine} type='radio' onChange={() => { toggleMyItem(i, isFirstList) }}></input>}</td>
+          {isFirstList &&
+            <td className={[cellHeaderClass].join(' ')}>{!isHeader && <input disabled={isHeader} checked={isMine} type='radio' onChange={() => { toggleMyItem(i, isFirstList) }}></input>}</td>}
+          {!isFirstList && <td className={[cellHeaderClass].join(' ')}>{!isHeader && <input disabled={isHeader} checked={isRejected} type='radio' onChange={() => { toggleRejectItem(i, isFirstList) }}></input>}</td>}
           <td className={[cellHeaderClass].join(' ')}>{!isHeader && <input disabled={isHeader} checked={isShared} type='radio' onChange={() => { toggleShareItem(i, isFirstList) }}></input>}</td>
-          <td className={[cellHeaderClass].join(' ')}>{!isHeader && <input disabled={isHeader} checked={isRejected} type='radio' onChange={() => { toggleRejectItem(i, isFirstList) }}></input>}</td>
+          {!isFirstList &&
+            <td className={[cellHeaderClass].join(' ')}>{!isHeader && <input disabled={isHeader} checked={isMine} type='radio' onChange={() => { toggleMyItem(i, isFirstList) }}></input>}</td>}
+          {isFirstList &&
+            <td className={[cellHeaderClass].join(' ')}>{!isHeader && <input disabled={isHeader} checked={isRejected} type='radio' onChange={() => { toggleRejectItem(i, isFirstList) }}></input>}</td>}
           <td className={[cellHeaderClass].join(' ')}>{!isHeader && <select disabled={isHeader} defaultValue={Category[item.category]} onChange={(e) => {
             selectCategory(i, isFirstList, e)
           }}>
@@ -463,12 +546,15 @@ export default function Home() {
                     setFirstList([]);
                     // removeItem('firstList', 'session')
 
-                  }}>Clear CSV</button>
+                  }}>Clear Data</button>
                   <button className={[styles.fancyButton].join('')} onClick={() => {
                     if (typeof window !== null && typeof window !== undefined) {
                       window.document.getElementById('firstUpload')!.click()
                     }
-                  }}>Upload CSV</button>
+                  }}>Upload Data</button>
+                  <button disabled={secondList.length === 0 && firstList.length === 0} className={[styles.fancyButton].join('')} onClick={() => {
+                    downloadCSV(firstPersonName + '_expenses', [prepCSVdData(firstList, secondList)])
+                  }}>Export Expenses</button>
                 </div>
 
                 <input type='file' id='firstUpload' accept='.csv' multiple={true} onChange={handleFirstFileUpload} style={{ display: 'none' }}></input>
@@ -514,13 +600,15 @@ export default function Home() {
                 }}>+ Add</button>
               </div>
 
-              <table className={[styles.personTable].join(' ')}>
-                <thead>{generateTableHeader()}</thead>
-                <tbody>
-                  {
-                    ...generateTableRows(firstList, true)
-                  }</tbody>
-              </table>
+              {firstList.length !== 0 &&
+                <table className={[styles.personTable].join(' ')}>
+                  <thead>{generateTableHeader()}</thead>
+                  <tbody>
+                    {
+                      ...generateTableRows(firstList, true)
+                    }</tbody>
+                </table>
+              }
             </div>
             <div className={[styles.personCell].join(' ')}>
               <div className={[styles.personHeader].join(' ')}>
@@ -531,15 +619,15 @@ export default function Home() {
                   <button className={[styles.fancyButton].join('')} onClick={() => {
                     setSecondList([]);
                     // removeItem('secondList', 'session')
-
-
-                  }}>Clear CSV</button>
+                  }}>Clear Data</button>
                   <button className={[styles.fancyButton].join('')} onClick={() => {
                     if (typeof window !== null && typeof window !== undefined) {
                       window.document.getElementById('secondUpload')!.click()
-
                     }
-                  }}>Upload CSV</button>
+                  }}>Upload Data</button>
+                  <button disabled={secondList.length === 0 && firstList.length === 0} className={[styles.fancyButton].join('')} onClick={() => {
+                    downloadCSV(secondPersonName + '_expenses', [prepCSVdData(secondList, firstList)])
+                  }}>Export Expenses</button>
                 </div>
 
                 <input type='file' id='secondUpload' accept='.csv' multiple={true} onChange={handleSecondFileUpload} style={{ display: 'none' }}></input>
@@ -584,92 +672,16 @@ export default function Home() {
                   setSecondItemAmount(NaN)
                 }}>+ Add</button>
               </div>
-              <table className={[styles.personTable].join(' ')}>
-                <thead>{generateTableHeader()}</thead>
-                <tbody>
-                  {...generateTableRows(secondList, false)}
-                </tbody>
-              </table>
+              {secondList.length !== 0 &&
+                <table className={[styles.personTable].join(' ')}>
+                  <thead>{generateTableHeader()}</thead>
+                  <tbody>
+                    {...generateTableRows(secondList, false)}
+                  </tbody>
+                </table>
+              }
             </div>
           </div>
-          <div>
-            <button className={[styles.fancyButton].join('')} onClick={() => {
-              const options = {
-                fieldSeparator: ',',
-                quoteStrings: '"',
-                decimalSeparator: '.',
-                showLabels: true,
-                showTitle: false,
-                title: firstPersonName + '_report',
-                useTextFile: false,
-                useBom: true,
-                useKeysAsHeaders: true,
-                // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
-              };
-              const csvExporter = new ExportToCsv(options);
-              csvExporter.generateCsv(firstList.filter(e => e.amount !== 0).map((e) => {
-                return {
-                  name: e.name,
-                  price: e.price,
-                  amount: e.amount,
-                  category: Category[e.category],
-                  shared: e.shared,
-                  rejected: e.rejected,
-                }
-              }));
-            }}>Download {firstPersonName} CSV</button>
-            <button className={[styles.fancyButton].join('')} onClick={() => {
-              const options = {
-                fieldSeparator: ',',
-                quoteStrings: '"',
-                decimalSeparator: '.',
-                showLabels: true,
-                showTitle: false,
-                title: secondPersonName + '_report',
-                useTextFile: false,
-                useBom: true,
-                useKeysAsHeaders: true,
-                // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
-              };
-              const csvExporter = new ExportToCsv(options);
-              csvExporter.generateCsv(secondList.filter(e => e.amount !== 0).map((e) => {
-                return {
-                  name: e.name,
-                  price: e.price,
-                  amount: e.amount,
-                  category: Category[e.category],
-                  shared: e.shared,
-                  rejected: e.rejected,
-                }
-              }));
-            }}>Download {secondPersonName} CSV</button>
-            <button className={[styles.fancyButton].join('')} onClick={() => {
-              const options = {
-                fieldSeparator: ',',
-                quoteStrings: '"',
-                decimalSeparator: '.',
-                showLabels: true,
-                showTitle: false,
-                title: 'total_report',
-                useTextFile: false,
-                useBom: true,
-                useKeysAsHeaders: true,
-                // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
-              };
-              const csvExporter = new ExportToCsv(options);
-              csvExporter.generateCsv(firstList.concat(secondList).filter(e => e.amount !== 0).map((e) => {
-                return {
-                  name: e.name,
-                  price: e.price,
-                  amount: e.amount,
-                  category: Category[e.category],
-                  shared: e.shared,
-                  rejected: e.rejected,
-                }
-              }));
-            }}>Download total CSV</button>
-          </div>
-          <br />
         </Content>
         <Footer>
           <ScrollNavLink
