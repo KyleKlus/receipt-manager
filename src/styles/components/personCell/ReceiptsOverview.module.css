@@ -1,0 +1,22 @@
+.personTableSum {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+
+    margin: 12px 0;
+
+
+    width: 100%;
+}
+
+.personTableSum div:first-child {
+    word-break: normal;
+    line-break: normal;
+    max-width: 80%;
+}
+
+.personTableSum div {
+    padding: 0 12px;
+}
