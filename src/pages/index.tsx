@@ -321,7 +321,7 @@ export default function Home() {
           elementName="https://majorenkidu.github.io/#aboutPage"
           displayText="About"
         />
-        {/* <ThemeButton /> */}
+        <ThemeButton />
       </Header>
       <Main>
         <div id={'top'}></div>
