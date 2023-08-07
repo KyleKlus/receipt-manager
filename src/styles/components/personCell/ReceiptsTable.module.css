@@ -1,0 +1,218 @@
+.receiptsTable {
+    margin: 0 32px 64px 32px;
+    width: calc(100% - 64px);
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    padding-top: 16px;
+    box-shadow:
+        0 0 0 1px hsla(0, 0%, 0%, .6),
+        0 2px 3px hsla(0, 0%, 0%, .6);
+    background-color: var(--bg-color-00);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+
+.table {
+    border-spacing: 0px;
+    width: 100%;
+    box-shadow:
+        0 0 0 1px hsla(0, 0%, 0%, .6),
+        0 2px 3px hsla(0, 0%, 0%, .6);
+    background-color: var(--bg-color-00);
+
+    overflow: hidden;
+}
+
+.table th {
+    border-bottom: 1px solid var(--bg-color-90);
+    font-size: large;
+    padding: 12px 4px;
+}
+
+.table td {
+    border-bottom: 1px solid var(--bg-color-40);
+    padding: 8px 4px;
+    text-align: center;
+}
+
+.table :is(td, th):nth-child(1) {
+    max-width: 30ch;
+    min-width: 25ch;
+}
+
+.table :is(td, th):nth-child(2) {
+    text-align: end;
+}
+
+.table :is(td, th):nth-child(4) {
+    background-color: hsla(0, 50%, 50%, 0.253);
+}
+
+.table :is(td, th):nth-child(4) input:checked::after {
+    background-color: hsla(0, 50%, 50%, 1) !important;
+}
+
+.table :is(td, th):nth-child(6) {
+    background-color: hsla(56, 50%, 50%, 0.253);
+}
+
+.table :is(td, th):nth-child(6) input:checked::after {
+    background-color: hsla(56, 50%, 50%, 1) !important;
+}
+
+.table :is(td, th):nth-child(5) {
+    background-color: hsla(118, 50%, 50%, 0.253);
+}
+
+.table :is(td, th):nth-child(5) input:checked::after {
+    background-color: hsla(118, 50%, 50%, 1) !important;
+}
+
+.table :is(td, th):nth-child(7) {
+    max-width: 25ch;
+    min-width: 20ch;
+}
+
+.table :is(td, th):nth-child(7) select {
+    width: 100%;
+    height: 100%;
+    font-size: medium;
+}
+
+.table td div {
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table td input[type='radio'] {
+    background-color: var(--bg-color-25);
+    border-radius: 10px;
+    outline: 1px solid var(--bg-color-80);
+    box-shadow:
+        0 0 0 1px hsla(0, 0%, 0%, .6),
+        0 2px 3px hsla(0, 0%, 0%, .6);
+    cursor: pointer;
+    display: inline-block;
+    height: 15px;
+    position: relative;
+    width: 15px;
+    appearance: none;
+    transition: background-color 200ms ease, outline-color 200ms ease, box-shadow 200ms ease;
+}
+
+.table td input[type='radio']:checked {
+    cursor: default;
+}
+
+.table td input[type='radio']:not(:checked):hover {
+    background-color: var(--bg-color-30);
+    outline-color: var(--bg-color-90);
+    box-shadow:
+        0 0 0 1px hsla(0, 0%, 0%, .6),
+        0 2px 3px hsla(0, 0%, 0%, .6),
+        0 4px 3px hsla(0, 0%, 0%, .4);
+}
+
+.table td input[type='radio']:disabled {
+    display: none;
+}
+
+.table td input[type='radio']:after {
+    background-color: var(--bg-color-25);
+    border-radius: 25px;
+    content: '';
+    display: block;
+    height: 11px;
+    left: 2px;
+    position: relative;
+    top: 2px;
+    width: 11px;
+    transition: background-color 200ms ease;
+}
+
+.table td input[type='radio']:checked:after {
+    background-color: var(--color-accent-10);
+}
+
+td.personTableCellHeader {
+    padding: 10px 5px !important;
+    font-weight: bold;
+    border-bottom-color: var(--bg-color-70);
+    background-color: var(--bg-color-05);
+}
+
+/* Mobile */
+@media (max-width: 650px) {
+    .personCell {
+        font-size: small;
+    }
+
+    .table th {
+        font-size: small;
+    }
+
+    .table td input[type='radio'] {
+        border-radius: 10px;
+        height: 10px;
+        width: 10px;
+    }
+
+    .table td input[type='radio']:after {
+        border-radius: 15px;
+        height: 6px;
+        left: 2px;
+        top: 2px;
+        width: 6px;
+    }
+
+    .personHeader button {
+        padding: 4px 4px;
+        font-size: small;
+    }
+
+}
+
+@media (max-width: 550px) {
+    .personCell {
+        font-size: x-small;
+    }
+
+    .table th {
+        font-size: smaller;
+    }
+
+    .table td {
+        padding: 6px 3px;
+    }
+
+    .personHeader button {
+        padding: 3px 3px;
+        font-size: 0.5rem;
+    }
+}
+
+@media (max-width: 400px) {
+
+    .table td div {
+        max-width: 100px;
+    }
+}
+
+@media (max-width: 300px) {
+
+    .table td div {
+        max-width: 80px;
+    }
+}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 601px) and (max-width: 1120px) {}
+
+@media (prefers-color-scheme: dark) {}

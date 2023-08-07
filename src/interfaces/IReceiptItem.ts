@@ -6,6 +6,7 @@ export interface IReceiptItem {
     price: number;
     amount: number;
     category: Category;
-    shared: boolean;
-    rejected: boolean;
+    isMine: boolean;
+    isShared: boolean;
+    isRejected: boolean;
 }

@@ -1,31 +1,25 @@
-/** @format */
-
-.center {
-    justify-content: center;
-}
-
-.split {
-    width: 100%;
-    display: flex;
-    flex-wrap: nowrap;
-    flex-direction: row;
-
-    justify-content: center;
-    gap: 32px;
-    padding: 32px;
-}
-
-.personCell {
+.personCard {
+    padding: 8px 0;
     flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--bg-color-00);
+    border-radius: var(--border-radius);
+    box-shadow:
+        0 0 0 1px hsla(0, 0%, 0%, .6),
+        0 2px 3px hsla(0, 0%, 0%, .6);
+
 }
 
 .personHeader {
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     margin-bottom: 24px;
+    gap: 16px;
 }
 
 .personName {
@@ -33,11 +27,11 @@
     border: none;
     font-size: x-large;
     max-width: 10ch;
+    margin-bottom: 16px;
 }
 
 .fancyButton {
-    padding: 4px 8px;
-    margin: 0 8px;
+    padding: 2px 4px;
     background-color: var(--bg-color-25);
     border: 1px solid var(--bg-color-50);
     border-radius: var(--border-radius);
@@ -57,38 +51,21 @@
         0 4px 3px hsla(0, 0%, 0%, .4);
 }
 
-
-
 .personAddItemWrapper {
     display: flex;
     flex-wrap: wrap;
-    flex-direction: row;
-    justify-content: space-around;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 
     margin-top: 32px;
     margin-bottom: 32px;
+
+    width: 42ch;
+
+    gap: 16px;
 }
 
-.personAddItemWrapper button {
-    padding: 4px 8px;
-    background-color: var(--bg-color-25);
-    border: 1px solid var(--bg-color-50);
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    box-shadow:
-        0 0 0 1px hsla(0, 0%, 0%, .6),
-        0 2px 3px hsla(0, 0%, 0%, .6);
-    transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
-}
-
-.personAddItemWrapper button:hover {
-    background-color: var(--bg-color-30);
-    border-color: var(--bg-color-70);
-    box-shadow:
-        0 0 0 1px hsla(0, 0%, 0%, .6),
-        0 2px 3px hsla(0, 0%, 0%, .6),
-        0 4px 3px hsla(0, 0%, 0%, .4);
-}
 
 .personAddItemWrapper input[type='text'],
 .personAddItemWrapper input[type='number'] {
@@ -106,17 +83,25 @@
     border-bottom-color: var(--bg-color-90);
 }
 
-.personAddItemWrapper > *:nth-child(1) {
-    width: 25ch;
+.personAddItemWrapper input[type='number'] {
+    width: 8ch;
 }
 
+.personAddItemWrapper > *:nth-child(1),
 .personAddItemWrapper > *:nth-child(2) {
-    width: 8ch;
+    width: 42ch;
 }
 
 .personAddItemWrapper > *:nth-child(3) {
-    width: 8ch;
+    display: flex;
+    gap: 8.5ch;
 }
+
+.personAddItemWrapper > *:nth-child(4) {
+    width: 9ch;
+}
+
+
 
 
 
@@ -135,7 +120,6 @@
     }
 
     .personHeader button {
-        padding: 4px 4px;
         font-size: small;
     }
 
