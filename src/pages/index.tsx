@@ -26,6 +26,7 @@ const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
 });
 
 
+
 export interface IListItem {
   name: string;
   price: number;
@@ -46,6 +47,8 @@ export enum Category {
   Dates,
   Misc
 }
+
+const DEFAULT_CATEGORY: Category = Category.Food;
 
 export default function Home() {
   const { getItem, removeItem, setItem } = useStorage();
@@ -137,6 +140,16 @@ export default function Home() {
     return matrix;
   }
 
+  function firstCharToUppercase(text: string): string {
+    if (text !== undefined && text !== '' && text.length > 1) {
+      // Make first letter of text uppercase
+      const firstLetterOfText: string = text[0].toUpperCase();
+      const restOfText: string = text.slice(1);
+      return firstLetterOfText + restOfText;
+    }
+    return '';
+  }
+
   function parseFileToIListItems(file: File): Promise<IListItem[]> {
     let items: IListItem[] = []
 
@@ -162,35 +175,37 @@ export default function Home() {
             const receipt: string[] = receipts[i].split(',');
             const receiptItems: string[][] = listToMatrix(receipt.slice(receiptHeaderCount).join('').replaceAll('"', '').split('|'), itemHeaderCount).filter((item) => { return item.length > 1 });
 
-            let parsedItems = receiptItems.map(list => {
-              const amount: number = list[5] === '' ? 1 : Math.floor(parseFloat(list[5]) * 100) / 100
-              let name = list[0].slice(1)
-              name = list[0][0].toUpperCase() + name
+            let parsedReceipt = receiptItems.map(list => {
+              let itemName = firstCharToUppercase(list[0]);
+              itemName = itemName !== '' ? itemName : 'Unrecognized Item';
+              const itemAmount: number = list[5] === '' ? 1 : Math.floor(parseFloat(list[5]) * 100) / 100;
 
               return {
-                name: name,
+                name: itemName,
                 price: Math.floor(parseFloat(list[2]) * -100) / 100,
-                amount: amount,
+                amount: itemAmount,
                 shared: true,
                 rejected: false,
-                category: Category.Misc
+                category: DEFAULT_CATEGORY
               }
             })
 
-            parsedItems = parsedItems.reverse()
-            let name = receipt[3].slice(1)
-            name = receipt[3][0].toUpperCase() + name
-            parsedItems.push({
-              name: name === undefined || name === '' || name.length < 1 ? 'Unknown Shop or Item' : name,
-              price: 0,
+            // Add store name to receipt
+            parsedReceipt = parsedReceipt.reverse();
+            let storeName = firstCharToUppercase(receipt[3]);
+            storeName = storeName !== '' ? storeName : 'Unrecognized Store';
+
+            parsedReceipt.push({
+              name: storeName,
+              price: Math.floor(parseFloat(receipt[8]) * -100) / 100,
               amount: 0,
               shared: false,
               rejected: false,
-              category: Category.Misc
+              category: DEFAULT_CATEGORY
             })
-            parsedItems = parsedItems.reverse()
+            parsedReceipt = parsedReceipt.reverse()
 
-            items = items.concat(parsedItems)
+            items = items.concat(parsedReceipt)
           }
         }
 
@@ -446,7 +461,7 @@ export default function Home() {
     for (let i = 0; i < list.length; i++) {
       const item: IListItem = list[i];
 
-      const isHeader = item.price === 0
+      const isHeader = item.amount === 0;
       const isShared = isHeader ? false : item.shared
       const isRejected = isHeader ? false : item.rejected
       const isMine = isHeader ? false : !item.shared && !item.rejected
@@ -456,7 +471,7 @@ export default function Home() {
       rows.push(
         <tr key={i}>
           <td className={[cellHeaderClass].join(' ')}><div>{item.name}</div></td>
-          <td className={[cellHeaderClass].join(' ')}>{isHeader ? '' : item.price + ' €'}</td>
+          <td className={[cellHeaderClass].join(' ')}>{item.price + ' €'}</td>
           <td className={[cellHeaderClass].join(' ')}>{isHeader ? '' : item.amount}</td>
           {isFirstList &&
             <td className={[cellHeaderClass].join(' ')}>{!isHeader && <input disabled={isHeader} checked={isMine} type='radio' onChange={() => { toggleMyItem(i, isFirstList) }}></input>}</td>}
@@ -591,7 +606,7 @@ export default function Home() {
                     amount: firstItemAmount,
                     shared: true,
                     rejected: false,
-                    category: Category.Misc
+                    category: DEFAULT_CATEGORY
                   })
                   setFirstList([...tmpList])
                   setFirstItemName('')
@@ -664,7 +679,7 @@ export default function Home() {
                     amount: secondItemAmount,
                     shared: true,
                     rejected: false,
-                    category: Category.Misc
+                    category: DEFAULT_CATEGORY
                   })
                   setSecondList([...tmpList])
                   setSecondItemName('')
