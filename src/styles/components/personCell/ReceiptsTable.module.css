@@ -37,12 +37,18 @@
 .table td {
     border-bottom: 1px solid var(--bg-color-40);
     padding: 8px 4px;
+    width: fit-content;
     text-align: center;
 }
 
 .table :is(td, th):nth-child(1) {
     max-width: 30ch;
     min-width: 25ch;
+    padding-left: 10px;
+}
+
+.table :is(td):nth-child(1) {
+    padding-left: 42px;
 }
 
 .table :is(td, th):nth-child(2) {
@@ -82,6 +88,7 @@
     width: 100%;
     height: 100%;
     font-size: medium;
+    background-color: var(--bg-color-00);
 }
 
 .table td div {
@@ -92,7 +99,7 @@
 }
 
 .table td input[type='radio'] {
-    background-color: var(--bg-color-25);
+    background-color: var(--bg-color-10);
     border-radius: 10px;
     outline: 1px solid var(--bg-color-80);
     box-shadow:
@@ -125,7 +132,7 @@
 }
 
 .table td input[type='radio']:after {
-    background-color: var(--bg-color-25);
+    background-color: var(--bg-color-10);
     border-radius: 25px;
     content: '';
     display: block;

@@ -38,13 +38,13 @@ export default function ReceiptsTable(props: {
     function generateTableHeader(isFirst: boolean, myName: string, otherName: string): JSX.Element {
         return (
             <tr>
-                <th>Name</th>
-                <th>€</th>
-                <th>Amt.</th>
+                <th>Item / Store Name</th>
+                <th>Price €</th>
+                <th>Amount</th>
                 <th >{isFirst ? myName : otherName}</th>
-                <th>Sh.</th>
+                <th>Shared</th>
                 <th >{isFirst ? otherName : myName}</th>
-                <th >Categ.</th>
+                <th >Category</th>
             </tr>
         );
     }
