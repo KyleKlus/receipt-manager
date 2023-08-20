@@ -1,12 +1,18 @@
 /** @format */
 
+
 .main {
   display: flex;
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
   scroll-behavior: smooth;
+
+
+  /* animation: slide-out 2s infinite; */
 }
+
+
 
 
 /* Enable hover only on non-touch devices */

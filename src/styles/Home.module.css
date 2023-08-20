@@ -25,6 +25,82 @@
     background-color: var(--bg-color-translucent-05);
 }
 
+@keyframes slide-out-dotted {
+    from {
+        --circle-pos-w: calc(calc(100vw -  6.5rem + var(--cross-width)) / 2);
+        --circle-pos-h: calc(calc(100vh -  6.5rem + var(--cross-width)) / 2);
+        background-size:  6.5rem  6.5rem;
+        background-position:
+        var(--circle-pos-w) var(--circle-pos-h),
+        var(--cross-pos-w) var(--cross-pos-h),
+        var(--cross-pos-w) var(--cross-pos-h);
+    }
+
+    25% {
+        background-size:  7rem  7rem;
+        background-position:
+        calc(calc(80vw -  7rem + var(--cross-width)) / 2) calc(calc(70vh -  7rem + var(--cross-width)) / 2),
+        calc(calc(80vw + var(--cross-arm-width)) / 2) calc(calc(70vh + var(--cross-arm-width)) / 2),
+        calc(calc(80vw + var(--cross-arm-width)) / 2) calc(calc(70vh + var(--cross-arm-width)) / 2);
+    }
+
+    60% {
+        background-size:  7.5rem  7.5rem;
+        background-position:
+        calc(calc(90vw -  7.5rem + var(--cross-width)) / 2) calc(calc(80vh -  7.5rem + var(--cross-width)) / 2),
+        calc(calc(90vw + var(--cross-arm-width)) / 2) calc(calc(80vh + var(--cross-arm-width)) / 2),
+        calc(calc(90vw + var(--cross-arm-width)) / 2) calc(calc(80vh + var(--cross-arm-width)) / 2);
+    }
+
+    80% {
+        background-size:  7rem  7rem;
+        background-position:
+        calc(calc(80vw -  7rem + var(--cross-width)) / 2) calc(calc(90vh -  7rem + var(--cross-width)) / 2),
+        calc(calc(80vw + var(--cross-arm-width)) / 2) calc(calc(90vh + var(--cross-arm-width)) / 2),
+        calc(calc(80vw + var(--cross-arm-width)) / 2) calc(calc(90vh + var(--cross-arm-width)) / 2);
+    }
+
+    to {
+        --circle-pos-w: calc(calc(100vw -  6.5rem + var(--cross-width)) / 2);
+        --circle-pos-h: calc(calc(100vh -  6.5rem + var(--cross-width)) / 2);
+        background-size:  6.5rem  6.5rem;
+        background-position:
+        var(--circle-pos-w) var(--circle-pos-h),
+        var(--cross-pos-w) var(--cross-pos-h),
+        var(--cross-pos-w) var(--cross-pos-h);
+    }
+
+
+    /* to {
+      background-position: calc(var(--cross-position) - 100vh) calc(var(--cross-position) - 100vw), calc(-100vh - var(--cross-arm-width)) calc(-100vw - var(--cross-arm-width)), calc(-100vh - var(--cross-arm-width)) calc(-100vw - var(--cross-arm-width));
+    } */
+}
+
+
+.dotted {
+    --cross-arm-width: .08rem;
+    --cross-width: calc(var(--cross-arm-width)*2);
+    --spacing: 6.5rem;
+
+    --circle-pos-w: calc(calc(100vw - var(--spacing) + var(--cross-width)) / 2);
+    --circle-pos-h: calc(calc(100vh - var(--spacing) + var(--cross-width)) / 2);
+
+    --cross-pos-w: calc(calc(100vw + var(--cross-arm-width)) / 2);
+    --cross-pos-h: calc(calc(100vh + var(--cross-arm-width)) / 2);
+
+    background-image:
+        radial-gradient(circle, transparent var(--cross-width), var(--bg-color-05) var(--cross-width)),
+        linear-gradient(var(--bg-color-50) var(--cross-arm-width), transparent var(--cross-arm-width)),
+        linear-gradient(90deg, var(--bg-color-50) var(--cross-arm-width), transparent var(--cross-arm-width));
+    background-size: var(--spacing) var(--spacing);
+    background-position:
+        var(--circle-pos-w) var(--circle-pos-h),
+        var(--cross-pos-w) var(--cross-pos-h),
+        var(--cross-pos-w) var(--cross-pos-h);
+    background-repeat: repeat;
+    animation: slide-out-dotted 60s linear infinite;
+}
+
 .portfolioPage {
     background-color: var(--bg-color-00);
     position: relative;
