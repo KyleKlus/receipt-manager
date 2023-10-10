@@ -42,71 +42,67 @@ export default function ReceiptsOverview(props: {
 
     return (
         <div className={[styles.receiptsOverview].join(' ')}>
-            <hr />
-            <div className={[styles.personTableSum].join(' ')}>
-                <div>{myName}&#39;s personal stuff from {myName}&#39;s receipts: </div>
-                <div>{myItemsFromMe} €</div>
-            </div>
-            <div className={[styles.personTableSum].join(' ')}>
-                <div>{myName}&#39;s share from the shared items of {myName}&#39;s receipts: </div>
-                <div>{sharedFromMe} €</div>
-            </div>
-            <hr />
-            <div className={[styles.personTableSum].join(' ')}>
-                <div>{myName}&#39;s expenses from {myName}&#39;s receipts: </div>
-                <div>{myExpensesFromMe} €</div>
-            </div>
-            <hr />
-            <hr />
-            <div className={[styles.personTableSum].join(' ')}>
-                <div>{myName}&#39;s personal stuff from {otherName}&#39;s receipts: </div>
-                <div>{myItemsFromOther} €</div>
-            </div>
-            <div className={[styles.personTableSum].join(' ')}>
-                <div>{myName}&#39;s share from the shared items of {otherName}&#39;s receipts: </div>
-                <div>{sharedFromOther} €</div>
-            </div>
-            <hr />
-            <div className={[styles.personTableSum].join(' ')}>
-                <div>{myName}&#39;s expenses from {otherName}&#39;s receipts: </div>
-                <div>{myExpensesFromOther} €</div>
-            </div>
-            <hr />
-            <hr />
-            <div className={[styles.personTableSum].join(' ')}>
-                <div>{myName}&#39;s expenses from {myName}&#39;s receipts: </div>
-                <div>{myExpensesFromMe} €</div>
-            </div>
-            <div className={[styles.personTableSum].join(' ')}>
-                <div>{myName}&#39;s expenses from {otherName}&#39;s receipts: </div>
-                <div>{myExpensesFromOther} €</div>
-            </div>
-            <hr />
-            <div className={[styles.personTableSum].join(' ')}>
-                <div>{myName}&#39;s total expenses: </div>
-                <div>{myTotalExpenses} €</div>
+            <div className={[styles.personTableHorizontalSplit].join(' ')}>
+                <div className={[styles.personTableSplit].join(' ')}>
+                    <div className={[styles.personTableSplitHeader].join(' ')}>{myName}&#39;s Receipts</div>
+                    <hr />
+                    <div className={[styles.personTableSum].join(' ')}>
+                        <div>Personal items: </div>
+                        <div>{-myItemsFromMe} €</div>
+                    </div>
+                    <div className={[styles.personTableSum].join(' ')}>
+                        <div>Shared items: </div>
+                        <div>{-sharedFromMe} €</div>
+                    </div>
+                    <hr />
+                    <hr />
+                    <div className={[styles.personTableSum].join(' ')}>
+                        <div>Expenses: </div>
+                        <div>{-myExpensesFromMe} €</div>
+                    </div>
+                </div>
+                <div className={[styles.personTableSplit].join(' ')}>
+                    <div className={[styles.personTableSplitHeader].join(' ')}>{otherName}&#39;s Receipts</div>
+                    <hr />
+                    <div className={[styles.personTableSum].join(' ')}>
+                        <div>Personal items: </div>
+                        <div>{-myItemsFromOther} €</div>
+                    </div>
+                    <div className={[styles.personTableSum].join(' ')}>
+                        <div>Shared items: </div>
+                        <div>{-sharedFromOther} €</div>
+                    </div>
+                    <hr />
+                    <hr />
+                    <div className={[styles.personTableSum].join(' ')}>
+                        <div>Expenses: </div>
+                        <div>{-myExpensesFromOther} €</div>
+                    </div>
+                </div>
             </div>
             <hr />
             <hr />
             <div className={[styles.personTableSum].join(' ')}>
                 <div>{myName}&#39;s total expenses: </div>
-                <div>{myTotalExpenses} €</div>
-            </div>
-            <div className={[styles.personTableSum].join(' ')}>
-                <div>{otherName}&#39;s personal stuff from {myName}&#39;s receipts: </div>
-                <div>{+rejectedFromMe} €</div>
+                <div>{-myTotalExpenses} €</div>
             </div>
             <div className={[styles.personTableSum].join(' ')}>
                 <div>{myName} paid: </div>
-                <div>{-myReceiptsExpenses} €</div>
+                <div>{myReceiptsExpenses} €</div>
             </div>
             <hr />
             <div className={[styles.personTableSum].join(' ')}>
+                <div>Total result: </div>
+                <div>{-1 * result} €</div>
+            </div>
+            <hr />
+            <hr />
+            <div className={[styles.personTableSum].join(' ')}>
                 {result <= 0
-                    ? <div>{myName} has paid the following amount too much: </div>
-                    : <div>{myName} needs to pay the following: </div>
+                    ? <div>{myName} has paid too much: </div>
+                    : <div>{myName} needs to pay: </div>
                 }
-                <div>{result} €</div>
+                <div>{Math.abs(result)} €</div>
             </div>
             <hr />
         </div>
