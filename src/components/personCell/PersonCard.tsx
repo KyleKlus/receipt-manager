@@ -61,11 +61,7 @@ export default function PersonCard(props: {
             }} />
             <div className={[styles.personHeader].join(' ')}>
 
-                <button className={[styles.fancyButton].join('')} onClick={() => {
-                    setReceipts([], isFirst);
-                }}>
-                    Clear Data
-                </button>
+
                 <button className={[styles.fancyButton].join('')} onClick={() => {
                     if (typeof window !== null && typeof window !== undefined) {
                         window.document.getElementById(isFirst ? 'firstUpload' : 'secondUpload')!.click()
@@ -77,6 +73,11 @@ export default function PersonCard(props: {
                     CSVParser.downloadCSV(myName + '_expenses', myReceipts, otherReceipts);
                 }}>
                     Export Expenses
+                </button>
+                <button className={[styles.fancyButton].join('')} onClick={() => {
+                    setReceipts([], isFirst);
+                }}>
+                    Clear Data
                 </button>
 
 
