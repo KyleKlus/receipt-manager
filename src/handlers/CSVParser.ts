@@ -3,18 +3,20 @@ import { IReceiptItem } from "@/interfaces/IReceiptItem";
 import { ExportToCsv } from "export-to-csv";
 
 export enum Category {
-    Activities,
-    Cleaning,
-    Cosmetics,
-    Dates,
     Food,
-    Household,
-    Hygiene,
-    Hardware,
-    Misc,
     Pet,
+    Household,
+    Cleaning,
+    Hygiene,
     Sport,
+    Clothing,
+    Activities,
+    Medicine,
+    Dates,
+    Presents,
+    Stationery,
     Travel,
+    Misc,
     None
 }
 
