@@ -1,4 +1,4 @@
-import { Category } from "@/handlers/CSVParser";
+import { Category } from "@/handlers/DataParser";
 
 
 export interface IReceiptItem {

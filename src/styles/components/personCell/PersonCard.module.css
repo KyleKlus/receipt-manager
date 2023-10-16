@@ -84,7 +84,7 @@
 }
 
 .personAddItemWrapper input[type='number'] {
-    width: 8ch;
+    width: 9ch;
 }
 
 .personAddItemWrapper > *:nth-child(1),

@@ -3,9 +3,11 @@ import styles from '@/styles/components/personCell/PersonCard.module.css';
 import { ChangeEvent, useState } from 'react';
 import { IReceiptItem } from '@/interfaces/IReceiptItem';
 import { IReceipt } from '@/interfaces/IReceipt';
-import * as CSVParser from '@/handlers/CSVParser';
+import * as DataParser from '@/handlers/DataParser';
 import * as Calculator from '@/handlers/Calculator';
 import ReceiptsOverview from './ReceiptsOverview';
+import moment from 'moment';
+import { IResult } from '@/interfaces/IResult';
 
 export default function PersonCard(props: {
     myName: string,
@@ -34,11 +36,15 @@ export default function PersonCard(props: {
     const [newItemAmount, setNewItemAmount] = useState<number>(NaN);
 
     const myReceiptsExpenses: number = Calculator.calcReceiptsExpenses(myReceipts);
+    const otherReceiptsExpenses: number = Calculator.calcReceiptsExpenses(otherReceipts);
+
     const myItemsFromMe: number = Calculator.calcPersonalExpenses(myReceipts);
+    const otherItemsFromOther: number = Calculator.calcPersonalExpenses(otherReceipts);
     const sharedFromMe: number = Calculator.calcSharedExpenses(myReceipts);
     const myExpensesFromMe: number = Math.floor((myItemsFromMe + sharedFromMe) * 100) / 100;
 
     const myItemsFromOther: number = Calculator.calcRejectedExpenses(otherReceipts);
+    const otherItemsFromMe: number = Calculator.calcRejectedExpenses(myReceipts);
     const sharedFromOther: number = Calculator.calcSharedExpenses(otherReceipts);
     const myExpensesFromOther: number = Math.floor((myItemsFromOther + sharedFromOther) * 100) / 100;
 
@@ -70,7 +76,22 @@ export default function PersonCard(props: {
                     Upload Data
                 </button>
                 <button disabled={myReceipts.length === 0 && otherReceipts.length === 0} className={[styles.fancyButton].join('')} onClick={() => {
-                    CSVParser.downloadCSV(myName + '_expenses', myReceipts, otherReceipts);
+
+                    const resultData: IResult = {
+                        payerName: result <= 0 ? otherName : myName,
+                        receiverName: result <= 0 ? myName : otherName,
+                        payerExpenses: result <= 0 ? otherReceiptsExpenses : myReceiptsExpenses,
+                        receiverExpenses: result <= 0 ? myReceiptsExpenses : otherReceiptsExpenses,
+                        sharedFromPayer: result <= 0 ? sharedFromOther : sharedFromMe,
+                        sharedFromReceiver: result <= 0 ? sharedFromMe : sharedFromOther,
+                        payerItemsFromPayer: result <= 0 ? otherItemsFromOther : myItemsFromMe,
+                        receiverItemsFromReceiver: result <= 0 ? myItemsFromMe : otherItemsFromOther,
+                        receiverItemsFromPayer: result <= 0 ? myItemsFromOther : otherItemsFromMe,
+                        payerItemsFromReceiver: result <= 0 ? otherItemsFromMe : myItemsFromOther,
+                        result: result
+                    };
+
+                    DataParser.downloadEXCEL('Expenses_' + moment().format('DD_MM_YYYY'), myName, otherName, myReceipts, otherReceipts, resultData);
                 }}>
                     Export Expenses
                 </button>
@@ -115,7 +136,7 @@ export default function PersonCard(props: {
                         isMine: false,
                         isShared: true,
                         isRejected: false,
-                        category: CSVParser.DEFAULT_CATEGORY
+                        category: DataParser.DEFAULT_CATEGORY
                     }
 
                     const newReceipt: IReceipt = {
@@ -123,7 +144,7 @@ export default function PersonCard(props: {
                         owner: myName,
                         totalPrice: newItemPrice,
                         items: [newItem],
-                        categoryForAllItems: CSVParser.DEFAULT_CATEGORY,
+                        categoryForAllItems: DataParser.DEFAULT_CATEGORY,
                         isAllShared: false,
                         isAllRejected: false,
                         isAllMine: false
