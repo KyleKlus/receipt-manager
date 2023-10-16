@@ -66,8 +66,6 @@ export default function PersonCard(props: {
                 setPersonName(e.currentTarget.value, isFirst);
             }} />
             <div className={[styles.personHeader].join(' ')}>
-
-
                 <button className={[styles.fancyButton].join('')} onClick={() => {
                     if (typeof window !== null && typeof window !== undefined) {
                         window.document.getElementById(isFirst ? 'firstUpload' : 'secondUpload')!.click()
