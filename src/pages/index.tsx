@@ -20,10 +20,10 @@ import NavLink from '@/components/header/NavLink';
 import Card from '@/components/Card';
 import { ChangeEvent, SyntheticEvent, useState } from 'react';
 import { IReceipt } from '@/interfaces/IReceipt';
-import * as CSVParser from '@/handlers/CSVParser';
+import * as CSVParser from '@/handlers/DataParser';
 import PersonCard from '@/components/personCell/PersonCard';
 import ReceiptsTable from '@/components/personCell/ReceiptsTable';
-import { Category } from '@/handlers/CSVParser';
+import { Category } from '@/handlers/DataParser';
 import { IReceiptItem } from '@/interfaces/IReceiptItem';
 
 const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {

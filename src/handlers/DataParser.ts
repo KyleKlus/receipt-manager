@@ -1,6 +1,8 @@
 import { IReceipt } from "@/interfaces/IReceipt";
 import { IReceiptItem } from "@/interfaces/IReceiptItem";
+import { IResult } from "@/interfaces/IResult";
 import { ExportToCsv } from "export-to-csv";
+import * as XLSX from 'xlsx';
 
 export enum Category {
     Food,
@@ -23,7 +25,7 @@ export enum Category {
 export const DEFAULT_CATEGORY: Category = Category.Food;
 
 export function downloadCSV(name: string, myReceipts: IReceipt[], otherReceipts: IReceipt[]) {
-    const data: string[] = [_prepCSVData(myReceipts, otherReceipts)];
+    const data: string[] = [_prepCSVDataReceipts(myReceipts, otherReceipts)];
     if (name === undefined || data === undefined || name === '' || data.length === 0 || data[0] === '') { return; }
     const link = document.createElement('a');
     const fileBlob = new Blob(data, { type: 'text/csv' });
@@ -31,6 +33,36 @@ export function downloadCSV(name: string, myReceipts: IReceipt[], otherReceipts:
     link.download = name + '.csv';
     document.body.appendChild(link);
     link.click();
+}
+
+export function downloadEXCEL(name: string, myName: string, otherName: string, myReceipts: IReceipt[], otherReceipts: IReceipt[], result: IResult) {
+    const myData: string = _prepCSVDataReceipts(myReceipts, otherReceipts);
+    const otherData: string = _prepCSVDataReceipts(otherReceipts, myReceipts);
+    const resultData: string = _prepCSVDataTotal(result);
+
+    if (name === undefined || myData === undefined || name === '' || myData.length === 0 || myData[0] === '') { return; }
+
+    const myArrayOfArrayCsv = myData.split("\n").map((row: string) => {
+        return row.split(';');
+    });
+    const otherArrayOfArrayCsv = otherData.split("\n").map((row: string) => {
+        return row.split(';');
+    });
+    const resultArrayOfArrayCsv = resultData.split("\n").map((row: string) => {
+        return row.split(';');
+    });
+
+
+    const wb = XLSX.utils.book_new();
+    const myWs = XLSX.utils.aoa_to_sheet(myArrayOfArrayCsv);
+    const otherWs = XLSX.utils.aoa_to_sheet(otherArrayOfArrayCsv);
+    const resultWs = XLSX.utils.aoa_to_sheet(resultArrayOfArrayCsv);
+
+    XLSX.utils.book_append_sheet(wb, myWs, myName + '_' + name);
+    XLSX.utils.book_append_sheet(wb, otherWs, otherName + '_' + name);
+    XLSX.utils.book_append_sheet(wb, resultWs, 'Result_' + name);
+
+    XLSX.writeFileXLSX(wb, name + '.xlsx', { type: 'file' });
 }
 
 export function parseFileToReceipts(file: File, ownerName: string): Promise<IReceipt[]> {
@@ -131,8 +163,7 @@ function _firstCharToUppercase(text: string): string {
     return '';
 }
 
-
-function _prepCSVData(myReceipts: IReceipt[], otherReceipts: IReceipt[]): string {
+function _prepCSVDataReceipts(myReceipts: IReceipt[], otherReceipts: IReceipt[]): string {
     let dataString: string = '';
 
     if (myReceipts === undefined || otherReceipts === undefined) { return dataString; }
@@ -166,8 +197,8 @@ function _prepCSVData(myReceipts: IReceipt[], otherReceipts: IReceipt[]): string
     const data = filteredList.concat(otherFilteredList).slice(0).map((e) => {
         return {
             name: e.name,
-            price: e.price,
-            amount: e.amount,
+            price: e.price.toString().replace('.', ','),
+            amount: e.amount.toString().replace('.', ','),
             category: Category[e.category],
             mine: e.isMine,
             shared: e.isShared,
@@ -177,20 +208,64 @@ function _prepCSVData(myReceipts: IReceipt[], otherReceipts: IReceipt[]): string
 
     if (data.length === 0) { return dataString; }
 
-    const options = {
-        fieldSeparator: ',',
-        quoteStrings: '"',
-        decimalSeparator: '.',
-        showLabels: true,
-        showTitle: false,
-        title: 'expenses',
-        useTextFile: false,
-        useBom: true,
-        useKeysAsHeaders: true,
-        // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
-    };
-    const csvExporter = new ExportToCsv(options);
-    dataString = csvExporter.generateCsv(data, true);
+    const csvHeaders: string = 'Name;Price;Amount;Category;IsMyItem;IsSharedItem;IsRejectedItem';
+    const csvDataArray: string[] = [csvHeaders, ...data.map((row) => {
+        return [row.name, row.price, row.amount, row.category, row.mine, row.shared, row.rejected].join(';')
+    })]
 
-    return dataString;
+    const csvData: string = csvDataArray.join('\n');
+
+    // const options = {
+    //     fieldSeparator: ';',
+    //     quoteStrings: '',
+    //     decimalSeparator: ',',
+    //     showLabels: true,
+    //     showTitle: false,
+    //     title: 'expenses',
+    //     useTextFile: false,
+    //     useBom: true,
+    //     useKeysAsHeaders: true,
+    //     // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
+    // };
+    // const csvExporter = new ExportToCsv(options);
+    // dataString = csvExporter.generateCsv(data, true);
+
+    return csvData;
+}
+
+function _prepCSVDataTotal(resultData: IResult): string {
+    let dataString: string = '';
+
+    if (resultData === undefined) { return dataString; }
+
+    const csvHeaders: string = 'Stuff;' + resultData.payerName + '`s Values;' + resultData.receiverName + '`s Values;';
+    const csvDataArray: string[] = [csvHeaders];
+
+    csvDataArray.push('Personal Items from ' + resultData.payerName + '`s receipts;'
+        + (resultData.payerItemsFromPayer).toString().replace('.', ',') + ';'
+        + (resultData.receiverItemsFromPayer).toString().replace('.', ',') + ';');
+
+    csvDataArray.push('Personal Items from ' + resultData.receiverName + '`s receipts;'
+        + (resultData.payerItemsFromReceiver).toString().replace('.', ',') + ';'
+        + (resultData.receiverItemsFromReceiver).toString().replace('.', ',') + ';');
+
+    csvDataArray.push('Shared Items from ' + resultData.payerName + '`s receipts;'
+        + (resultData.sharedFromPayer).toString().replace('.', ',') + ';'
+        + (resultData.sharedFromPayer).toString().replace('.', ',') + ';');
+
+    csvDataArray.push('Shared Items from ' + resultData.receiverName + '`s receipts;'
+        + (resultData.sharedFromReceiver).toString().replace('.', ',') + ';'
+        + (resultData.sharedFromReceiver).toString().replace('.', ',') + ';');
+
+    csvDataArray.push('Money paid;'
+        + (-1 * resultData.payerExpenses).toString().replace('.', ',') + ';'
+        + (-1 * resultData.receiverExpenses).toString().replace('.', ',') + ';');
+
+    csvDataArray.push('Result;' + (-1 * resultData.result).toString().replace('.', ',')
+        + ';' + (resultData.result).toString().replace('.', ',') + ';');
+
+
+    const csvData: string = csvDataArray.join('\n');
+
+    return csvData;
 }
