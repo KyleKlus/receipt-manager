@@ -20,30 +20,6 @@ const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
 });
 
 export default function Home() {
-
-  function getSideNavChildren() {
-    return (
-      <Card className={sideNavStyles.menuCard}>
-        <h4>Other Sites</h4>
-        <NavLink
-          className={sideNavStyles.sideNavLink}
-          pathName="/projects"
-          displayText="Projects"
-        />
-        <NavLink
-          className={sideNavStyles.sideNavLink}
-          pathName="/Kyles-Cookbook/en"
-          displayText="Cookbook 🇬🇧"
-        />
-        <NavLink
-          className={sideNavStyles.sideNavLink}
-          pathName="/Kyles-Cookbook/de"
-          displayText="Cookbook 🇩🇪"
-        />
-      </Card>
-    );
-  }
-
   return (
     <>
       <Head>
@@ -80,7 +56,7 @@ export default function Home() {
           href={process.env.basePath + "/favicon-16x16.png"}
         />
       </Head>
-      <Header sideNavChildren={getSideNavChildren()}>
+      <Header >
         <ScrollNavLink
           className={headerStyles.headerNavLink}
           elementName="https://majorenkidu.github.io/#heroPage"
@@ -97,7 +73,7 @@ export default function Home() {
           displayText="About"
         />
         <ThemeButton />
-      </Header>
+      </Header >
       <Main>
         <div id={'top'}></div>
         <Content className={['applyHeaderOffset'].join(' ')}>

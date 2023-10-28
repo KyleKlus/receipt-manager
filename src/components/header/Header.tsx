@@ -1,15 +1,22 @@
 /** @format */
 
 import styles from '@/styles/components/header/Header.module.css';
+import sideNavStyles from '@/styles/components/header/SideNavigation.module.css'
 import React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import ScrollUpButton from '../buttons/ScrollUpButton';
 import SideNavigationButton from '../buttons/SideNavigationButton';
+import Card from '../Card';
+import NavLink from '../links/NavLink';
 import HeaderNavigation from './HeaderNavigation';
 import Logo from './Logo';
 import SideNavigation from './SideNavigation';
 
-interface IHeaderProps { sideNavChildren?: JSX.Element }
+interface IHeaderProps {
+  overrideSideNavContent?: JSX.Element,
+  addSideNavChildren?: JSX.Element[],
+  addSideNavMenuCards?: JSX.Element[]
+}
 
 export default function Header(props: React.PropsWithChildren<IHeaderProps>) {
   const [isSideNavigationActive, setIsSideNavigationActive] = useState(false);
@@ -24,8 +31,8 @@ export default function Header(props: React.PropsWithChildren<IHeaderProps>) {
     : '';
 
   function hideAndShowHeader() {
-    let slideInClass = ' ' + styles.slideIn
-    let scrollDownClass = styles.isHidden
+    let slideInClass = ' ' + styles.slideIn;
+    let scrollDownClass = styles.isHidden;
 
     if (isSideNavigationActive) { slideInClass = ''; scrollDownClass = [styles.isVisible].join(' '); }
     const currentScrollPos = window.pageYOffset;
@@ -61,7 +68,7 @@ export default function Header(props: React.PropsWithChildren<IHeaderProps>) {
 
   return (
     <div>
-      <header className={[styles.header ,isHeaderHiddenClassName.current].join(' ')}>
+      <header className={[styles.header, isHeaderHiddenClassName.current].join(' ')}>
         <div className={styles.headerLeft}>
           <SideNavigationButton
             isActive={isSideNavigationActive}
@@ -96,9 +103,47 @@ export default function Header(props: React.PropsWithChildren<IHeaderProps>) {
           ></div>
           <Logo />
         </div>
-        <HeaderNavigation>{props.children}</HeaderNavigation>
+        <HeaderNavigation>
+          {props.children}
+        </HeaderNavigation>
       </header>
-      <SideNavigation isActive={isSideNavigationActive}>{props.sideNavChildren}</SideNavigation>
+      <SideNavigation isActive={isSideNavigationActive}>
+        {props.overrideSideNavContent
+          ? props.overrideSideNavContent
+          : <>
+            <Card className={sideNavStyles.menuCard}>
+              <h4>Other Sites</h4>
+              <NavLink
+                className={sideNavStyles.sideNavLink}
+                pathName="/projects"
+                displayText="Projects"
+              />
+              <NavLink
+                className={sideNavStyles.sideNavLink}
+                pathName="/Kyles-Cookbook/en"
+                displayText="Cookbook 🇬🇧"
+              />
+              <NavLink
+                className={sideNavStyles.sideNavLink}
+                pathName="/Kyles-Cookbook/de"
+                displayText="Cookbook 🇩🇪"
+              />
+              <NavLink
+                className={sideNavStyles.sideNavLink}
+                pathName="/receipt-manager"
+                displayText="Receipt Manager"
+              />
+              {props.addSideNavChildren !== undefined && props.addSideNavChildren.map((child) => {
+                return child;
+              })}
+            </Card>
+            {props.addSideNavMenuCards !== undefined && props.addSideNavMenuCards.map((card) => {
+              return card;
+            })}
+          </>
+        }
+
+      </SideNavigation>
       <ScrollUpButton isVisible={!isScrollArrowHidden}></ScrollUpButton>
     </div>
   );
