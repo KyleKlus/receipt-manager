@@ -27,7 +27,7 @@ export default function Header(props: React.PropsWithChildren<IHeaderProps>) {
     let slideInClass = ' ' + styles.slideIn
     let scrollDownClass = styles.isHidden
 
-    if (isSideNavigationActive) { slideInClass = ''; scrollDownClass = styles.isVisible; }
+    if (isSideNavigationActive) { slideInClass = ''; scrollDownClass = [styles.isVisible].join(' '); }
     const currentScrollPos = window.pageYOffset;
     const lastScrollPos = lastScroll.current;
     lastScroll.current = currentScrollPos;
@@ -39,12 +39,12 @@ export default function Header(props: React.PropsWithChildren<IHeaderProps>) {
       setIsScrollArrowHidden(true);
     } else if (currentScrollPos < lastScrollPos) {
       // up
-      isHeaderHiddenClassName.current = styles.isVisible;
+      isHeaderHiddenClassName.current = [styles.isVisible].join(' ');
 
       setIsHeaderHidden(false);
     } else if (currentScrollPos > lastScrollPos) {
       // down
-      isHeaderHiddenClassName.current = styles.isVisible;
+      isHeaderHiddenClassName.current = [styles.isVisible].join(' ');
       setIsHeaderHidden(true);
       setIsScrollArrowHidden(false);
     }
@@ -61,9 +61,10 @@ export default function Header(props: React.PropsWithChildren<IHeaderProps>) {
 
   return (
     <div>
-      <header className={styles.header + ' ' + isHeaderHiddenClassName.current}>
+      <header className={[styles.header ,isHeaderHiddenClassName.current].join(' ')}>
         <div className={styles.headerLeft}>
           <SideNavigationButton
+            isActive={isSideNavigationActive}
             onClick={() => {
               setIsSideNavigationActive(!isSideNavigationActive);
               if (!isSideNavigationActive) {

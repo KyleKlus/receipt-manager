@@ -6,9 +6,8 @@
     align-items: center;
     background-color: var(--bg-color-00);
     border-radius: var(--border-radius);
-    box-shadow:
-        0 0 0 1px hsla(0, 0%, 0%, .6),
-        0 2px 3px hsla(0, 0%, 0%, .6);
+    outline: 1px solid var(--bg-color-40);
+    box-shadow:var(--shadowElevation_4);
 
 }
 
@@ -33,23 +32,6 @@
 
 .fancyButton {
     padding: 2px 4px;
-    background-color: var(--bg-color-25);
-    border: 1px solid var(--bg-color-50);
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    box-shadow:
-        0 0 0 1px hsla(0, 0%, 0%, .6),
-        0 2px 3px hsla(0, 0%, 0%, .6);
-    transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
-}
-
-.fancyButton:hover {
-    background-color: var(--bg-color-30);
-    border-color: var(--bg-color-70);
-    box-shadow:
-        0 0 0 1px hsla(0, 0%, 0%, .6),
-        0 2px 3px hsla(0, 0%, 0%, .6),
-        0 4px 3px hsla(0, 0%, 0%, .4);
 }
 
 .personAddItemWrapper {

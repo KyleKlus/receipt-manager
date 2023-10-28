@@ -1,8 +1,8 @@
 /** @format */
 import styles from '@/styles/components/header/SideNavigation.module.css';
 import Card from '../Card';
-import NavLink from './NavLink';
-import ScrollNavLink from './ScrollNavLink';
+import NavLink from '../links/NavLink';
+import ScrollNavLink from '../links/ScrollNavLink';
 
 interface ISideNavigationProps {
   isActive: boolean;
@@ -14,8 +14,8 @@ export default function SideNavigation(
 
 
   return (
-    <nav className={styles.sideNavMenu + ' ' + isActiveClassName}>
-      <Card className={styles.menuCard}>
+    <nav className={[styles.sideNavMenu,isActiveClassName, 'shadowElevation_5'].join(' ')}>
+      <Card className={[styles.menuCard].join(' ')}>
         <h4>Main Site</h4>
         <ScrollNavLink
           className={styles.sideNavLink}

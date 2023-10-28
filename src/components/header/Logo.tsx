@@ -13,7 +13,7 @@ export default function Logo() {
         e.preventDefault();
         router.push('/');
       }}
-      className={styles.logoWrapper}
+      className={[styles.logoWrapper].join(' ')}
     >
       <Image
         src={process.env.basePath + "/KK_Logo.svg"}
@@ -21,6 +21,7 @@ export default function Logo() {
         width={'42'}
         height={'42'}
         quality={100}
+        className={['buttonClass'].join(' ')}
       ></Image>
       <p>Kyle Klus</p>
     </div>
