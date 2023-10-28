@@ -24,7 +24,9 @@ export default function NavLink(props: React.PropsWithChildren<INavLinkProps>) {
 
   const styleClass =
     (lastPropsPathNameElement.length === 0 && lastPathNameElement.length === 0) ||
-      (lastPropsPathNameElement.length !== 0 && lastPathNameElement.length !== 0 && lastPropsPathNameElement.indexOf(lastPathNameElement) !== -1)
+      (lastPropsPathNameElement.length !== 0 && lastPathNameElement.length !== 0 && lastPropsPathNameElement.indexOf(lastPathNameElement) !== -1) ||
+      (lastPropsPathNameElement.length === 0 && lastBasePathElement.length === 0) ||
+      (lastPropsPathNameElement.length !== 0 && lastBasePathElement.length !== 0 && lastPropsPathNameElement.indexOf(lastBasePathElement) !== -1)
       ? styles.isCurrentWindow
       : '';
 
