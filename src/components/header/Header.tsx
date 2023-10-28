@@ -116,22 +116,22 @@ export default function Header(props: React.PropsWithChildren<IHeaderProps>) {
               <NavLink
                 className={sideNavStyles.sideNavLink}
                 pathName="https://majorenkidu.github.io/projects"
-                displayText="Projects"
+                displayText="Projects 🛠️"
               />
               <NavLink
                 className={sideNavStyles.sideNavLink}
                 pathName="https://majorenkidu.github.io/Kyles-Cookbook/en"
-                displayText="Cookbook 🇬🇧"
+                displayText="Cookbook 🧑‍🍳 🇬🇧"
               />
               <NavLink
                 className={sideNavStyles.sideNavLink}
                 pathName="https://majorenkidu.github.io/Kyles-Cookbook/de"
-                displayText="Cookbook 🇩🇪"
+                displayText="Cookbook 🧑‍🍳 🇩🇪"
               />
               <NavLink
                 className={sideNavStyles.sideNavLink}
                 pathName="https://majorenkidu.github.io/receipt-manager"
-                displayText="Receipt Manager"
+                displayText="Receipt Manager 🧾"
               />
               {props.addSideNavChildren !== undefined && props.addSideNavChildren.map((child) => {
                 return child;
