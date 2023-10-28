@@ -19,7 +19,7 @@ interface INavLinkProps {
 export default function NavLink(props: React.PropsWithChildren<INavLinkProps>) {
   const router = useRouter();
   const styleClass =
-    router.pathname.endsWith(props.pathName) ? styles.isCurrentWindow : '';
+    router.pathname.replace('/','').replace('#','').endsWith(props.pathName.split('/').reverse()[0].replace('#','')) ? styles.isCurrentWindow : '';
 
   return (
     <Link

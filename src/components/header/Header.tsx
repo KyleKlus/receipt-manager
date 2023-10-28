@@ -115,22 +115,22 @@ export default function Header(props: React.PropsWithChildren<IHeaderProps>) {
               <h4>Other Sites</h4>
               <NavLink
                 className={sideNavStyles.sideNavLink}
-                pathName="/projects"
+                pathName="https://majorenkidu.github.io/projects"
                 displayText="Projects"
               />
               <NavLink
                 className={sideNavStyles.sideNavLink}
-                pathName="/Kyles-Cookbook/en"
+                pathName="https://majorenkidu.github.io/Kyles-Cookbook/en"
                 displayText="Cookbook 🇬🇧"
               />
               <NavLink
                 className={sideNavStyles.sideNavLink}
-                pathName="/Kyles-Cookbook/de"
+                pathName="https://majorenkidu.github.io/Kyles-Cookbook/de"
                 displayText="Cookbook 🇩🇪"
               />
               <NavLink
                 className={sideNavStyles.sideNavLink}
-                pathName="/receipt-manager"
+                pathName="https://majorenkidu.github.io/receipt-manager"
                 displayText="Receipt Manager"
               />
               {props.addSideNavChildren !== undefined && props.addSideNavChildren.map((child) => {
