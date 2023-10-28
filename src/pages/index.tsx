@@ -3,22 +3,16 @@ import Head from 'next/head';
 import Footer from '@/components/footer/Footer';
 import Header from '@/components/header/Header';
 import Content from '@/components/Content';
-import { ExportToCsv } from 'export-to-csv';
 
 import Main from '@/components/Main';
 
 import styles from '@/styles/ReceiptManager.module.css'
 import headerStyles from '@/styles/components/header/Header.module.css'
-import sideNavStyles from '@/styles/components/header/SideNavigation.module.css'
-import footerStyles from '@/styles/components/footer/Footer.module.css'
 
 import ScrollNavLink from '@/components/links/ScrollNavLink';
 import dynamic from 'next/dynamic';
 
-import Link from 'next/link';
-import NavLink from '@/components/links/NavLink';
-import Card from '@/components/Card';
-import { ChangeEvent, SyntheticEvent, useState } from 'react';
+import { useState } from 'react';
 import { IReceipt } from '@/interfaces/IReceipt';
 import * as CSVParser from '@/handlers/DataParser';
 import PersonCard from '@/components/personCell/PersonCard';
@@ -33,7 +27,6 @@ const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
 export default function Home() {
   const [firstPersonName, setFirstPersonName] = useState<string>('Person 1');
   const [firstReceipts, setFirstReceipts] = useState<IReceipt[]>([]);
-
 
   const [secondPersonName, setSecondPersonName] = useState<string>('Person 2');
   const [secondReceipts, setSecondReceipts] = useState<IReceipt[]>([]);
@@ -92,7 +85,6 @@ export default function Home() {
 
     isFirstList ? setFirstReceipts([...updatedList]) : setSecondReceipts([...updatedList]);
   }
-
 
   function selectCategoryForAllItems(receiptNum: number, isFrist: boolean, selectedCategory: Category) {
     const updatedList: IReceipt[] = isFrist ? firstReceipts.slice(0) : secondReceipts.slice(0);
@@ -166,7 +158,6 @@ export default function Home() {
     isFirstList ? setFirstReceipts([...updatedList]) : setSecondReceipts([...updatedList]);
   }
 
-
   async function uploadFile(files: FileList | null, isFirst: boolean): Promise<void> {
     if (files !== null && files !== undefined) {
       let receipts: IReceipt[] = [];
@@ -189,30 +180,6 @@ export default function Home() {
       setSecondReceipts([...receipts]);
     }
   }
-
-  function getSideNavChildren() {
-    return (
-      <Card className={sideNavStyles.menuCard}>
-        <h4>Other Sites</h4>
-        <NavLink
-          className={sideNavStyles.sideNavLink}
-          pathName="/projects"
-          displayText="Projects"
-        />
-        <NavLink
-          className={sideNavStyles.sideNavLink}
-          pathName="/Kyles-Cookbook/en"
-          displayText="Cookbook 🇬🇧"
-        />
-        <NavLink
-          className={sideNavStyles.sideNavLink}
-          pathName="/Kyles-Cookbook/de"
-          displayText="Cookbook 🇩🇪"
-        />
-      </Card>
-    );
-  }
-
 
   return (
     <>
@@ -250,7 +217,7 @@ export default function Home() {
           href={process.env.basePath + "/favicon-16x16.png"}
         />
       </Head>
-      <Header sideNavChildren={getSideNavChildren()}>
+      <Header>
         <ScrollNavLink
           className={headerStyles.headerNavLink}
           elementName="https://majorenkidu.github.io/#heroPage"
