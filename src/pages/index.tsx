@@ -184,10 +184,10 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Kyle Klus | Receipt Manager</title>
+        <title>Kyle Klus | Receipt Manager 🧾</title>
         <meta
           name="description"
-          content="Receipt Manager"
+          content="Receipt Manager web app"
         />
         <meta
           name="viewport"
