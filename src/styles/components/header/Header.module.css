@@ -57,10 +57,10 @@
 }
 
 .header.isVisible {
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(4px);
   background-color: var(--bg-color-translucent-05);
   border-bottom: 1px solid var(--bg-color-40);
-  box-shadow: 0px 2px 12px hsla(196, 3%, 3%, 0.25);
+  box-shadow: var(--shadowElevation_4);
 }
 
 .header.isHidden {
@@ -110,9 +110,8 @@
   .header {
     backdrop-filter: blur(6px);
     background-color: var(--bg-color-translucent-05);
-    border-bottom: 1px solid var(--bg-color-30);
-    box-shadow: 6px 2px 12px hsla(196, 3%, 3%, 0.5);
-
+    border-bottom: 1px solid var(--bg-color-40);
+    box-shadow: var(--shadowElevation_4);
   }
 
   .headerNavLink {

@@ -1,6 +1,5 @@
 /** @format */
 import fs from 'fs';
-import path from 'path';
 
 
 import Head from 'next/head';
@@ -10,16 +9,14 @@ import Content from '@/components/Content';
 
 import Main from '@/components/Main';
 
-import headerStyles from '@/styles/components/header/Header.module.css'
-import footerStyles from '@/styles/components/footer/Footer.module.css'
+import headerStyles from '@/styles/components/header/Header.module.css';
 
-import ScrollNavLink from '@/components/header/ScrollNavLink';
+import ScrollNavLink from '@/components/links/ScrollNavLink';
 import dynamic from 'next/dynamic';
 
 import Link from 'next/link';
 import matter from 'gray-matter';
 import IPost from '@/interfaces/IPost';
-import NavLink from '@/components/header/NavLink';
 
 const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
   ssr: false,
@@ -85,32 +82,7 @@ export default function MarkdownPostListTemplate(props: { posts: IPost[] }) {
         <Content id='markdownSection' className={['applyHeaderOffset'].join(' ')}>
           {...props.posts.map((post, index) => { return (<Link key={index} href={'posts/' + post.slug}>{post.slug}</Link>) })}
         </Content>
-        <Footer>
-          <ScrollNavLink
-            className={footerStyles.footerNavLink}
-            elementName="https://majorenkidu.github.io/#heroPage"
-            displayText="Home"
-          />
-          <ScrollNavLink
-            className={footerStyles.footerNavLink}
-            elementName="https://majorenkidu.github.io/#portfolioPage"
-            displayText="Portfolio"
-          />
-          <ScrollNavLink
-            className={footerStyles.footerNavLink}
-            elementName="https://majorenkidu.github.io/#aboutPage"
-            displayText="About"
-          />
-          <Link href={'https://github.com/MajorEnkidu'} className={footerStyles.footerNavLink}>GitHub</Link>
-          <Link href={'https://www.linkedin.com/in/kyle-klus-9a2588275'} className={footerStyles.footerNavLink}>LinkedIn</Link>
-          <Link href={'https://ko-fi.com/majorenkidu'} className={footerStyles.footerNavLink}>Ko-fi</Link>
-          <Link href={'mailto:kyle.klus.2@gmail.com'} className={footerStyles.footerNavLink}>Contact</Link>
-          <NavLink
-            className={footerStyles.sideNavLink + ' ' + footerStyles.footerNavLink}
-            pathName="https://majorenkidu.github.io/privacy"
-            displayText="Privacy"
-          />
-        </Footer>
+        <Footer/>
       </Main>
     </>
   );

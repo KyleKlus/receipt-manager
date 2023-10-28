@@ -1,11 +1,20 @@
 /** @format */
-
-a.navLink {
+.navLink {
   text-decoration: none;
   position: relative;
   font-size: large;
   box-shadow: none;
   cursor: pointer;
+  margin-bottom: 4px;
+  color: var(--bg-color-90);
+  transform: scale(1);
+  transition: transform 200ms ease;
+}
+
+
+button.navLink {
+  background-color: transparent;
+  border: none;
 }
 
 .navLink::after {
@@ -32,11 +41,18 @@ a.navLink {
 
   .navLink:focus-within::after,
   .navLink:hover::after {
+    box-shadow: none;
     visibility: visible;
     transform: scaleX(1);
     background-color: var(--color-accent-00);
   }
 
+  .navLink:focus-within,
+  .navLink:hover {
+    box-shadow: none;
+    transform: scale(1.05);
+    color: var(--bg-color-90);
+  }
 }
 
 @media (prefers-reduced-motion) {

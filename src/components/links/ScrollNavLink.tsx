@@ -1,6 +1,7 @@
 /** @format */
 
-import styles from '@/styles/components/header/ScrollNavLink.module.css';
+import scrollStyles from '@/styles/components/links/ScrollNavLink.module.css';
+import navStyles from '@/styles/components/links/NavLink.module.css';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -14,9 +15,9 @@ interface INavLinkProps {
 export default function ScrollNavLink(props: React.PropsWithChildren<INavLinkProps>) {
   const router = useRouter();
   const [isInView, setIsInView] = useState(false)
-  const styleClass = props.className ? ' ' + props.className : ''
+  const styleClass = props.className ? props.className : ''
   const classes =
-    isInView || router.pathname.endsWith(props.elementName) ? ' ' + styles.isCurrentWindow + styleClass : styleClass;
+    isInView || router.pathname.endsWith(props.elementName) ? [navStyles.isCurrentWindow, styleClass].join(' ') : styleClass;
 
   useEffect(() => {
     function determineCurrentPage() {
@@ -44,13 +45,13 @@ export default function ScrollNavLink(props: React.PropsWithChildren<INavLinkPro
 
   const correctElement = props.elementName.startsWith('/') || props.elementName.startsWith('www.') || props.elementName.startsWith('https')
     ? <Link
-      className={styles.navLink + classes}
+      className={[navStyles.navLink, classes].join(' ')}
       href={props.elementName}
     >
       {props.displayText}
     </Link>
     : <button
-      className={styles.navLink + classes}
+      className={[scrollStyles.scrollNavLink, navStyles.navLink, classes].join(' ')}
       onClick={(e) => {
         const element = document.getElementById(props.elementName)
         if (element) {
