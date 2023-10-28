@@ -8,9 +8,8 @@
     align-items: center;
     gap: 16px;
     padding-top: 16px;
-    box-shadow:
-        0 0 0 1px hsla(0, 0%, 0%, .6),
-        0 2px 3px hsla(0, 0%, 0%, .6);
+    outline: 1px solid var(--bg-color-40);
+    box-shadow:var(--shadowElevation_4);
     background-color: var(--bg-color-00);
     border-radius: var(--border-radius);
     overflow: hidden;
@@ -20,16 +19,14 @@
 .table {
     border-spacing: 0px;
     width: 100%;
-    box-shadow:
-        0 0 0 1px hsla(0, 0%, 0%, .6),
-        0 2px 3px hsla(0, 0%, 0%, .6);
+    outline: 1px solid var(--bg-color-50);
     background-color: var(--bg-color-00);
 
     overflow: hidden;
 }
 
 .table th {
-    border-bottom: 1px solid var(--bg-color-90);
+    border-bottom: 1px solid var(--bg-color-70);
     font-size: large;
     padding: 12px 4px;
 }
@@ -102,9 +99,7 @@
     background-color: var(--bg-color-10);
     border-radius: 10px;
     outline: 1px solid var(--bg-color-80);
-    box-shadow:
-        0 0 0 1px hsla(0, 0%, 0%, .6),
-        0 2px 3px hsla(0, 0%, 0%, .6);
+    box-shadow:var(--shadowElevation_4);
     cursor: pointer;
     display: inline-block;
     height: 15px;
@@ -121,10 +116,7 @@
 .table td input[type='radio']:not(:checked):hover {
     background-color: var(--bg-color-30);
     outline-color: var(--bg-color-90);
-    box-shadow:
-        0 0 0 1px hsla(0, 0%, 0%, .6),
-        0 2px 3px hsla(0, 0%, 0%, .6),
-        0 4px 3px hsla(0, 0%, 0%, .4);
+    box-shadow:var(--shadowElevation_4);
 }
 
 .table td input[type='radio']:disabled {

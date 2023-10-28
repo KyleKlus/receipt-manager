@@ -12,11 +12,11 @@ import headerStyles from '@/styles/components/header/Header.module.css'
 import sideNavStyles from '@/styles/components/header/SideNavigation.module.css'
 import footerStyles from '@/styles/components/footer/Footer.module.css'
 
-import ScrollNavLink from '@/components/header/ScrollNavLink';
+import ScrollNavLink from '@/components/links/ScrollNavLink';
 import dynamic from 'next/dynamic';
 
 import Link from 'next/link';
-import NavLink from '@/components/header/NavLink';
+import NavLink from '@/components/links/NavLink';
 import Card from '@/components/Card';
 import { ChangeEvent, SyntheticEvent, useState } from 'react';
 import { IReceipt } from '@/interfaces/IReceipt';
@@ -29,8 +29,6 @@ import { IReceiptItem } from '@/interfaces/IReceiptItem';
 const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
   ssr: false,
 });
-
-
 
 export default function Home() {
   const [firstPersonName, setFirstPersonName] = useState<string>('Person 1');
@@ -192,59 +190,6 @@ export default function Home() {
     }
   }
 
-
-  // function calcResult(list: IListItem[], isFirstResult: boolean): number {
-  //   let myResult: number = 0;
-  //   let otherResult: number = 0;
-
-  //   let myRejectedResult: number = 0;
-  //   let otherRejectedResult: number = 0;
-
-  //   let mySharedResult: number = 0;
-  //   let otherSharedResult: number = 0;
-
-  //   const myList: IListItem[] = isFirstResult ? firstReceipts : secondReceipts;
-  //   const otherList: IListItem[] = isFirstResult ? secondReceipts : firstReceipts;
-
-  //   let mySharedItems: IListItem[] = myList.filter(item => { return item.shared });
-  //   let otherSharedItems: IListItem[] = otherList.filter(item => { return item.shared });
-
-  //   let myItems: IListItem[] = myList.filter(item => { return !item.rejected && !item.shared });
-  //   let myRejectedItems = myList.filter(item => { return item.rejected });
-
-  //   let otherItems: IListItem[] = otherList.filter(item => { return !item.rejected && !item.shared });
-  //   let otherRejectedItems = otherList.filter(item => { return item.rejected });
-
-  //   myItems.forEach(item => {
-  //     myResult += item.price
-  //   });
-
-  //   otherItems.forEach(item => {
-  //     otherResult += item.price
-  //   });
-
-  //   myRejectedItems.forEach(item => {
-  //     myRejectedResult += item.price
-  //   });
-
-  //   otherRejectedItems.forEach(item => {
-  //     otherRejectedResult += item.price
-  //   });
-
-  //   mySharedItems.forEach(item => {
-  //     mySharedResult += Math.floor((item.price / 2) * 100) / 100
-  //   });
-
-  //   otherSharedItems.forEach(item => {
-  //     otherSharedResult += Math.floor((item.price / 2) * 100) / 100
-  //   });
-
-  //   const myFinalResult = otherSharedResult + otherRejectedResult
-  //   const otherFinalResult = mySharedResult + myRejectedResult
-
-  //   return myFinalResult > otherFinalResult ? Math.floor((myFinalResult - otherFinalResult) * 100) / 100 : 0
-  // }
-
   function getSideNavChildren() {
     return (
       <Card className={sideNavStyles.menuCard}>
@@ -381,32 +326,7 @@ export default function Home() {
             />
           }
         </Content>
-        <Footer>
-          <ScrollNavLink
-            className={footerStyles.footerNavLink}
-            elementName="https://majorenkidu.github.io/#heroPage"
-            displayText="Home"
-          />
-          <ScrollNavLink
-            className={footerStyles.footerNavLink}
-            elementName="https://majorenkidu.github.io/#portfolioPage"
-            displayText="Portfolio"
-          />
-          <ScrollNavLink
-            className={footerStyles.footerNavLink}
-            elementName="https://majorenkidu.github.io/#aboutPage"
-            displayText="About"
-          />
-          <Link href={'https://github.com/MajorEnkidu'} className={footerStyles.footerNavLink}>GitHub</Link>
-          <Link href={'https://www.linkedin.com/in/kyle-klus-9a2588275'} className={footerStyles.footerNavLink}>LinkedIn</Link>
-          <Link href={'https://ko-fi.com/majorenkidu'} className={footerStyles.footerNavLink}>Ko-fi</Link>
-          <Link href={'mailto:kyle.klus.2@gmail.com'} className={footerStyles.footerNavLink}>Contact</Link>
-          <NavLink
-            className={footerStyles.sideNavLink + ' ' + footerStyles.footerNavLink}
-            pathName="https://majorenkidu.github.io/privacy"
-            displayText="Privacy"
-          />
-        </Footer>
+        <Footer />
       </Main>
     </>
   );
