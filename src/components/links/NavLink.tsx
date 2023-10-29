@@ -22,9 +22,6 @@ export default function NavLink(props: React.PropsWithChildren<INavLinkProps>) {
   const lastPathNameElement: string = router.pathname.split('/').reverse()[0].replace('#', '');
   const lastPropsPathNameElement: string = props.pathName.split('/').reverse()[0].replace('#', '');
 
-  console.log(router.basePath.split('/'), router.pathname.split('/'), props.pathName.split('/'));
-
-
   const styleClass =
     (lastPropsPathNameElement.length === 0 && lastPathNameElement.length === 0) ||
       (lastPropsPathNameElement.length !== 0 && lastPathNameElement.length !== 0 && lastPropsPathNameElement.indexOf(lastPathNameElement) !== -1) ||
