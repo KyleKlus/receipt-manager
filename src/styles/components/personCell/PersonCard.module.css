@@ -7,7 +7,7 @@
     background-color: var(--bg-color-00);
     border-radius: var(--border-radius);
     outline: 1px solid var(--bg-color-40);
-    box-shadow:var(--shadowElevation_4);
+    box-shadow: var(--shadowElevation_4);
 
 }
 
@@ -117,11 +117,51 @@
         padding: 3px 3px;
         font-size: 0.5rem;
     }
+
+    .personCard {
+        width: 100%;
+    }
+
+    .personAddItemWrapper input[type='number'] {
+        width: 6ch;
+    }
+
+    .personAddItemWrapper > *:nth-child(1),
+    .personAddItemWrapper > *:nth-child(2) {
+        width: 30ch;
+    }
+
+    .personAddItemWrapper > *:nth-child(3) {
+        display: flex;
+        gap: 7ch;
+    }
+
+    .personAddItemWrapper > *:nth-child(4) {
+        width: 7ch;
+    }
 }
 
 @media (max-width: 400px) {}
 
-@media (max-width: 300px) {}
+@media (max-width: 340px) {
+    .personAddItemWrapper input[type='number'] {
+        width: 6ch;
+    }
+
+    .personAddItemWrapper > *:nth-child(1),
+    .personAddItemWrapper > *:nth-child(2) {
+        width: 20ch;
+    }
+
+    .personAddItemWrapper > *:nth-child(3) {
+        display: flex;
+        gap: 6ch;
+    }
+
+    .personAddItemWrapper > *:nth-child(4) {
+        width: 6ch;
+    }
+}
 
 /* Tablet and Smaller Desktop */
 @media (min-width: 601px) and (max-width: 1120px) {}

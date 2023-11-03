@@ -9,7 +9,7 @@
     gap: 16px;
     padding-top: 16px;
     outline: 1px solid var(--bg-color-40);
-    box-shadow:var(--shadowElevation_4);
+    box-shadow: var(--shadowElevation_4);
     background-color: var(--bg-color-00);
     border-radius: var(--border-radius);
     overflow: hidden;
@@ -29,6 +29,11 @@
     border-bottom: 1px solid var(--bg-color-70);
     font-size: large;
     padding: 12px 4px;
+}
+
+.table :is(th, td) {
+    word-break: keep-all;
+    overflow: hidden;
 }
 
 .table td {
@@ -99,7 +104,7 @@
     background-color: var(--bg-color-10);
     border-radius: 10px;
     outline: 1px solid var(--bg-color-80);
-    box-shadow:var(--shadowElevation_4);
+    box-shadow: var(--shadowElevation_4);
     cursor: pointer;
     display: inline-block;
     height: 15px;
@@ -116,7 +121,7 @@
 .table td input[type='radio']:not(:checked):hover {
     background-color: var(--bg-color-30);
     outline-color: var(--bg-color-90);
-    box-shadow:var(--shadowElevation_4);
+    box-shadow: var(--shadowElevation_4);
 }
 
 .table td input[type='radio']:disabled {
@@ -148,13 +153,26 @@ td.personTableCellHeader {
 }
 
 /* Mobile */
-@media (max-width: 650px) {
+@media (max-width: 970px) {
     .personCell {
         font-size: small;
     }
 
-    .table th {
+    .table th,
+    .personTableCellHeader,
+    .table :is(td, th):nth-child(7) select {
         font-size: small;
+    }
+
+    .table :is(td, th):nth-child(7) {
+        max-width: 20ch;
+        min-width: 15ch;
+    }
+
+    .table :is(td, th):nth-child(1) {
+        max-width: 25ch;
+        min-width: 20ch;
+        padding-left: 5px;
     }
 
     .table td input[type='radio'] {
@@ -178,12 +196,14 @@ td.personTableCellHeader {
 
 }
 
-@media (max-width: 550px) {
+@media (max-width: 860px) {
     .personCell {
         font-size: x-small;
     }
 
-    .table th {
+    .table th,
+    .personTableCellHeader,
+    .table :is(td, th):nth-child(7) select {
         font-size: smaller;
     }
 
@@ -194,6 +214,56 @@ td.personTableCellHeader {
     .personHeader button {
         padding: 3px 3px;
         font-size: 0.5rem;
+    }
+}
+
+@media (max-width: 760px) {
+    .table :is(td, th):nth-child(7) {
+        max-width: 10ch;
+        min-width: 5ch;
+    }
+
+    .table :is(td, th):nth-child(1) {
+        max-width: 15ch;
+        min-width: 10ch;
+        padding-left: 2px;
+    }
+
+    .table td {
+        padding: 4px 2px;
+    }
+
+    .receiptsTable {
+        margin: 0 16px 64px 16px;
+        width: calc(100% - 32px);
+    }
+}
+
+@media (max-width: 650px) {
+
+    .table :is(td, th):not(:nth-child(7), :nth-child(1), :nth-child(2)) {
+        max-width: 2ch;
+        min-width: 10px;
+    }
+
+    .table :is(td, th):nth-child(7) {
+        max-width: 5ch;
+        min-width: 0ch;
+    }
+
+    .table :is(td, th):nth-child(1) {
+        max-width: 10ch;
+        min-width: 5ch;
+        padding-left: 2px;
+    }
+
+    .table td {
+        padding: 2px 0px;
+    }
+
+    .receiptsTable {
+        margin: 0 8px 64px 8px;
+        width: calc(100% - 16px);
     }
 }
 
