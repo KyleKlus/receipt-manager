@@ -48,3 +48,18 @@
 .personTableSum div {
     padding: 0 8px;
 }
+
+@media (max-width: 500px) {
+    .receiptsOverview {
+        font-size: small;
+    }
+
+    .personTableHorizontalSplit {
+        flex-direction: column;
+
+    }
+
+    .personTableSum > * {
+        padding: 0 2px;
+    }
+}
