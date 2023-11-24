@@ -1,7 +1,6 @@
 import { IReceipt } from "@/interfaces/IReceipt";
 import { IReceiptItem } from "@/interfaces/IReceiptItem";
 import { IResult } from "@/interfaces/IResult";
-import { ExportToCsv } from "export-to-csv";
 import * as XLSX from 'xlsx';
 
 export enum Category {
