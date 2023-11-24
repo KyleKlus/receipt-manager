@@ -1,10 +1,4 @@
 /** @format */
-import fs from 'fs';
-import matter from 'gray-matter';
-import MarkdownSection from '@/components/MarkdownSection';
-import Markdown from 'markdown-to-jsx';
-
-
 import Head from 'next/head';
 import Footer from '@/components/footer/Footer';
 import Header from '@/components/header/Header';
@@ -12,23 +6,47 @@ import Content from '@/components/Content';
 
 import Main from '@/components/Main';
 
-import headerStyles from '@/styles/components/header/Header.module.css';
+import headerStyles from '@/styles/components/header/Header.module.css'
+import navLinkStyles from '@/styles/components/links/NavLink.module.css'
+
+import styles from '@/styles/LockedPage.module.css'
 
 import ScrollNavLink from '@/components/links/ScrollNavLink';
 import dynamic from 'next/dynamic';
 
-import IPost from 'templates/interfaces/IPost';
-import { GetStaticPropsContext } from 'next/types';
+import NavLink from '@/components/links/NavLink';
+import Card from '@/components/Card';
+import { IAuthContext, useAuth } from 'templates/context/AuthContext';
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { IDataBaseContext, useDB } from 'templates/context/DatabaseContext';
 
 const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
   ssr: false,
 });
 
-export default function MarkdownPostListTemplate(props: IPost) {
+export default function Home() {
+  const authContext: IAuthContext = useAuth();
+  const dbContext: IDataBaseContext = useDB();
+  const router = useRouter();
+
+  console.log(authContext);
+  console.log(dbContext);
+
+
+
+  useEffect(() => {
+    if (authContext.user === null) router.push(process.env.basePath + "/auth/login");
+  }, [authContext.user, router]);
+
+  const handleLogout = () => {
+    authContext.logOut();
+  };
+
   return (
     <>
       <Head>
-        <title>Kyle Klus | {props.frontmatter.title}</title>
+        <title>Kyle Klus | Website</title>
         <meta
           name="description"
           content="Website of Kyle Klus."
@@ -61,7 +79,7 @@ export default function MarkdownPostListTemplate(props: IPost) {
           href={process.env.basePath + "/favicon-16x16.png"}
         />
       </Head>
-      <Header>
+      <Header >
         <ScrollNavLink
           className={headerStyles.headerNavLink}
           elementName="https://kyleklus.github.io/#heroPage"
@@ -77,58 +95,31 @@ export default function MarkdownPostListTemplate(props: IPost) {
           elementName="https://kyleklus.github.io/#aboutPage"
           displayText="About"
         />
+        <button onClick={handleLogout} className={[navLinkStyles.navLink].join(' ')}>Logout</button>
         <ThemeButton />
-      </Header>
+      </Header >
       <Main>
         <div id={'top'}></div>
         <Content className={['applyHeaderOffset'].join(' ')}>
-          <Markdown options={{ wrapper: MarkdownSection, forceWrapper: true }}>{props.content}</Markdown>
+          <button onClick={() => {
+            if (authContext.user === null) { return; }
+            dbContext.addUserDocument(authContext.user, authContext.user?.displayName + '_secrets', { secret: '42', uid: authContext.user?.uid });
+          }}>Add a document</button>
+          <button onClick={() => {
+            if (authContext.user === null) { return; }
+            dbContext.updateUserDocument(authContext.user, authContext.user?.displayName + '_secrets', { secret: '84', uid: authContext.user?.uid });
+          }}>Update a document</button>
+          <button onClick={() => {
+            if (authContext.user === null) { return; }
+            dbContext.deleteUserDocument(authContext.user, authContext.user?.displayName + '_secrets');
+          }}>Delete a document</button>
+          <button onClick={() => {
+            if (authContext.user === null) { return; }
+            dbContext.readUserDocument(authContext.user, authContext.user?.displayName + '_secrets');
+          }}>Read a document</button>
         </Content>
         <Footer />
       </Main>
     </>
   );
-}
-
-export async function getStaticPaths() {
-  const folder = 'posts/'
-  const filenames = fs.readdirSync(folder)
-  const markdownFilenames = filenames.filter(file => file.endsWith('.md')).map(filename => '/' + folder + filename).map(filename => filename.replace('.md', ''))
-  return {
-    paths: markdownFilenames,
-    fallback: false
-  }
-}
-
-export async function getStaticProps({ params }: GetStaticPropsContext) {
-
-  // get files
-  const folder = 'posts/'
-  const delimiter = '---'
-  if (!params || !params.markdownPostTemplate || Array.isArray(params.markdownPostTemplate)) return { props: {} };
-
-  const filename = params.markdownPostTemplate + '.md'
-
-  const slug = params.markdownPostTemplate
-  const path = `${folder}${filename}`
-  const buffer = fs.readFileSync(path, 'utf-8')
-  let fileContent = buffer.toString();
-  let frontmatter = {}
-
-  if (fileContent.startsWith(delimiter)) {
-    frontmatter = matter(fileContent).data
-    const startOfFrontmatter = fileContent.indexOf(delimiter)
-    const endOfFrontmatter = fileContent.indexOf(delimiter, startOfFrontmatter + delimiter.length) + delimiter.length
-    fileContent = fileContent.substring(endOfFrontmatter, fileContent.length)
-  }
-
-  return {
-    props: {
-      name: filename,
-      slug: slug,
-      path: path,
-      frontmatter: frontmatter,
-      content: fileContent
-    }
-  }
 }

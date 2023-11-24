@@ -1,0 +1,42 @@
+.loginPageCard {
+    margin-top: calc(50vh - 350px);
+    width: 500px;
+    padding: 42px 64px ;
+    align-items: center;
+    box-shadow: var(--shadowElevation_4);
+}
+
+.textbox{
+    padding: 8px;
+    width: 250px;
+}
+
+.textboxLabel{
+    width: 230px;
+}
+
+.errorLabel{
+    color: #ff4b4b;
+    margin-top: 2px;
+    font-size: xx-small;
+}
+
+.loginButton{
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    justify-content: center;
+    align-self: center;
+    width: 250px;
+}
+
+.googleButton{
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    justify-content: center;
+    max-width: 200px;
+    align-self: center;
+}

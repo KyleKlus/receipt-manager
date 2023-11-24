@@ -23,11 +23,12 @@
 
 .personName {
     background-color: transparent;
-    border: none;
+    border: none !important;
     font-size: x-large;
     text-align: center;
     max-width: 16ch;
     margin-bottom: 16px;
+    box-shadow: none !important;
 }
 
 .fancyButton {
@@ -58,6 +59,8 @@
     border: none;
     border-bottom: 1px dotted var(--bg-color-70);
     transition: border 200ms ease;
+    box-shadow: none;
+    border-radius: 0;
 }
 
 .personAddItemWrapper input[type='text']:is(:hover, :focus-visible),

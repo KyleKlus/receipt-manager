@@ -1,5 +1,5 @@
 /** @format */
-import styles from '@/styles/components/personCell/ReceiptsOverview.module.css';
+import styles from '@/styles/components/receipt-manager/personCell/ReceiptsOverview.module.css';
 
 export default function ReceiptsOverview(props: {
     myName: string,

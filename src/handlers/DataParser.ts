@@ -214,22 +214,6 @@ function _prepCSVDataReceipts(myReceipts: IReceipt[], otherReceipts: IReceipt[])
     })]
 
     const csvData: string = csvDataArray.join('\n');
-
-    // const options = {
-    //     fieldSeparator: ';',
-    //     quoteStrings: '',
-    //     decimalSeparator: ',',
-    //     showLabels: true,
-    //     showTitle: false,
-    //     title: 'expenses',
-    //     useTextFile: false,
-    //     useBom: true,
-    //     useKeysAsHeaders: true,
-    //     // headers: ['Column 1', 'Column 2', etc...] <-- Won't work with useKeysAsHeaders present!
-    // };
-    // const csvExporter = new ExportToCsv(options);
-    // dataString = csvExporter.generateCsv(data, true);
-
     return csvData;
 }
 

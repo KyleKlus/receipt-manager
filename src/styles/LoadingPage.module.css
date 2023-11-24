@@ -1,0 +1,37 @@
+.loadingPage {
+    --spinner-width: 150px;
+    --spinner-line-width: 6px;
+}
+
+@keyframes rotateCircle {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    50% {
+        transform: rotate(180deg);
+    }
+
+    100% {
+        transform: rotate(365deg);
+    }
+}
+
+.loadingImageWrapper {
+    width: calc(var(--spinner-width) + var(--spinner-line-width));
+    height: calc(var(--spinner-width) + var(--spinner-line-width));
+    background: linear-gradient(var(--color-accent-00) 5%, transparent 30%);
+    position: absolute;
+    top: calc(50vh + var(--header-height) - var(--spinner-width));
+    animation: rotateCircle linear 1s infinite;
+    border-radius: 50%;
+}
+
+.loadingImage {
+    width: var(--spinner-width);
+    height: var(--spinner-width);
+    position: absolute;
+    border-radius: 50%;
+    top: calc(50vh + var(--header-height) - var(--spinner-width) + calc(var(--spinner-line-width) / 2));
+    box-shadow: var(--shadowElevation_4);
+}

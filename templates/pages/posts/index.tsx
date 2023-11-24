@@ -16,7 +16,7 @@ import dynamic from 'next/dynamic';
 
 import Link from 'next/link';
 import matter from 'gray-matter';
-import IPost from '@/interfaces/IPost';
+import IPost from 'templates/interfaces/IPost';
 
 const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
   ssr: false,
@@ -82,7 +82,7 @@ export default function MarkdownPostListTemplate(props: { posts: IPost[] }) {
         <Content id='markdownSection' className={['applyHeaderOffset'].join(' ')}>
           {...props.posts.map((post, index) => { return (<Link key={index} href={'posts/' + post.slug}>{post.slug}</Link>) })}
         </Content>
-        <Footer/>
+        <Footer />
       </Main>
     </>
   );
