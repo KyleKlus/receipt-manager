@@ -15,6 +15,9 @@
 button.navLink {
   background-color: transparent;
   border: none;
+  outline: none;
+  box-shadow: none;
+  padding: 0px;
 }
 
 .navLink::after {

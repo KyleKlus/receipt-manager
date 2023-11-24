@@ -11,7 +11,7 @@ export default function Logo() {
     <div
       onClick={(e) => {
         e.preventDefault();
-        router.push('/');
+        router.push('https://kyleklus.github.io/');
       }}
       className={[styles.logoWrapper].join(' ')}
     >
@@ -21,7 +21,7 @@ export default function Logo() {
         width={'42'}
         height={'42'}
         quality={100}
-        className={['buttonClass'].join(' ')}
+        className={[].join(' ')}
       ></Image>
       <p>Kyle Klus</p>
     </div>

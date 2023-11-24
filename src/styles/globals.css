@@ -201,11 +201,32 @@ a,
 button,
 .buttonClass {
   border: 0;
-  outline: 1px solid var(--bg-color-20);
+  outline: 1px solid var(--bg-color-30);
   border-radius: 5px;
+  padding: 8px;
   background: var(--bg-color-00);
   box-shadow: var(--shadowElevation_3);
   transition: background 250ms ease;
+}
+
+input[type=text],
+textarea,
+input[type=password],
+.textboxClass {
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid var(--bg-color-30);
+  background: var(--bg-color-00);
+  box-shadow: var(--shadowElevation_3);
+  outline: none;
+}
+
+input[type=text]:focus-within,
+textarea:focus-within,
+input[type=password]:focus-within,
+.textboxClass:focus-within {
+  border-color: var(--bg-color-60);
+  background: var(--bg-color-05);
 }
 
 a {
@@ -299,6 +320,81 @@ ol li {
   box-shadow: 0 4px 8px hsla(0, 0%, 0%, 0.12);
 }
 
+@keyframes slide-out-dotted {
+  from {
+    --circle-pos-w: calc(calc(100vw - 6.5rem + var(--cross-width)) / 2);
+    --circle-pos-h: calc(calc(100vh - 6.5rem + var(--cross-width)) / 2);
+    background-size: 6.5rem 6.5rem;
+    background-position:
+      var(--circle-pos-w) var(--circle-pos-h),
+      var(--cross-pos-w) var(--cross-pos-h),
+      var(--cross-pos-w) var(--cross-pos-h);
+  }
+
+  25% {
+    background-size: 7rem 7rem;
+    background-position:
+      calc(calc(80vw - 7rem + var(--cross-width)) / 2) calc(calc(70vh - 7rem + var(--cross-width)) / 2),
+      calc(calc(80vw + var(--cross-arm-width)) / 2) calc(calc(70vh + var(--cross-arm-width)) / 2),
+      calc(calc(80vw + var(--cross-arm-width)) / 2) calc(calc(70vh + var(--cross-arm-width)) / 2);
+  }
+
+  60% {
+    background-size: 7.5rem 7.5rem;
+    background-position:
+      calc(calc(90vw - 7.5rem + var(--cross-width)) / 2) calc(calc(80vh - 7.5rem + var(--cross-width)) / 2),
+      calc(calc(90vw + var(--cross-arm-width)) / 2) calc(calc(80vh + var(--cross-arm-width)) / 2),
+      calc(calc(90vw + var(--cross-arm-width)) / 2) calc(calc(80vh + var(--cross-arm-width)) / 2);
+  }
+
+  80% {
+    background-size: 7rem 7rem;
+    background-position:
+      calc(calc(80vw - 7rem + var(--cross-width)) / 2) calc(calc(90vh - 7rem + var(--cross-width)) / 2),
+      calc(calc(80vw + var(--cross-arm-width)) / 2) calc(calc(90vh + var(--cross-arm-width)) / 2),
+      calc(calc(80vw + var(--cross-arm-width)) / 2) calc(calc(90vh + var(--cross-arm-width)) / 2);
+  }
+
+  to {
+    --circle-pos-w: calc(calc(100vw - 6.5rem + var(--cross-width)) / 2);
+    --circle-pos-h: calc(calc(100vh - 6.5rem + var(--cross-width)) / 2);
+    background-size: 6.5rem 6.5rem;
+    background-position:
+      var(--circle-pos-w) var(--circle-pos-h),
+      var(--cross-pos-w) var(--cross-pos-h),
+      var(--cross-pos-w) var(--cross-pos-h);
+  }
+
+
+  /* to {
+    background-position: calc(var(--cross-position) - 100vh) calc(var(--cross-position) - 100vw), calc(-100vh - var(--cross-arm-width)) calc(-100vw - var(--cross-arm-width)), calc(-100vh - var(--cross-arm-width)) calc(-100vw - var(--cross-arm-width));
+  } */
+}
+
+.dotted {
+  --cross-arm-width: .08rem;
+  --cross-width: calc(var(--cross-arm-width)*2);
+  --spacing: 6.5rem;
+
+  --circle-pos-w: calc(calc(100vw - var(--spacing) + var(--cross-width)) / 2);
+  --circle-pos-h: calc(calc(100vh - var(--spacing) + var(--cross-width)) / 2);
+
+  --cross-pos-w: calc(calc(100vw + var(--cross-arm-width)) / 2);
+  --cross-pos-h: calc(calc(100vh + var(--cross-arm-width)) / 2);
+
+  background-image:
+    radial-gradient(circle, transparent var(--cross-width), var(--bg-color-05) var(--cross-width)),
+    linear-gradient(var(--bg-color-50) var(--cross-arm-width), transparent var(--cross-arm-width)),
+    linear-gradient(90deg, var(--bg-color-50) var(--cross-arm-width), transparent var(--cross-arm-width));
+  background-size: var(--spacing) var(--spacing);
+  background-position:
+    var(--circle-pos-w) var(--circle-pos-h),
+    var(--cross-pos-w) var(--cross-pos-h),
+    var(--cross-pos-w) var(--cross-pos-h);
+  background-repeat: repeat;
+  animation: slide-out-dotted 60s linear infinite;
+}
+
 @media (max-width: 600px) {
 
   html,
@@ -322,6 +418,13 @@ ol li {
     background: var(--bg-color-10);
     box-shadow: var(--shadowElevation_3);
     outline: 1.5px solid var(--bg-color-40);
+  }
+
+  input[type=text]:not(:focus-within):hover,
+  textarea:not(:focus-within):hover,
+  input[type=password]:not(:focus-within):hover,
+  .textboxClass:not(:focus-within):hover {
+    border-color: var(--bg-color-50);
   }
 
   .hoverBGEffect:hover {

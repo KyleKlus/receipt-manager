@@ -29,6 +29,7 @@ export default function Footer(props: React.PropsWithChildren<IFooterProps>) {
               <Link href={'https://ko-fi.com/majorenkidu'} className={styles.footerNavLink}>Ko-fi</Link>
               <Link href={'mailto:kyle.klus.2@gmail.com'} className={styles.footerNavLink}>Contact</Link>
               <Link href={'https://kyleklus.github.io/privacy'} className={styles.footerNavLink}>Privacy</Link>
+              <Link href={'https://kyleklus.github.io/terms-of-service'} className={styles.footerNavLink}>Terms of Service</Link>
               {props.children}
             </div>
           </div>
