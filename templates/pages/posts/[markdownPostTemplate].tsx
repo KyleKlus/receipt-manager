@@ -17,7 +17,7 @@ import headerStyles from '@/styles/components/header/Header.module.css';
 import ScrollNavLink from '@/components/links/ScrollNavLink';
 import dynamic from 'next/dynamic';
 
-import IPost from '@/interfaces/IPost';
+import IPost from 'templates/interfaces/IPost';
 import { GetStaticPropsContext } from 'next/types';
 
 const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
@@ -84,7 +84,7 @@ export default function MarkdownPostListTemplate(props: IPost) {
         <Content className={['applyHeaderOffset'].join(' ')}>
           <Markdown options={{ wrapper: MarkdownSection, forceWrapper: true }}>{props.content}</Markdown>
         </Content>
-        <Footer/>
+        <Footer />
       </Main>
     </>
   );

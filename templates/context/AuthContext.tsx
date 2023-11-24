@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import React from 'react';
 import { UserCredential, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User, signInWithRedirect, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import firebase_auth from '@/services/firebaseAuth';
+import firebase_auth from 'templates/services/firebaseAuth';
 import { useRouter } from 'next/router';
 
 export interface IAuthContext {

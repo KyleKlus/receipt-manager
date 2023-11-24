@@ -7,18 +7,19 @@ import Content from '@/components/Content';
 import Main from '@/components/Main';
 
 import headerStyles from '@/styles/components/header/Header.module.css'
-import styles from '@/styles/Login.module.css'
+import styles from '@/styles/Register.module.css'
 
 import ScrollNavLink from '@/components/links/ScrollNavLink';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 
 import Card from '@/components/Card';
+
+import { initFirebase } from 'templates/services/firebase';
+import { IAuthContext, useAuth } from 'templates/context/AuthContext';
 import { getRedirectResult, GoogleAuthProvider, UserCredential } from 'firebase/auth';
+import firebase_auth from 'templates/services/firebaseAuth';
 import { useRouter } from 'next/router';
-import { IAuthContext, useAuth } from '@/context/AuthContext';
-import { initFirebase } from '@/services/firebase';
-import firebase_auth from '@/services/firebaseAuth';
 
 import googleLogo from '../../../public/google.png';
 import { useState } from 'react';
@@ -75,18 +76,22 @@ export default function Home() {
   const handleSignIn = async () => {
     setIsLoading(true);
     try {
-      const userCredentials: UserCredential = await authContext.emailLogin(email, password);
+      const userCredentials: UserCredential = await authContext.emailRegister(email, password);
       if (userCredentials.user !== null) {
         setErrorMsg('');
         router.push(process.env.basePath + "/auth/locked-page");
       }
     }
-    catch (error) { setErrorMsg('Wrong credentials'); setIsLoading(false); }
+    catch (error) {
+      setErrorMsg('min. 6 characters, etc.');
+      setIsLoading(false);
+    }
   };
+
   return (
     <>
       <Head>
-        <title>Kyle Klus | Login</title>
+        <title>Kyle Klus | Register</title>
         <meta
           name="description"
           content="Website of Kyle Klus."
@@ -140,8 +145,8 @@ export default function Home() {
       <Main>
         <div id={'top'}></div>
         <Content className={['applyHeaderOffset'].join(' ')}>
-          <Card className={[styles.loginPageCard].join(' ')}>
-            <h1>Login</h1>
+          <Card className={[styles.registerPageCard].join(' ')}>
+            <h1>Register</h1>
             <br />
             <br />
             <label className={[styles.textboxLabel].join(' ')}>E-Mail</label>
@@ -160,8 +165,8 @@ export default function Home() {
             <label className={[styles.textboxLabel, styles.errorLabel].join(' ')}>{errorMsg}</label>
             <br />
             <br />
-            <button disabled={isLoading} className={[styles.loginButton].join(' ')} onClick={handleSignIn}>
-              <h2>Login</h2>
+            <button disabled={isLoading} className={[styles.registerButton].join(' ')} onClick={handleSignIn}>
+              <h2>Register</h2>
             </button>
             <br />
             <br />

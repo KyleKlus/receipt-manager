@@ -7,20 +7,19 @@ import Content from '@/components/Content';
 import Main from '@/components/Main';
 
 import headerStyles from '@/styles/components/header/Header.module.css'
+import navLinkStyles from '@/styles/components/links/NavLink.module.css'
 
-import styles from '@/styles/LoadingPage.module.css'
+import styles from '@/styles/LockedPage.module.css'
 
 import ScrollNavLink from '@/components/links/ScrollNavLink';
 import dynamic from 'next/dynamic';
 
-import { IAuthContext, useAuth } from '@/context/AuthContext';
+import NavLink from '@/components/links/NavLink';
+import Card from '@/components/Card';
+import { IAuthContext, useAuth } from 'templates/context/AuthContext';
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { GoogleAuthProvider, getRedirectResult } from 'firebase/auth';
-import firebase_auth from '@/services/firebaseAuth';
-import { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
-
-
+import { IDataBaseContext, useDB } from 'templates/context/DatabaseContext';
 
 const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
   ssr: false,
@@ -28,51 +27,26 @@ const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
 
 export default function Home() {
   const authContext: IAuthContext = useAuth();
+  const dbContext: IDataBaseContext = useDB();
   const router = useRouter();
-  // TODO: redirect if wrong use of loading page
-  // const timerRef = useRef<NodeJS.Timeout>();
+
+  console.log(authContext);
+  console.log(dbContext);
+
+
 
   useEffect(() => {
-    const startSignIn: string | null = sessionStorage.getItem('startSignIn');
-    if (startSignIn !== null) {
-      sessionStorage.removeItem('startSignIn')
-      authContext.googleSignIn();
-      // clearTimeout(timerRef.current);
-    } else {
-      // timerRef.current = setTimeout(() => { router.push(process.env.basePath + "/auth/login"); }, 10000);
-    }
-  });
+    if (authContext.user === null) router.push(process.env.basePath + "/auth/login");
+  }, [authContext.user, router]);
 
-  getRedirectResult(firebase_auth).then((result) => {
-    // This gives you a Google Access Token. You can use it to access Google APIs.
-    if (result !== null) {
-      // clearTimeout(timerRef.current);
-      router.push(process.env.basePath + "/auth/locked-page");
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      const token = credential?.accessToken;
-
-      // The signed-in user info.
-      const user = result?.user;
-      // IdP data available using getAdditionalUserInfo(result)
-    }
-  }).catch((error) => {
-    // Handle Errors here.
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    // The email of the user's account used.
-    const email = error.customData.email;
-    // The AuthCredential type that was used.
-    const credential = GoogleAuthProvider.credentialFromError(error);
-    // clearTimeout(timerRef.current);
-    router.push(process.env.basePath + "/auth/login");
-
-    // ...
-  });
+  const handleLogout = () => {
+    authContext.logOut();
+  };
 
   return (
     <>
       <Head>
-        <title>Kyle Klus | Loading ...</title>
+        <title>Kyle Klus | Website</title>
         <meta
           name="description"
           content="Website of Kyle Klus."
@@ -121,22 +95,28 @@ export default function Home() {
           elementName="https://kyleklus.github.io/#aboutPage"
           displayText="About"
         />
+        <button onClick={handleLogout} className={[navLinkStyles.navLink].join(' ')}>Logout</button>
         <ThemeButton />
       </Header >
       <Main>
         <div id={'top'}></div>
-        <Content className={['applyHeaderOffset', styles.loadingPage, 'dotted'].join(' ')}>
-          <div className={[styles.loadingImageWrapper].join(' ')}>
-
-          </div>
-          <Image
-            src={process.env.basePath + "/KK_Logo.svg"}
-            alt="KK Logo"
-            width={'84'}
-            height={'84'}
-            quality={100}
-            className={[styles.loadingImage].join(' ')}
-          />
+        <Content className={['applyHeaderOffset'].join(' ')}>
+          <button onClick={() => {
+            if (authContext.user === null) { return; }
+            dbContext.addUserDocument(authContext.user, authContext.user?.displayName + '_secrets', { secret: '42', uid: authContext.user?.uid });
+          }}>Add a document</button>
+          <button onClick={() => {
+            if (authContext.user === null) { return; }
+            dbContext.updateUserDocument(authContext.user, authContext.user?.displayName + '_secrets', { secret: '84', uid: authContext.user?.uid });
+          }}>Update a document</button>
+          <button onClick={() => {
+            if (authContext.user === null) { return; }
+            dbContext.deleteUserDocument(authContext.user, authContext.user?.displayName + '_secrets');
+          }}>Delete a document</button>
+          <button onClick={() => {
+            if (authContext.user === null) { return; }
+            dbContext.readUserDocument(authContext.user, authContext.user?.displayName + '_secrets');
+          }}>Read a document</button>
         </Content>
         <Footer />
       </Main>
