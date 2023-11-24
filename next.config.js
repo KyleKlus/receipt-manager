@@ -5,10 +5,10 @@
 
 const nextConfig = {
   reactStrictMode: true,
-  basePath: '',
+  basePath: '/receipt-manager',
   output: 'export',
   env: {
-    basePath: '',
+    basePath: '/receipt-manager',
     // NEXT_PUBLIC_FIREBASE_API_KEY: 'AIzaSyAYytnWLc4vB2glt1X8tWz27gpgclDvrls',
     // NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: 'protected-page-login.firebaseapp.com',
     // NEXT_PUBLIC_FIREBASE_PROJECT_ID: 'protected-page-login',
