@@ -7,6 +7,7 @@ const nextConfig = {
   reactStrictMode: true,
   basePath: '/receipt-manager',
   output: 'export',
+  images: { unoptimized: true },
   env: {
     basePath: '/receipt-manager',
     // NEXT_PUBLIC_FIREBASE_API_KEY: 'AIzaSyAYytnWLc4vB2glt1X8tWz27gpgclDvrls',

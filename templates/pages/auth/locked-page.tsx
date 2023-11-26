@@ -36,7 +36,7 @@ export default function Home() {
 
 
   useEffect(() => {
-    if (authContext.user === null) router.push(process.env.basePath + "/auth/login");
+    if (authContext.user === null) router.push("/auth/login");
   }, [authContext.user, router]);
 
   const handleLogout = () => {

@@ -21,6 +21,12 @@
     font-size: xx-small;
 }
 
+.smallInfoLabel,
+.smallInfoLabel > * {
+    margin-top: 2px;
+    font-size: x-small;
+}
+
 .registerButton {
     padding: 8px 16px;
     display: flex;

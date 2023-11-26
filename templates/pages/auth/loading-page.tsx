@@ -39,7 +39,7 @@ export default function Home() {
       authContext.googleSignIn();
       // clearTimeout(timerRef.current);
     } else {
-      // timerRef.current = setTimeout(() => { router.push(process.env.basePath + "/auth/login"); }, 10000);
+      // timerRef.current = setTimeout(() => { "/auth/login"); }, 10000);
     }
   });
 
@@ -47,7 +47,7 @@ export default function Home() {
     // This gives you a Google Access Token. You can use it to access Google APIs.
     if (result !== null) {
       // clearTimeout(timerRef.current);
-      router.push(process.env.basePath + "/auth/locked-page");
+      router.push("/auth/locked-page");
       const credential = GoogleAuthProvider.credentialFromResult(result);
       const token = credential?.accessToken;
 
@@ -64,7 +64,7 @@ export default function Home() {
     // The AuthCredential type that was used.
     const credential = GoogleAuthProvider.credentialFromError(error);
     // clearTimeout(timerRef.current);
-    router.push(process.env.basePath + "/auth/login");
+    router.push("/auth/login");
 
     // ...
   });

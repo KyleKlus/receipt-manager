@@ -23,6 +23,7 @@ import { useRouter } from 'next/router';
 
 import googleLogo from '../../../public/google.png';
 import { useState } from 'react';
+import Link from 'next/link';
 
 const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
   ssr: false,
@@ -49,7 +50,7 @@ export default function Home() {
     const user = result?.user;
     // IdP data available using getAdditionalUserInfo(result)
     // ...
-    router.push(process.env.basePath + "/auth/locked-page");
+    router.push("/auth/locked-page");
   }).catch((error) => {
     // Handle Errors here.
     const errorCode = error.code;
@@ -64,7 +65,7 @@ export default function Home() {
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
-      router.push(process.env.basePath + "/auth/loading-page");
+      router.push("/auth/loading-page");
       sessionStorage.setItem('startSignIn', 'true');
     }
     catch (error) {
@@ -168,6 +169,7 @@ export default function Home() {
             <button disabled={isLoading} className={[styles.registerButton].join(' ')} onClick={handleSignIn}>
               <h2>Register</h2>
             </button>
+            <label className={[styles.textboxLabel, styles.smallInfoLabel].join(' ')}>Already have an account? {<Link href={'/auth/login'}>Login</Link>}</label>
             <br />
             <br />
             <br />
