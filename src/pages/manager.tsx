@@ -6,19 +6,40 @@ import Content from '@/components/Content';
 
 import Main from '@/components/Main';
 
-import styles from '@/styles/ReceiptManager.module.css'
-import headerStyles from '@/styles/components/header/Header.module.css'
+import styles from '@/styles/ReceiptManager.module.css';
+import headerStyles from '@/styles/components/header/Header.module.css';
+import navLinkStyles from '@/styles/components/links/NavLink.module.css';
 
 import ScrollNavLink from '@/components/links/ScrollNavLink';
 import dynamic from 'next/dynamic';
 import ReceiptManager from '@/components/receipt-manager/ReceiptManager';
+import { IAuthContext, useAuth } from '@/context/AuthContext';
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { IDataBaseContext, useDB } from '@/context/DatabaseContext';
+import { initFirebase } from '@/services/firebase';
 
 const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
   ssr: false,
 });
 
-export default function Home() {
+initFirebase();
 
+export default function Home() {
+  const authContext: IAuthContext = useAuth();
+  const dbContext: IDataBaseContext = useDB();
+  const router = useRouter();
+
+  console.log(authContext);
+  console.log(dbContext);
+
+  useEffect(() => {
+    if (authContext.user === null) router.push("/auth/login");
+  }, [authContext.user, router]);
+
+  const handleLogout = () => {
+    authContext.logOut();
+  };
 
   return (
     <>
@@ -72,12 +93,18 @@ export default function Home() {
           elementName="https://kyleklus.github.io/#aboutPage"
           displayText="About"
         />
+        {authContext.user !== null &&
+          <button onClick={handleLogout} className={[navLinkStyles.navLink].join(' ')}>Logout</button>
+        }
         <ThemeButton />
       </Header>
       <Main>
         <div id={'top'}></div>
         <Content className={['applyHeaderOffset'].join(' ')}>
-          <ReceiptManager/>
+          {authContext.user !== null &&
+
+            <ReceiptManager />
+          }
         </Content>
         <Footer />
       </Main>

@@ -16,10 +16,10 @@ import dynamic from 'next/dynamic';
 
 import NavLink from '@/components/links/NavLink';
 import Card from '@/components/Card';
-import { IAuthContext, useAuth } from 'templates/context/AuthContext';
+import { IAuthContext, useAuth } from '@/context/AuthContext';
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { IDataBaseContext, useDB } from 'templates/context/DatabaseContext';
+import { IDataBaseContext, useDB } from '@/context/DatabaseContext';
 
 const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
   ssr: false,

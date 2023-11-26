@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import React from 'react';
 import { UserCredential, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User, signInWithRedirect, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import firebase_auth from '@/services/firebaseAuth';
-import { useRouter } from 'next/router';
 
 export interface IAuthContext {
     user: User | null,
@@ -24,10 +23,11 @@ const AuthContext: React.Context<IAuthContext> = createContext<IAuthContext>(def
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = (props) => {
     const [user, setUser] = useState<User | null>(null);
-    const router = useRouter();
 
     const googleSignIn = () => {
         const provider: GoogleAuthProvider = new GoogleAuthProvider();
+        console.log('test');
+
         signInWithRedirect(firebase_auth, provider);
     };
 

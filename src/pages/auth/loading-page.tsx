@@ -34,8 +34,9 @@ export default function Home() {
 
   useEffect(() => {
     const startSignIn: string | null = sessionStorage.getItem('startSignIn');
+
     if (startSignIn !== null) {
-      sessionStorage.removeItem('startSignIn')
+      sessionStorage.removeItem('startSignIn');
       authContext.googleSignIn();
       // clearTimeout(timerRef.current);
     } else {
@@ -47,7 +48,7 @@ export default function Home() {
     // This gives you a Google Access Token. You can use it to access Google APIs.
     if (result !== null) {
       // clearTimeout(timerRef.current);
-      router.push("/auth/locked-page");
+      router.push("/manager");
       const credential = GoogleAuthProvider.credentialFromResult(result);
       const token = credential?.accessToken;
 
