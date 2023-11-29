@@ -82,13 +82,12 @@ function Home() {
           elementName="https://kyleklus.github.io/#aboutPage"
           displayText="About"
         />
-        <button onClick={handleLogout} className={[navLinkStyles.navLink].join(' ')}>Logout</button>
+          <button onClick={handleLogout} className={[navLinkStyles.navLink].join(' ')}>Logout</button>
         <ThemeButton />
       </Header>
       <Main>
         <div id={'top'}></div>
         <Content className={['applyHeaderOffset'].join(' ')}>
-          <ReceiptManager />
         </Content>
         <Footer />
       </Main>

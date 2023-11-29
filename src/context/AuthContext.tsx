@@ -10,7 +10,8 @@ export const redirectPaths: string[] = [
     '/auth/login',
     '/auth/register',
     '/auth/loading-page',
-    '/auth/locked-page'
+    '/auth/locked-page',
+    '/auth/dashboard'
 ];
 
 export enum RedirectPathOptions {
@@ -20,6 +21,7 @@ export enum RedirectPathOptions {
     RegisterPage = 2,
     LoadingPage = 3,
     LockedPage = 4,
+    DashBoardPage = 5,
 }
 
 export interface IAuthContext {
@@ -43,6 +45,7 @@ const defaultValue: IAuthContext = {
 }
 
 const AuthContext: React.Context<IAuthContext> = createContext<IAuthContext>(defaultValue);
+
 initFirebase();
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = (props) => {
@@ -55,6 +58,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = (props) => {
     };
 
     const emailRegister = (email: string, password: string) => {
+
         return createUserWithEmailAndPassword(firebase_auth, email, password);
     };
 

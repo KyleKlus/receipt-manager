@@ -42,7 +42,7 @@ export default function Home() {
       authContext.googleSignIn();
     }
     catch (error) {
-      setErrorMsg('Wrong credentials');
+      setErrorMsg('Account already exists');
     }
   };
 
@@ -51,13 +51,18 @@ export default function Home() {
       const userCredentials: UserCredential = await authContext.emailRegister(email, password);
       if (userCredentials.user !== null) {
         setErrorMsg('');
-        router.push(redirectPaths[RedirectPathOptions.LockedPage]);
+        router.push(redirectPaths[RedirectPathOptions.DashBoardPage]);
       }
     }
     catch (error) {
       setErrorMsg('Wrong credentials');
     }
   };
+
+  if (user) {
+    router.push(redirectPaths[RedirectPathOptions.DashBoardPage]);
+  }
+
 
   return (
     <>

@@ -52,7 +52,7 @@ export default function Home() {
       const userCredentials: UserCredential = await authContext.emailLogin(email, password);
       if (userCredentials.user !== null) {
         setErrorMsg('');
-        router.push(redirectPaths[RedirectPathOptions.LockedPage]);
+        router.push(redirectPaths[RedirectPathOptions.DashBoardPage]);
       }
     }
     catch (error) {
@@ -61,7 +61,7 @@ export default function Home() {
   };
 
   if (user) {
-    router.push(redirectPaths[RedirectPathOptions.LockedPage]);
+    router.push(redirectPaths[RedirectPathOptions.DashBoardPage]);
   }
 
   return (
