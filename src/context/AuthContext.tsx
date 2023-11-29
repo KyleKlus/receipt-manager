@@ -1,10 +1,31 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import React from 'react';
-import { UserCredential, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User, signInWithRedirect, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { UserCredential, GoogleAuthProvider, signOut, User, signInWithRedirect, createUserWithEmailAndPassword, signInWithEmailAndPassword, getRedirectResult } from 'firebase/auth';
 import firebase_auth from '@/services/firebaseAuth';
+import { initFirebase } from '@/services/firebase';
+
+// Paths where the user can be redirected to after a loading screen
+export const redirectPaths: string[] = [
+    'googleSignIn',
+    '/auth/login',
+    '/auth/register',
+    '/auth/loading-page',
+    '/auth/locked-page'
+];
+
+export enum RedirectPathOptions {
+    None = -1,
+    Google = 0,
+    LoginPage = 1,
+    RegisterPage = 2,
+    LoadingPage = 3,
+    LockedPage = 4,
+}
 
 export interface IAuthContext {
     user: User | null,
+    loading: boolean,
+    setLoading: (state: boolean) => void,
     googleSignIn: () => void,
     emailRegister: (email: string, password: string) => Promise<UserCredential>,
     emailLogin: (email: string, password: string) => Promise<UserCredential>,
@@ -13,6 +34,8 @@ export interface IAuthContext {
 
 const defaultValue: IAuthContext = {
     user: null,
+    loading: true,
+    setLoading: (state: boolean) => { },
     googleSignIn: () => { },
     emailRegister: (email: string, password: string) => { return new Promise(() => { }); },
     emailLogin: (email: string, password: string) => { return new Promise(() => { }); },
@@ -20,14 +43,14 @@ const defaultValue: IAuthContext = {
 }
 
 const AuthContext: React.Context<IAuthContext> = createContext<IAuthContext>(defaultValue);
+initFirebase();
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = (props) => {
     const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
 
     const googleSignIn = () => {
         const provider: GoogleAuthProvider = new GoogleAuthProvider();
-        console.log('test');
-
         signInWithRedirect(firebase_auth, provider);
     };
 
@@ -40,17 +63,44 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = (props) => {
     };
 
     const logOut = () => {
-        signOut(firebase_auth);
+        signOut(firebase_auth).then(_ => {
+        });
     }
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(firebase_auth, (currentUser: User | null) => {
-            setUser(currentUser);
+        getRedirectResult(firebase_auth).then((result) => {
+            if (result && result.user) {
+                setUser(result.user);
+            }
         });
-        return () => unsubscribe();
-    }, [user]);
 
-    return <AuthContext.Provider value={{ user, googleSignIn, emailRegister, emailLogin, logOut }}>{props.children}</AuthContext.Provider>;
+        const unsubscribe = firebase_auth.onAuthStateChanged((user) => {
+            if (user) {
+                setUser(user);
+            } else {
+                setUser(null);
+            }
+            setLoading(false);
+        });
+
+        // Cleanup subscription on unmount
+        return () => unsubscribe();
+    }, []);
+
+
+    return <AuthContext.Provider
+        value={{
+            user,
+            loading,
+            setLoading,
+            googleSignIn,
+            emailRegister,
+            emailLogin,
+            logOut
+        }}
+    >
+        {props.children}
+    </AuthContext.Provider>;
 };
 
 export default AuthProvider;

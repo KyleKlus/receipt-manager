@@ -14,28 +14,17 @@ import ScrollNavLink from '@/components/links/ScrollNavLink';
 import dynamic from 'next/dynamic';
 import ReceiptManager from '@/components/receipt-manager/ReceiptManager';
 import { IAuthContext, useAuth } from '@/context/AuthContext';
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
 import { IDataBaseContext, useDB } from '@/context/DatabaseContext';
-import { initFirebase } from '@/services/firebase';
+import withAuth from '@/components/withAuth';
 
 const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
   ssr: false,
 });
 
-initFirebase();
 
-export default function Home() {
+function Home() {
   const authContext: IAuthContext = useAuth();
   const dbContext: IDataBaseContext = useDB();
-  const router = useRouter();
-
-  console.log(authContext);
-  console.log(dbContext);
-
-  useEffect(() => {
-    if (authContext.user === null) router.push("/auth/login");
-  }, [authContext.user, router]);
 
   const handleLogout = () => {
     authContext.logOut();
@@ -111,3 +100,5 @@ export default function Home() {
     </>
   );
 }
+
+export default withAuth(Home);
