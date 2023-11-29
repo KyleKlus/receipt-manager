@@ -43,7 +43,7 @@ export default function Home() {
       authContext.googleSignIn();
     }
     catch (error) {
-      setErrorMsg('Wrong credentials');
+      setErrorMsg('Something went wrong');
     }
   };
 

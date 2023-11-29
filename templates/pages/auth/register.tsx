@@ -42,7 +42,7 @@ export default function Home() {
       authContext.googleSignIn();
     }
     catch (error) {
-      setErrorMsg('Wrong credentials');
+      setErrorMsg('Account already exists');
     }
   };
 
@@ -55,9 +55,13 @@ export default function Home() {
       }
     }
     catch (error) {
-      setErrorMsg('Wrong credentials');
+      setErrorMsg('Account already exists or password too short');
     }
   };
+
+  if (user) {
+    router.push(redirectPaths[RedirectPathOptions.LockedPage]);
+  }
 
   return (
     <>
