@@ -33,7 +33,7 @@ function Home() {
   return (
     <>
       <Head>
-        <title>Kyle Klus | Receipt Manager 🧾</title>
+        <title>Kyle Klus | Receipt Manager 🧾 - Dashboard</title>
         <meta
           name="description"
           content="Receipt Manager web app"
@@ -88,6 +88,7 @@ function Home() {
       <Main>
         <div id={'top'}></div>
         <Content className={['applyHeaderOffset'].join(' ')}>
+
         </Content>
         <Footer />
       </Main>
