@@ -100,7 +100,7 @@ export default function Home() {
           href={process.env.basePath + "/favicon-16x16.png"}
         />
       </Head>
-      <Header >
+      {/* <Header >
         <ScrollNavLink
           className={headerStyles.headerNavLink}
           elementName="https://kyleklus.github.io/#heroPage"
@@ -117,13 +117,13 @@ export default function Home() {
           displayText="About"
         />
         <ThemeButton />
-      </Header >
+      </Header > */}
       <Main>
         <div id={'top'}></div>
         <Content className={['applyHeaderOffset', 'dotted'].join(' ')}>
           {!loading && !user &&
             <Card className={[styles.registerPageCard].join(' ')}>
-              <h1>Register</h1>
+              <h2>Receipt Manager</h2>
               <br />
               <br />
               <label className={[styles.textboxLabel].join(' ')}>E-Mail</label>
@@ -141,16 +141,13 @@ export default function Home() {
               }} />
               <label className={[styles.textboxLabel, styles.errorLabel].join(' ')}>{errorMsg}</label>
               <br />
-              <br />
               <button className={[styles.registerButton].join(' ')} onClick={handleSignIn}>
-                <h2>Register</h2>
+                <h3>Register</h3>
               </button>
               <label className={[styles.textboxLabel, styles.smallInfoLabel].join(' ')}>Already have an account? {<Link href={'/auth/login'}>Login</Link>}</label>
               <br />
               <br />
-              <br />
-              <h3>Or</h3>
-              <br />
+              <h4>Or</h4>
               <br />
               <button className={[styles.googleButton].join(' ')} onClick={handleGoogleSignIn}>
                 <Image
@@ -160,7 +157,7 @@ export default function Home() {
                   width={32}
                   height={32}
                 />
-                <h2>Sign in</h2>
+                <h3>Sign in</h3>
               </button>
             </Card>
           }
