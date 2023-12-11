@@ -1,73 +1,105 @@
-import { createContext, useContext, useRef } from 'react';
+import { createContext, useContext, useRef, useState } from 'react';
 import React from 'react';
-import firebase_db from '@/services/firebaseStore';
-import { collection, setDoc, doc, addDoc, getDoc, deleteDoc } from 'firebase/firestore';
-import { User } from 'firebase/auth';
 
-export interface IData {
-    secret: string,
-    uid: string
-}
+import * as dbService from '@/services/firebaseStore';
+import { User } from 'firebase/auth';
+import IConnection from '@/interfaces/IConnection';
+import IBill from '@/interfaces/IBill';
 
 export interface IDataBaseContext {
-    addUserDocument: (user: User | null, docName: string, data: IData) => void,
-    updateUserDocument: (user: User | null, docName: string, data: IData) => void,
-    deleteUserDocument: (user: User | null, docName: string) => void,
-    readUserDocument: (user: User | null, docName: string) => void,
+    selectedConnection: string,
+    activeConnections: IConnection[],
+    bills: IBill[],
+    saveSelectedConnection: (connection: string) => void,
+    saveActiveConnections: (connections: IConnection[]) => void,
+    saveBills: (bills: IBill[]) => void,
+    addUserToDB: (user: User | null) => Promise<void>,
+    addPendingSyncToken: (user: User | null, token: string) => Promise<void>,
+    addActiveSyncToken: (user: User | null, token: string) => Promise<boolean>,
+    generateNewSyncToken: (user: User | null) => string,
+    getActiveConnections: (user: User | null) => Promise<IConnection[]>,
+    getBillsByToken: (user: User | null, token: string) => Promise<IBill[]>
+    addBill: (user: User | null, token: string) => Promise<void>;
 }
 
 const defaultValue: IDataBaseContext = {
-    addUserDocument: (user: User | null, docName: string, data: IData) => { },
-    updateUserDocument: (user: User | null, docName: string, data: IData) => { },
-    readUserDocument: (user: User | null, docName: string) => { },
-    deleteUserDocument: (user: User | null, docName: string) => { },
-
+    selectedConnection: '',
+    activeConnections: [],
+    bills: [],
+    saveSelectedConnection: (connection: string) => { },
+    saveActiveConnections: (connections: IConnection[]) => [],
+    saveBills: (bills: IBill[]) => { },
+    addUserToDB: (user: User | null) => { return new Promise<void>(() => { }); },
+    addPendingSyncToken: (user: User | null, token: string) => { return new Promise<void>(() => { }); },
+    addActiveSyncToken: (user: User | null, token: string) => { return new Promise<boolean>(() => { }); },
+    generateNewSyncToken: (user: User | null) => '',
+    getActiveConnections: (user: User | null) => { return new Promise<IConnection[]>(() => { }); },
+    getBillsByToken: (user: User | null, token: string) => { return new Promise<IBill[]>(() => { }); },
+    addBill: (user: User | null, token: string) => { return new Promise<void>(() => { }); }
 }
 
 const DataBaseContext: React.Context<IDataBaseContext> = createContext<IDataBaseContext>(defaultValue);
 
 const DataBaseProvider: React.FC<{ children: React.ReactNode }> = (props) => {
-    const addUserDocument = async (user: User | null, docName: string, data: IData) => {
-        if (user === null) { throw Error('No logged in user!') }
-        if (docName.length === 0) { throw Error('Document name is too short!') }
-        if (data === undefined) { throw Error('Data is empty!') }
+    const [selectedConnection, setSelectedConnection] = useState('');
+    const [activeConnections, setActiveConnections] = useState<IConnection[]>([]);
+    const [bills, setBills] = useState<IBill[]>([]);
 
-        setDoc(doc(firebase_db, 'user-datas', docName), data).then(() => {
-            alert('Data added');
-        })
-    };
+    function saveSelectedConnection(connection: string) {
+        setSelectedConnection(connection);
+    }
 
-    const readUserDocument = async (user: User | null, docName: string) => {
-        if (user === null) { throw Error('No logged in user!') }
-        if (docName.length === 0) { throw Error('Document name is too short!') }
+    function saveActiveConnections(connections: IConnection[]) {
+        setActiveConnections(connections);
+    }
 
-        getDoc(doc(firebase_db, 'user-datas', docName)).then((response) => {
-            console.log(response.data());
-        })
-    };
+    function saveBills(bills: IBill[]) {
+        setBills(bills);
+    }
 
-    const updateUserDocument = async (user: User | null, docName: string, data: IData) => {
-        if (user === null) { throw Error('No logged in user!') }
-        if (docName.length === 0) { throw Error('Document name is too short!') }
-        if (data === undefined) { throw Error('Data is empty!') }
+    async function addUserToDB(user: User | null): Promise<void> {
+        return await dbService.addUserToDB(user);
+    }
 
-        // use updateDoc, if you want it to fail if the doc isnt there
-        setDoc(doc(firebase_db, 'user-datas', docName), data).then(() => {
-            alert('Data updated');
-        })
-    };
+    async function addPendingSyncToken(user: User | null, token: string): Promise<void> {
+        return await dbService.addPendingSyncToken(user, token);
+    }
 
-    const deleteUserDocument = async (user: User | null, docName: string) => {
-        if (user === null) { throw Error('No logged in user!') }
-        if (docName.length === 0) { throw Error('Document name is too short!') }
+    async function addActiveSyncToken(user: User | null, token: string): Promise<boolean> {
+        return await dbService.addActiveSyncToken(user, token);
+    }
 
-        deleteDoc(doc(firebase_db, 'user-datas', docName)).then(() => {
-            alert('Data deleted');
-        })
-    };
+    function generateNewSyncToken(): string {
+        return crypto.randomUUID();
+    }
 
+    async function getActiveConnections(user: User | null): Promise<IConnection[]> {
+        return await dbService.getActiveConnections(user);
+    }
 
-    return <DataBaseContext.Provider value={{ addUserDocument, readUserDocument, updateUserDocument, deleteUserDocument }}>{props.children}</DataBaseContext.Provider>;
+    async function getBillsByToken(user: User | null, token: string): Promise<IBill[]> {
+        return await dbService.getBillsByToken(user, token);
+    }
+
+    async function addBill(user: User | null, token: string): Promise<void> {
+        return await dbService.addBill(user, token);
+    }
+
+    return <DataBaseContext.Provider value={{
+        selectedConnection,
+        activeConnections,
+        bills,
+        saveSelectedConnection: saveSelectedConnection,
+        saveBills,
+        saveActiveConnections,
+        addUserToDB,
+        addPendingSyncToken,
+        addActiveSyncToken,
+        generateNewSyncToken,
+        getActiveConnections,
+        getBillsByToken,
+        addBill
+    }}>{props.children}</DataBaseContext.Provider>;
 };
 
 export default DataBaseProvider;

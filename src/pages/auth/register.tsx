@@ -1,16 +1,12 @@
 /** @format */
 import Head from 'next/head';
 import Footer from '@/components/footer/Footer';
-import Header from '@/components/header/Header';
 import Content from '@/components/Content';
 
 import Main from '@/components/Main';
 
-import headerStyles from '@/styles/components/header/Header.module.css'
 import styles from '@/styles/Register.module.css'
 
-import ScrollNavLink from '@/components/links/ScrollNavLink';
-import dynamic from 'next/dynamic';
 import Image from 'next/image';
 
 import Card from '@/components/Card';
@@ -22,10 +18,8 @@ import { useRouter } from 'next/router';
 import googleLogo from '../../../public/google.png';
 import { useState } from 'react';
 import Link from 'next/link';
+import { IDataBaseContext, useDB } from '@/context/DatabaseContext';
 
-const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
-  ssr: false,
-});
 
 export default function Home() {
   const [email, setEmail] = useState('');
@@ -35,6 +29,7 @@ export default function Home() {
   const authContext: IAuthContext = useAuth();
   const router = useRouter();
   const { user, loading } = useAuth();
+  const dbContext: IDataBaseContext = useDB();
 
   const handleGoogleSignIn = async () => {
     try {
@@ -51,7 +46,9 @@ export default function Home() {
       const userCredentials: UserCredential = await authContext.emailRegister(email, password);
       if (userCredentials.user !== null) {
         setErrorMsg('');
-        router.push(redirectPaths[RedirectPathOptions.DashBoardPage]);
+        dbContext.addUserToDB(userCredentials.user).then(_ => {
+          router.push(redirectPaths[RedirectPathOptions.DashBoardPage]);
+        });
       }
     }
     catch (error) {
@@ -60,9 +57,10 @@ export default function Home() {
   };
 
   if (user) {
-    router.push(redirectPaths[RedirectPathOptions.DashBoardPage]);
+    dbContext.addUserToDB(user).then(_ => {
+      router.push(redirectPaths[RedirectPathOptions.DashBoardPage]);
+    });
   }
-
 
   return (
     <>
@@ -100,24 +98,6 @@ export default function Home() {
           href={process.env.basePath + "/favicon-16x16.png"}
         />
       </Head>
-      {/* <Header >
-        <ScrollNavLink
-          className={headerStyles.headerNavLink}
-          elementName="https://kyleklus.github.io/#heroPage"
-          displayText="Home"
-        />
-        <ScrollNavLink
-          className={headerStyles.headerNavLink}
-          elementName="https://kyleklus.github.io/#portfolioPage"
-          displayText="Portfolio"
-        />
-        <ScrollNavLink
-          className={headerStyles.headerNavLink}
-          elementName="https://kyleklus.github.io/#aboutPage"
-          displayText="About"
-        />
-        <ThemeButton />
-      </Header > */}
       <Main>
         <div id={'top'}></div>
         <Content className={['applyHeaderOffset', 'dotted'].join(' ')}>

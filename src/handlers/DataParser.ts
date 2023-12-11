@@ -1,6 +1,7 @@
 import { IReceipt } from "@/interfaces/IReceipt";
 import { IReceiptItem } from "@/interfaces/IReceiptItem";
 import { IResult } from "@/interfaces/IResult";
+import moment, { Moment } from "moment";
 import * as XLSX from 'xlsx';
 
 export enum Category {
@@ -21,7 +22,28 @@ export enum Category {
     None
 }
 
+
 export const DEFAULT_CATEGORY: Category = Category.Food;
+
+export function getNameOfCategory(category: Category): string {
+    return (Object.keys(Category) as Array<keyof typeof Category>)
+        .slice((Object.keys(Category).length / 2))[category];
+}
+
+export function getCategoryByName(name: string): Category {
+    return (Object.keys(Category) as Array<keyof typeof Category>)
+        .slice((Object.keys(Category).length / 2))
+        .map((key) => { return key.toString() })
+        .indexOf(name);
+}
+
+export function getDateNameByMoment(date: Moment): string {
+    return date.format('DD-MM-YYYY_HH-mm-ss');
+}
+
+export function getDateNameByDateString(dateString: string): string {
+    return getDateNameByMoment(moment(dateString));
+}
 
 export function downloadCSV(name: string, myReceipts: IReceipt[], otherReceipts: IReceipt[]) {
     const data: string[] = [_prepCSVDataReceipts(myReceipts, otherReceipts)];

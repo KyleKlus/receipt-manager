@@ -3,6 +3,7 @@ import React from 'react';
 import { UserCredential, GoogleAuthProvider, signOut, User, signInWithRedirect, createUserWithEmailAndPassword, signInWithEmailAndPassword, getRedirectResult } from 'firebase/auth';
 import firebase_auth from '@/services/firebaseAuth';
 import { initFirebase } from '@/services/firebase';
+import { IDataBaseContext, useDB } from './DatabaseContext';
 
 // Paths where the user can be redirected to after a loading screen
 export const redirectPaths: string[] = [
@@ -72,7 +73,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = (props) => {
     }
 
     useEffect(() => {
-        getRedirectResult(firebase_auth).then((result) => {
+        getRedirectResult(firebase_auth).then(async (result) => {
             if (result && result.user) {
                 setUser(result.user);
             }

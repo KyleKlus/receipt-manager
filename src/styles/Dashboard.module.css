@@ -1,0 +1,113 @@
+.dashboard {
+    margin: calc(10vh - 64px) auto 10vh auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    box-shadow: var(--shadowElevation_4);
+
+    width: 80%;
+    height: 80vh;
+    padding: 0px !important;
+}
+
+.dashboardHeader {
+    width: 100%;
+    background-color: var(--bg-color-20);
+    display: flex;
+    border-top-right-radius: var(--border-radius);
+    border-top-left-radius: var(--border-radius);
+    border-bottom: 1px solid var(--bg-color-40);
+    padding: 16px 32px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dashboardHeaderControls {
+    display: flex;
+    gap: 8px;
+}
+
+.select input {
+    padding: unset;
+    border-radius: unset;
+    border: unset;
+    background: unset;
+    box-shadow: unset;
+    outline: unset;
+}
+
+.select > div[class$='control'] {
+    border-radius: 5px;
+    border: 1px solid var(--bg-color-30);
+    background: var(--bg-color-00);
+    box-shadow: var(--shadowElevation_3);
+    outline: none;
+}
+
+.select div[class$='menu'] {
+    background-color: var(--bg-color-00);
+}
+
+.select div[class$='menu'] div[class$='option'] {
+    background-color: var(--bg-color-00);
+}
+
+.select div[class$='menu'] div[class$='option'][aria-selected="true"] {
+    background-color: var(--color-accent-00);
+}
+
+.select div[class$='menu'] div[class$='option']:not([aria-selected="true"]):hover,
+.select div[class$='menu'] div[class$='option']:not([aria-selected="true"]):focus-within,
+.select div[class$='menu'] div[class$='option']:not([aria-selected="true"]):focus-visible {
+    background-color: var(--bg-color-20);
+}
+
+.select div[class$='singleValue'] {
+    color: var(--bg-color-90);
+}
+
+.select * {
+    caret-color: transparent;
+}
+
+.dashboardHeader .addConnectionButton {
+    width: fit-content;
+    font-size: 1rem;
+}
+
+.dashboardContent {
+    height: 100%;
+    width: 100%;
+    padding: 32px;
+    /* justify-content: center; */
+    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 180px);
+    grid-template-rows: repeat(auto-fit, 190px);
+    gap: 16px;
+    overflow: auto;
+    border-bottom-left-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+}
+
+.dashboardStartingScreen {
+    margin: calc(50vh - 300px) auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 64px;
+    width: 600px;
+}
+
+.dashboardStartingScreen > h2 {
+    text-align: center;
+    font-weight: normal;
+}
+
+.dashboardStartingScreen .addConnectionButton {
+    width: fit-content;
+    padding: 12px;
+    font-size: medium;
+}

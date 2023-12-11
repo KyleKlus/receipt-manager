@@ -8,6 +8,8 @@ import Main from '@/components/Main';
 import { useAuth } from '@/context/AuthContext';
 import Content from './Content';
 import { useRouter } from 'next/router';
+import IConnection from '@/interfaces/IConnection';
+import { useDB } from '@/context/DatabaseContext';
 
 const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
     ssr: false,
@@ -19,11 +21,13 @@ interface ILayoutProps {
 
 export default function Layout(props: React.PropsWithChildren<ILayoutProps>) {
     const authContext = useAuth();
+    const dbContext = useDB();
     const router = useRouter();
 
     const handleLogout = () => {
         authContext.logOut();
     }
+
     return (
         <>
             <Head>
@@ -75,6 +79,7 @@ export default function Layout(props: React.PropsWithChildren<ILayoutProps>) {
                                 }}
                             >D</button>
                             <button
+                                disabled={dbContext.activeConnections.length === 0}
                                 className={[
                                     styles.functionButton,
                                     applyCurrentWindowStyle(router.pathname, '/items')
@@ -85,6 +90,7 @@ export default function Layout(props: React.PropsWithChildren<ILayoutProps>) {
                                 }}
                             >I</button>
                             <button
+                                disabled={dbContext.activeConnections.length === 0}
                                 className={[
                                     styles.functionButton,
                                     applyCurrentWindowStyle(router.pathname, '/statistics')
