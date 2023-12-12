@@ -18,7 +18,7 @@ import { useRouter } from 'next/router';
 import googleLogo from '../../../public/google.png';
 import { useState } from 'react';
 import Link from 'next/link';
-import { IDataBaseContext, useDB } from '@/context/DatabaseContext';
+import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 
 
 export default function Home() {
@@ -29,7 +29,7 @@ export default function Home() {
   const authContext: IAuthContext = useAuth();
   const router = useRouter();
   const { user, loading } = useAuth();
-  const dbContext: IDataBaseContext = useDB();
+  const dbContext: IUserDataBaseContext = useUserDB();
 
   const handleGoogleSignIn = async () => {
     try {

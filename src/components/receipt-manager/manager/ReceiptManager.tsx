@@ -1,7 +1,7 @@
 /** @format */
 import styles from '@/styles/components/receipt-manager/manager/ReceiptManager.module.css';
-import { useState } from 'react';
-import { IReceipt } from '@/interfaces/IReceipt';
+import { useEffect, useState } from 'react';
+import { IReceipt } from '@/interfaces/data/IReceipt';
 import * as CSVParser from '@/handlers/DataParser';
 import PersonCard from '@/components/receipt-manager/personCell/PersonCard';
 import ReceiptsTable from '@/components/receipt-manager/personCell/ReceiptsTable';
@@ -9,19 +9,42 @@ import { Category } from '@/handlers/DataParser';
 import { IReceiptItem } from '@/interfaces/IReceiptItem';
 import UploadSection from './UploadSection';
 import ResultSection from './ResultSection';
+import { IAuthContext, useAuth } from '@/context/AuthContext';
+import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
+import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 
 interface IReceiptManagerProps {
     billDate: string;
+    token: string
 }
 
 export default function ReceiptManager(props: React.PropsWithChildren<IReceiptManagerProps>) {
-    const [isResultReady, setIsResultReady] = useState(false);
+    const authContext: IAuthContext = useAuth();
+    const userDBContext: IUserDataBaseContext = useUserDB();
+    const billDBContext: IBillDataBaseContext = useBillDB();
 
-    const [firstPersonName, setFirstPersonName] = useState<string>('Person 1');
+    const [isResultReady, setIsResultReady] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const [firstPersonName, setFirstPersonName] = useState<string>('');
     const [firstReceipts, setFirstReceipts] = useState<IReceipt[]>([]);
 
-    const [secondPersonName, setSecondPersonName] = useState<string>('Person 2');
+    const [secondPersonName, setSecondPersonName] = useState<string>('');
     const [secondReceipts, setSecondReceipts] = useState<IReceipt[]>([]);
+
+    useEffect(() => {
+        if (isLoading) {
+            loadData();
+        }
+    })
+
+    async function loadData() {
+        if (authContext.user === null || authContext.user.displayName == null) { return; }
+        setFirstPersonName(authContext.user.displayName);
+        const secondPersonName: string = await userDBContext.getUserNameByToken(authContext.user, props.token);
+        setSecondPersonName(secondPersonName);
+        setIsLoading(false);
+    }
 
     // function selectCategory(receiptNum: number, itemNum: number, isFrist: boolean, selectedCategory: Category) {
     //     const updatedList: IReceipt[] = isFrist ? firstReceipts : secondReceipts;
@@ -175,9 +198,13 @@ export default function ReceiptManager(props: React.PropsWithChildren<IReceiptMa
 
     return (
         <div className={[styles.receiptManager].join(' ')}>
-            {!isResultReady
-                ? <UploadSection setResultReady={setIsResultReady} />
-                : <ResultSection setResultReady={setIsResultReady} />
+            {!isLoading &&
+                <>
+                    {!isResultReady
+                        ? <UploadSection setResultReady={setIsResultReady} />
+                        : <ResultSection setResultReady={setIsResultReady} />
+                    }
+                </>
             }
         </div>
     );

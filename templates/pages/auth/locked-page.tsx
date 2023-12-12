@@ -16,7 +16,7 @@ import dynamic from 'next/dynamic';
 
 import Card from '@/components/Card';
 import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
-import { IDataBaseContext, useDB } from '@/context/DatabaseContext';
+import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import withAuth from '@/components/withAuth';
 
 const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
@@ -25,7 +25,7 @@ const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
 
 function Home() {
   const authContext: IAuthContext = useAuth();
-  const dbContext: IDataBaseContext = useDB();
+  const dbContext: IUserDataBaseContext = useUserDB();
 
   const handleLogout = () => {
     authContext.logOut();

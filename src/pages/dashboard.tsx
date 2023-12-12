@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { IAuthContext, useAuth } from '@/context/AuthContext';
-import { IDataBaseContext, useDB } from '@/context/DatabaseContext';
+import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 
 import Content from '@/components/Content';
 import withAuth from '@/components/withAuth';
@@ -10,17 +10,19 @@ import Layout from '@/components/Layout';
 import ShareSyncTokenModal from '@/components/receipt-manager/ShareSyncTokenModal';
 
 import Dashboard from '@/components/receipt-manager/Dashboard';
+import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
 
 function Home() {
   const authContext: IAuthContext = useAuth();
-  const dbContext: IDataBaseContext = useDB();
+  const userDBContext: IUserDataBaseContext = useUserDB();
+  const billDBContext: IBillDataBaseContext = useBillDB();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
 
-  const selectConnectionsOptions = dbContext.activeConnections.length > 0
-    ? dbContext.activeConnections.map(connection => {
+  const selectConnectionsOptions = userDBContext.activeConnections.length > 0
+    ? userDBContext.activeConnections.map(connection => {
       return { value: connection.token, label: connection.name }
     })
     : [];
@@ -28,15 +30,15 @@ function Home() {
   useEffect(() => {
     // Only fetches data on refresh page and when loading is set to true
     async function fetchActiveConnections() {
-      const activeConnections = await dbContext.getActiveConnections(authContext.user);
+      const activeConnections = await userDBContext.getActiveConnections(authContext.user);
       if (activeConnections.length > 0) {
-        dbContext.saveSelectedConnection(activeConnections[0].token);
-        dbContext.saveActiveConnections(activeConnections);
+        userDBContext.saveSelectedConnection(activeConnections[0].token);
+        userDBContext.saveActiveConnections(activeConnections);
       }
 
       setIsLoading(false);
-      dbContext.moveActivePendingTokensToActiveTokens(authContext.user).then(result => {
-        dbContext.saveActiveConnections(activeConnections.concat(result));
+      userDBContext.moveActivePendingTokensToActiveTokens(authContext.user).then(result => {
+        userDBContext.saveActiveConnections(activeConnections.concat(result));
       });
     }
 
@@ -47,12 +49,12 @@ function Home() {
 
   useEffect(() => {
     // The selected connection has changed
-    fetchBills(dbContext.selectedConnection);
-  }, [dbContext.selectedConnection])
+    fetchBills(userDBContext.selectedConnection);
+  }, [userDBContext.selectedConnection])
 
   async function fetchBills(selectedConnection: string) {
     if (selectedConnection === '') { return; }
-    dbContext.saveBills(await dbContext.getBillsByToken(authContext.user, selectedConnection));
+    billDBContext.saveBills(await billDBContext.getBillsByToken(authContext.user, selectedConnection));
   }
 
   return (

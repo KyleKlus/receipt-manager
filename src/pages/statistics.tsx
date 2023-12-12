@@ -1,13 +1,13 @@
 /** @format */
 import Content from '@/components/Content';
 import { IAuthContext, useAuth } from '@/context/AuthContext';
-import { IDataBaseContext, useDB } from '@/context/DatabaseContext';
+import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import withAuth from '@/components/withAuth';
 import Layout from '@/components/Layout';
 
 function Home() {
   const authContext: IAuthContext = useAuth();
-  const dbContext: IDataBaseContext = useDB();
+  const dbContext: IUserDataBaseContext = useUserDB();
 
   return (
     <Layout>

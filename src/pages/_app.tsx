@@ -2,7 +2,8 @@
 // Info: uncomment if you want to use firebase
 'use client';
 import AuthProvider from '@/context/AuthContext';
-import DataBaseProvider from '@/context/DatabaseContext';
+import UserDataBaseProvider from '@/context/UserDatabaseContext';
+import BillDataBaseProvider from '@/context/BillDatabaseContext';
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
 import { Fira_Code } from "next/font/google";
@@ -34,10 +35,12 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
         }
       `}</style>
       <AuthProvider>
-        <DataBaseProvider>
-          {/* <Component {...pageProps} /> */}
-          {getLayout(<Component {...pageProps} />)}
-        </DataBaseProvider>
+        <UserDataBaseProvider>
+          <BillDataBaseProvider>
+            {/* <Component {...pageProps} /> */}
+            {getLayout(<Component {...pageProps} />)}
+          </BillDataBaseProvider>
+        </UserDataBaseProvider>
       </AuthProvider>
     </>
 

@@ -2,7 +2,7 @@
 import styles from '@/styles/components/receipt-manager/ShareSyncTokenModal.module.css';
 import Modal from '../Modal';
 import { IAuthContext, useAuth } from '@/context/AuthContext';
-import { IDataBaseContext, useDB } from '@/context/DatabaseContext';
+import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import { useState, useRef, useEffect } from 'react';
 
 interface IShareSyncTokenModalProps {
@@ -19,10 +19,8 @@ export default function ShareSyncTokenModal(props: React.PropsWithChildren<IShar
     const [newActiveSyncToken, setNewActiveSyncToken] = useState('');
     const [newPendingSyncToken, setNewPendingSyncToken] = useState('');
 
-    const newPendingSyncTokenRef = useRef('');
-
     const authContext: IAuthContext = useAuth();
-    const dbContext: IDataBaseContext = useDB();
+    const dbContext: IUserDataBaseContext = useUserDB();
     return (
         <Modal
             contentClassName={[styles.addConnectionModal].join(' ')}
@@ -31,7 +29,6 @@ export default function ShareSyncTokenModal(props: React.PropsWithChildren<IShar
             closeModal={() => {
                 setNewActiveSyncToken('');
                 setNewPendingSyncToken('');
-                newPendingSyncTokenRef.current = '';
                 props.setIsLoading(false);
                 props.setIsModalOpen(false);
             }}
@@ -39,14 +36,13 @@ export default function ShareSyncTokenModal(props: React.PropsWithChildren<IShar
             <p>Share the following &quot;syncToken&quot; with some one so the other person can connect with you:</p>
             <div className={[styles.tokenContainerWrapper].join(' ')}>
                 {newPendingSyncToken.length > 0 &&
-                    <textarea className={[styles.tokenContainer].join(' ')} readOnly rows={1} value={newPendingSyncTokenRef.current} />
+                    <textarea className={[styles.tokenContainer].join(' ')} readOnly rows={1} value={newPendingSyncToken} />
                 }
                 <button onClick={() => {
                     const newToken = dbContext.generateNewSyncToken(authContext.user);
 
                     dbContext.addPendingSyncToken(authContext.user, newToken).then(_ => {
-                        newPendingSyncTokenRef.current = newToken;
-                        setNewPendingSyncToken(newPendingSyncTokenRef.current);
+                        setNewPendingSyncToken(newToken);
                     })
                 }}>Get new token</button>
             </div>
@@ -63,7 +59,6 @@ export default function ShareSyncTokenModal(props: React.PropsWithChildren<IShar
                             if (isSuccess) {
                                 setNewActiveSyncToken('');
                                 setNewPendingSyncToken('');
-                                newPendingSyncTokenRef.current = '';
                                 props.setIsLoading(true);
                                 props.setIsModalOpen(false);
                             }

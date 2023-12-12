@@ -1,4 +1,4 @@
-import { IReceipt } from "@/interfaces/IReceipt";
+import { IReceipt } from "@/interfaces/data/IReceipt";
 import { IReceiptItem } from "@/interfaces/IReceiptItem";
 import { IResult } from "@/interfaces/IResult";
 import moment, { Moment } from "moment";

@@ -1,4 +1,4 @@
-import { IReceipt } from "@/interfaces/IReceipt";
+import { IReceipt } from "@/interfaces/data/IReceipt";
 
 export function calcReceiptsExpenses(receipts: IReceipt[]): number {
     let expenses: number = 0;

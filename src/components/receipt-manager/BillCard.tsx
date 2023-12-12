@@ -1,14 +1,15 @@
 /** @format */
 import styles from '@/styles/components/receipt-manager/BillCard.module.css';
 import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
-import { IDataBaseContext, useDB } from '@/context/DatabaseContext';
+import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import Card from '../Card';
 import { Category } from '@/handlers/DataParser';
 import Image from 'next/image';
 import plusIcon from '../../../public/plus.png'
-import IBill from '@/interfaces/IBill';
+import IBill from '@/interfaces/data/IBill';
 import * as DataParser from '../../handlers/DataParser';
 import { useRouter } from 'next/router';
+import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
 
 
 interface IShareSyncTokenModalProps {
@@ -20,15 +21,16 @@ interface IShareSyncTokenModalProps {
 
 export default function BillCard(props: React.PropsWithChildren<IShareSyncTokenModalProps>) {
     const authContext: IAuthContext = useAuth();
-    const dbContext: IDataBaseContext = useDB();
+    const userDBContext: IUserDataBaseContext = useUserDB();
+    const billDBContext: IBillDataBaseContext = useBillDB();
     const router = useRouter();
 
     function handleAddBill() {
-        dbContext.addBill(authContext.user, dbContext.selectedConnection).then(billName => {
+        billDBContext.addBill(authContext.user, userDBContext.selectedConnection).then(billName => {
             props.reloadBills();
             router.push({
                 pathname: redirectPaths[RedirectPathOptions.ManagerPage],
-                query: { date: billName, token: dbContext.selectedConnection }
+                query: { date: billName, token: userDBContext.selectedConnection }
             });
         });
     }
@@ -37,7 +39,7 @@ export default function BillCard(props: React.PropsWithChildren<IShareSyncTokenM
         if (props.bill === undefined) { return }
         router.push({
             pathname: redirectPaths[RedirectPathOptions.ManagerPage],
-            query: { date: DataParser.getDateNameByMoment(props.bill.date), token: dbContext.selectedConnection }
+            query: { date: DataParser.getDateNameByMoment(props.bill.date), token: userDBContext.selectedConnection }
         });
     }
 

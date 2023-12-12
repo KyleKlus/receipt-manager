@@ -8,8 +8,8 @@ import Main from '@/components/Main';
 import { RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
 import Content from './Content';
 import { useRouter } from 'next/router';
-import IConnection from '@/interfaces/IConnection';
-import { useDB } from '@/context/DatabaseContext';
+import IConnection from '@/interfaces/app/IConnection';
+import { useUserDB } from '@/context/UserDatabaseContext';
 
 const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
     ssr: false,
@@ -21,7 +21,7 @@ interface ILayoutProps {
 
 export default function Layout(props: React.PropsWithChildren<ILayoutProps>) {
     const authContext = useAuth();
-    const dbContext = useDB();
+    const dbContext = useUserDB();
     const router = useRouter();
 
     const handleLogout = () => {

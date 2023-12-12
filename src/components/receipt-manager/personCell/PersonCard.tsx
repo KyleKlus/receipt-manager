@@ -2,7 +2,7 @@
 import styles from '@/styles/components/receipt-manager/personCell/PersonCard.module.css';
 import { ChangeEvent, useState } from 'react';
 import { IReceiptItem } from '@/interfaces/IReceiptItem';
-import { IReceipt } from '@/interfaces/IReceipt';
+import { IReceipt } from '@/interfaces/data/IReceipt';
 import * as DataParser from '@/handlers/DataParser';
 import * as Calculator from '@/handlers/Calculator';
 import ReceiptsOverview from './ReceiptsOverview';

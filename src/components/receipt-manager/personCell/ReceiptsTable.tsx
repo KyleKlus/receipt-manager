@@ -1,6 +1,6 @@
 /** @format */
 import styles from '@/styles/components/receipt-manager/personCell/ReceiptsTable.module.css'
-import { IReceipt } from '@/interfaces/IReceipt';
+import { IReceipt } from '@/interfaces/data/IReceipt';
 import { IReceiptItem } from '@/interfaces/IReceiptItem';
 import { Category } from '@/handlers/DataParser';
 

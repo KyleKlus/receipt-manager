@@ -1,54 +1,47 @@
 import { createContext, useContext, useRef, useState } from 'react';
 import React from 'react';
 
-import * as dbService from '@/services/firebaseStore';
+import * as userDBService from '@/services/fireStores/firebaseUserStore';
 import { User } from 'firebase/auth';
-import IConnection from '@/interfaces/IConnection';
-import IBill from '@/interfaces/IBill';
+import IConnection from '@/interfaces/app/IConnection';
+import { IUser } from '@/interfaces/IUser';
 
-export interface IDataBaseContext {
+export interface IUserDataBaseContext {
     selectedConnection: string,
     activeConnections: IConnection[],
-    bills: IBill[],
     saveSelectedConnection: (connection: string) => void,
     saveActiveConnections: (connections: IConnection[]) => void,
-    saveBills: (bills: IBill[]) => void,
     addUserToDB: (user: User | null) => Promise<void>,
     addPendingSyncToken: (user: User | null, token: string) => Promise<void>,
     addActiveSyncToken: (user: User | null, token: string) => Promise<boolean>,
     generateNewSyncToken: (user: User | null) => string,
     getActiveConnections: (user: User | null) => Promise<IConnection[]>,
     moveActivePendingTokensToActiveTokens: (user: User | null) => Promise<IConnection[]>,
-    getBillsByToken: (user: User | null, token: string) => Promise<IBill[]>
-    addBill: (user: User | null, token: string) => Promise<string>;
     hasUserTokenAccess: (user: User | null, token: string) => Promise<boolean>,
+    getUserNameByToken: (user: User | null, token: string) => Promise<string>
 }
 
-const defaultValue: IDataBaseContext = {
+const defaultValue: IUserDataBaseContext = {
     selectedConnection: '',
     activeConnections: [],
-    bills: [],
     saveSelectedConnection: (connection: string) => { },
     saveActiveConnections: (connections: IConnection[]) => [],
-    saveBills: (bills: IBill[]) => { },
     addUserToDB: (user: User | null) => { return new Promise<void>(() => { }); },
     addPendingSyncToken: (user: User | null, token: string) => { return new Promise<void>(() => { }); },
     addActiveSyncToken: (user: User | null, token: string) => { return new Promise<boolean>(() => { }); },
     generateNewSyncToken: (user: User | null) => '',
     getActiveConnections: (user: User | null) => { return new Promise<IConnection[]>(() => { }); },
     moveActivePendingTokensToActiveTokens: (user: User | null) => { return new Promise<IConnection[]>(() => { }); },
-    getBillsByToken: (user: User | null, token: string) => { return new Promise<IBill[]>(() => { }); },
-    addBill: (user: User | null, token: string) => { return new Promise<string>(() => { }); },
-    hasUserTokenAccess: (user: User | null, token: string) => { return new Promise<boolean>(() => { }); }
+    hasUserTokenAccess: (user: User | null, token: string) => { return new Promise<boolean>(() => { }); },
+    getUserNameByToken: (user: User | null, token: string) => { return new Promise<string>(() => { }); }
+
 }
 
-const DataBaseContext: React.Context<IDataBaseContext> = createContext<IDataBaseContext>(defaultValue);
+const UserDataBaseContext: React.Context<IUserDataBaseContext> = createContext<IUserDataBaseContext>(defaultValue);
 
-const DataBaseProvider: React.FC<{ children: React.ReactNode }> = (props) => {
+const UserDataBaseProvider: React.FC<{ children: React.ReactNode }> = (props) => {
     const [selectedConnection, setSelectedConnection] = useState('');
     const [activeConnections, setActiveConnections] = useState<IConnection[]>([]);
-    const [bills, setBills] = useState<IBill[]>([]);
-    // const [bills, setBills] = useState<[]>([]);
 
     function saveSelectedConnection(connection: string) {
         setSelectedConnection(connection);
@@ -58,20 +51,16 @@ const DataBaseProvider: React.FC<{ children: React.ReactNode }> = (props) => {
         setActiveConnections(connections);
     }
 
-    function saveBills(bills: IBill[]) {
-        setBills(bills);
-    }
-
     async function addUserToDB(user: User | null): Promise<void> {
-        return await dbService.addUserToDB(user);
+        return await userDBService.addUserToDB(user);
     }
 
     async function addPendingSyncToken(user: User | null, token: string): Promise<void> {
-        return await dbService.addPendingSyncToken(user, token);
+        return await userDBService.addPendingSyncToken(user, token);
     }
 
     async function addActiveSyncToken(user: User | null, token: string): Promise<boolean> {
-        return await dbService.addActiveSyncToken(user, token);
+        return await userDBService.addActiveSyncToken(user, token);
     }
 
     function generateNewSyncToken(): string {
@@ -79,46 +68,39 @@ const DataBaseProvider: React.FC<{ children: React.ReactNode }> = (props) => {
     }
 
     async function getActiveConnections(user: User | null): Promise<IConnection[]> {
-        return await dbService.getActiveConnections(user);
+        return await userDBService.getActiveConnections(user);
     }
 
     async function moveActivePendingTokensToActiveTokens(user: User | null): Promise<IConnection[]> {
-        return await dbService.moveActivePendingTokensToActiveTokens(user);
-    }
-
-    async function getBillsByToken(user: User | null, token: string): Promise<IBill[]> {
-        return await dbService.getBillsByToken(user, token);
-    }
-
-    async function addBill(user: User | null, token: string): Promise<string> {
-        return await dbService.addBill(user, token);
+        return await userDBService.moveActivePendingTokensToActiveTokens(user);
     }
 
     async function hasUserTokenAccess(user: User | null, token: string): Promise<boolean> {
-        return await dbService.hasUserTokenAccess(user, token);
+        return await userDBService.hasUserTokenAccess(user, token);
     }
 
-    return <DataBaseContext.Provider value={{
+    async function getUserNameByToken(user: User | null, token: string): Promise<string> {
+        return await userDBService.getUserNameByToken(user, token)
+    }
+
+    return <UserDataBaseContext.Provider value={{
         selectedConnection,
         activeConnections,
-        bills,
         saveSelectedConnection,
         moveActivePendingTokensToActiveTokens,
-        saveBills,
         saveActiveConnections,
         addUserToDB,
         addPendingSyncToken,
         addActiveSyncToken,
         generateNewSyncToken,
         getActiveConnections,
-        getBillsByToken,
-        addBill,
-        hasUserTokenAccess
-    }}>{props.children}</DataBaseContext.Provider>;
+        hasUserTokenAccess,
+        getUserNameByToken
+    }}>{props.children}</UserDataBaseContext.Provider>;
 };
 
-export default DataBaseProvider;
+export default UserDataBaseProvider;
 
-export const useDB = () => {
-    return useContext(DataBaseContext);
+export const useUserDB = () => {
+    return useContext(UserDataBaseContext);
 }

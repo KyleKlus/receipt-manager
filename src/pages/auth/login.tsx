@@ -17,14 +17,14 @@ import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from '@/con
 import googleLogo from '../../../public/google.png';
 import { useState } from 'react';
 import Link from 'next/link';
-import { IDataBaseContext, useDB } from '@/context/DatabaseContext';
+import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 
 export default function Home() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const { user, loading } = useAuth();
-  const dbContext: IDataBaseContext = useDB();
+  const dbContext: IUserDataBaseContext = useUserDB();
 
   const authContext: IAuthContext = useAuth();
   const router = useRouter();

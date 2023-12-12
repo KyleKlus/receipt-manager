@@ -1,11 +1,12 @@
 /** @format */
 import styles from '@/styles/components/receipt-manager/Dashboard.module.css';
 import { IAuthContext, useAuth } from '@/context/AuthContext';
-import { IDataBaseContext, useDB } from '@/context/DatabaseContext';
+import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import Select from 'react-select';
 import Card from '../Card';
 import BillCard from './BillCard';
 import * as DataParser from '@/handlers/DataParser';
+import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
 
 
 interface IDashboardProps {
@@ -18,7 +19,8 @@ interface IDashboardProps {
 
 export default function Dashboard(props: React.PropsWithChildren<IDashboardProps>) {
     const authContext: IAuthContext = useAuth();
-    const dbContext: IDataBaseContext = useDB();
+    const dbContext: IUserDataBaseContext = useUserDB();
+    const billDBContext: IBillDataBaseContext = useBillDB();
     return (
         <>
             {dbContext.activeConnections.length > 0
@@ -42,7 +44,7 @@ export default function Dashboard(props: React.PropsWithChildren<IDashboardProps
                     <div className={[styles.dashboardContent].join(' ')}>
                         <BillCard reloadBills={() => { props.fetchBills(dbContext.selectedConnection) }} />
                         {
-                            dbContext.bills.map(bill => {
+                            billDBContext.bills.map(bill => {
                                 return (<BillCard
                                     key={DataParser.getDateNameByMoment(bill.date)}
                                     bill={bill}
