@@ -5,7 +5,7 @@ import Head from 'next/head';
 import Footer from '@/components/footer/Footer';
 import dynamic from 'next/dynamic';
 import Main from '@/components/Main';
-import { useAuth } from '@/context/AuthContext';
+import { RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
 import Content from './Content';
 import { useRouter } from 'next/router';
 import IConnection from '@/interfaces/IConnection';
@@ -79,7 +79,7 @@ export default function Layout(props: React.PropsWithChildren<ILayoutProps>) {
                                 }}
                             >D</button>
                             <button
-                                disabled={dbContext.activeConnections.length === 0}
+                                disabled={dbContext.activeConnections.length === 0 && isCurrentWindow(router.pathname, redirectPaths[RedirectPathOptions.DashBoardPage])}
                                 className={[
                                     styles.functionButton,
                                     applyCurrentWindowStyle(router.pathname, '/items')
@@ -90,7 +90,7 @@ export default function Layout(props: React.PropsWithChildren<ILayoutProps>) {
                                 }}
                             >I</button>
                             <button
-                                disabled={dbContext.activeConnections.length === 0}
+                                disabled={dbContext.activeConnections.length === 0 && isCurrentWindow(router.pathname, redirectPaths[RedirectPathOptions.DashBoardPage])}
                                 className={[
                                     styles.functionButton,
                                     applyCurrentWindowStyle(router.pathname, '/statistics')

@@ -2,12 +2,9 @@ import { Category } from "@/handlers/DataParser";
 import { IReceiptItem } from "./IReceiptItem";
 
 export interface IReceipt {
+    payedByUid: string;
     store: string;
-    owner: string;
     totalPrice: number;
+    mostCommonCategory: Category;
     items: IReceiptItem[];
-    categoryForAllItems: Category
-    isAllShared: boolean;
-    isAllRejected: boolean;
-    isAllMine: boolean;
 }

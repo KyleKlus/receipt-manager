@@ -6,7 +6,5 @@ export interface IReceiptItem {
     price: number;
     amount: number;
     category: Category;
-    isMine: boolean;
-    isShared: boolean;
-    isRejected: boolean;
+    ownerUids: string[];
 }

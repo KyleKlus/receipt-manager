@@ -10,11 +10,32 @@ import * as DataParser from '../handlers/DataParser';
 
 const firebase_db = getFirestore(firebase_app);
 
-export const USERS_DB_NAME: string = 'users';
-export const CONNECTION_DB_NAME: string = 'connections';
-export const BILLS_DB_NAME: string = 'bills';
-export const RECEIPTS_DB_NAME: string = 'receipts';
-export const ITEMS_DB_NAME: string = 'items';
+
+interface IDBNames {
+    USERS_DB_NAME: string,
+    CONNECTION_DB_NAME: string,
+    BILLS_DB_NAME: string,
+    RECEIPTS_DB_NAME: string,
+    ITEMS_DB_NAME: string
+}
+
+const testNames: IDBNames = {
+    USERS_DB_NAME: 'test_users',
+    CONNECTION_DB_NAME: 'test_connections',
+    BILLS_DB_NAME: 'test_bills',
+    RECEIPTS_DB_NAME: 'test_receipts',
+    ITEMS_DB_NAME: 'test_items'
+}
+
+const productionNames: IDBNames = {
+    USERS_DB_NAME: 'users',
+    CONNECTION_DB_NAME: 'connections',
+    BILLS_DB_NAME: 'bills',
+    RECEIPTS_DB_NAME: 'receipts',
+    ITEMS_DB_NAME: 'items'
+}
+
+export const DB_ACCESS_NAMES: IDBNames = testNames;
 
 export const userConverter = {
     toFirestore: (user: IUser) => {
@@ -78,7 +99,7 @@ export const billConverter = {
 
 export async function addUserToDB(user: User | null): Promise<void> {
     if (user === null || user.displayName === null) { return; } // TODO: add error
-    if (await isDocumentExisting(user.uid, USERS_DB_NAME)) { return; }
+    if (await isDocumentExisting(user.uid, DB_ACCESS_NAMES.USERS_DB_NAME)) { return; }
 
     const newUser: IUser = {
         name: user.displayName,
@@ -87,7 +108,7 @@ export async function addUserToDB(user: User | null): Promise<void> {
         uid: user.uid
     }
 
-    await setDoc(doc(firebase_db, USERS_DB_NAME, user.uid), newUser);
+    await setDoc(doc(firebase_db, DB_ACCESS_NAMES.USERS_DB_NAME, user.uid), newUser);
 }
 
 export async function addPendingSyncToken(user: User | null, token: string): Promise<void> {
@@ -99,7 +120,7 @@ export async function addPendingSyncToken(user: User | null, token: string): Pro
     const pendingSyncTokens: string[] = userData.pendingSyncTokens;
     pendingSyncTokens.push(token);
 
-    await updateDoc(doc(firebase_db, USERS_DB_NAME, user.uid), { pendingSyncTokens: pendingSyncTokens });
+    await updateDoc(doc(firebase_db, DB_ACCESS_NAMES.USERS_DB_NAME, user.uid), { pendingSyncTokens: pendingSyncTokens });
 }
 
 export async function addActiveSyncToken(user: User | null, token: string): Promise<boolean> {
@@ -115,14 +136,14 @@ export async function addActiveSyncToken(user: User | null, token: string): Prom
     activeSyncTokens.push(token);
 
     // Create the doc for the token if it doesn't exist
-    if (!(await isDocumentExisting(token, CONNECTION_DB_NAME))) {
-        await setDoc(doc(firebase_db, CONNECTION_DB_NAME, token), {
+    if (!(await isDocumentExisting(token, DB_ACCESS_NAMES.CONNECTION_DB_NAME))) {
+        await setDoc(doc(firebase_db, DB_ACCESS_NAMES.CONNECTION_DB_NAME, token), {
             name: `connection-${token.split('-')[0]}`,
             token: token
         })
     }
 
-    return await updateDoc(doc(firebase_db, USERS_DB_NAME, user.uid), {
+    return await updateDoc(doc(firebase_db, DB_ACCESS_NAMES.USERS_DB_NAME, user.uid), {
         activeSyncTokens: activeSyncTokens
     }).then(_ => {
         return true;
@@ -131,8 +152,6 @@ export async function addActiveSyncToken(user: User | null, token: string): Prom
 
 export async function getActiveConnections(user: User | null): Promise<IConnection[]> {
     if (user === null || user.displayName === null) { return []; } // TODO: add error
-
-    await moveAllTokensFromPendingToActive(user);
 
     const userData = await getUserDBDataByUid(user.uid);
     if (userData === undefined) { return []; }
@@ -159,7 +178,7 @@ export async function getBillsByToken(user: User | null, token: string): Promise
     if (user === null || user.displayName === null) { return []; } // TODO: add error
     const bills: IBill[] = [];
 
-    const billCollectionOfConnection = [CONNECTION_DB_NAME, token, BILLS_DB_NAME].join('/');
+    const billCollectionOfConnection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.BILLS_DB_NAME].join('/');
 
     const billDocsSnap: QuerySnapshot<DocumentData, DocumentData> = await getDocs(collection(firebase_db, billCollectionOfConnection));
 
@@ -172,14 +191,14 @@ export async function getBillsByToken(user: User | null, token: string): Promise
 
 export async function getBillByTokenAndDate(user: User | null, token: string, date: string): Promise<IBill | undefined> {
     if (user === null || user.displayName === null) { return undefined; } // TODO: add error
-    const billCollectionOfConnection = [CONNECTION_DB_NAME, token, BILLS_DB_NAME].join('/');
+    const billCollectionOfConnection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.BILLS_DB_NAME].join('/');
 
     return await getDocumentData(date, billCollectionOfConnection, billConverter);
 }
 
-export async function addBill(user: User | null, token: string): Promise<void> {
-    if (user === null || user.displayName === null) { return; } // TODO: add error
-    const billCollectionOfConnection = [CONNECTION_DB_NAME, token, BILLS_DB_NAME].join('/');
+export async function addBill(user: User | null, token: string): Promise<string> {
+    if (user === null || user.displayName === null) { return ''; } // TODO: add error
+    const billCollectionOfConnection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.BILLS_DB_NAME].join('/');
 
     const newBill: IBill = {
         date: moment(),
@@ -188,10 +207,14 @@ export async function addBill(user: User | null, token: string): Promise<void> {
         totalPrice: 0
     }
 
+    const billName: string = DataParser.getDateNameByMoment(newBill.date);
+
     return await setDoc(
-        doc(firebase_db, billCollectionOfConnection, DataParser.getDateNameByMoment(newBill.date)),
+        doc(firebase_db, billCollectionOfConnection, billName),
         billConverter.toFirestore(newBill)
-    );
+    ).then(_ => {
+        return billName;
+    });
 }
 
 function isTokenInTokenArray(token: string, tokenArray: string[]): boolean {
@@ -199,12 +222,12 @@ function isTokenInTokenArray(token: string, tokenArray: string[]): boolean {
         tokenArray.filter(arrayToken => arrayToken === token).length !== 0;
 }
 
-async function moveAllTokensFromPendingToActive(
+export async function moveActivePendingTokensToActiveTokens(
     user: User | null
-): Promise<void> {
-    if (user === null || user.displayName === null) { return; } // TODO: add error
+): Promise<IConnection[]> {
+    if (user === null || user.displayName === null) { return []; } // TODO: add error
     const userData = await getUserDBDataByUid(user.uid);
-    if (userData === undefined) { return; }
+    if (userData === undefined) { return []; }
     let myPendingSyncTokens: string[] = userData.pendingSyncTokens;
     let myActivatedSyncTokens: string[] = userData.activeSyncTokens;
 
@@ -214,7 +237,7 @@ async function moveAllTokensFromPendingToActive(
         const token = myPendingSyncTokens[index];
         if (token.length < 36) { throw Error('One token in the activated tokens array of the user: ' + user.displayName + ' ' + user.uid + ' is invalid') }
 
-        if (await isDocumentExisting(token, CONNECTION_DB_NAME)) {
+        if (await isDocumentExisting(token, DB_ACCESS_NAMES.CONNECTION_DB_NAME)) {
             activatedSyncTokens.push(token);
             myActivatedSyncTokens.push(token);
         }
@@ -227,8 +250,34 @@ async function moveAllTokensFromPendingToActive(
     }
 
     await updateDoc(
-        doc(firebase_db, USERS_DB_NAME, user.uid),
+        doc(firebase_db, DB_ACCESS_NAMES.USERS_DB_NAME, user.uid),
         { activeSyncTokens: myActivatedSyncTokens, pendingSyncTokens: myPendingSyncTokens });
+
+    const activatedConnections: IConnection[] = [];
+    for (let index: number = 0; index < activatedSyncTokens.length; index++) {
+        const token = activatedSyncTokens[index];
+
+        if (token.length < 36) { throw Error('One token in the activated tokens array of the user: ' + user.displayName + ' ' + user.uid + ' is invalid') }
+
+        const connectionData = await getConnectionDBDataByToken(token);
+
+        if (connectionData !== undefined) {
+            activatedConnections.push(connectionData);
+        }
+    }
+
+    return activatedConnections;
+}
+
+export async function hasUserTokenAccess(user: User | null, token: string): Promise<boolean> {
+    if (user === null || token.length < 36) { return false; }
+    const userData: IUser | undefined = await getUserDBDataByUid(user.uid);
+    if (userData === undefined) {
+        return false;
+    }
+    console.log(isTokenInTokenArray(token, userData.activeSyncTokens));
+
+    return isTokenInTokenArray(token, userData.activeSyncTokens);
 }
 
 async function getUserDBData(user: User | null): Promise<IUser | undefined> {
@@ -237,11 +286,11 @@ async function getUserDBData(user: User | null): Promise<IUser | undefined> {
 }
 
 async function getUserDBDataByUid(uid: string): Promise<IUser | undefined> {
-    return await getDocumentData(uid, USERS_DB_NAME, userConverter) as IUser;
+    return await getDocumentData(uid, DB_ACCESS_NAMES.USERS_DB_NAME, userConverter) as IUser;
 }
 
 async function getConnectionDBDataByToken(token: string): Promise<IConnection | undefined> {
-    return await getDocumentData(token, CONNECTION_DB_NAME, connectionConverter) as IConnection;
+    return await getDocumentData(token, DB_ACCESS_NAMES.CONNECTION_DB_NAME, connectionConverter) as IConnection;
 }
 
 async function getDocumentData(

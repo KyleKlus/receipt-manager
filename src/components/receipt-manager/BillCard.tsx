@@ -1,14 +1,14 @@
 /** @format */
 import styles from '@/styles/components/receipt-manager/BillCard.module.css';
-import { IAuthContext, useAuth } from '@/context/AuthContext';
+import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
 import { IDataBaseContext, useDB } from '@/context/DatabaseContext';
 import Card from '../Card';
-import { Moment } from 'moment';
 import { Category } from '@/handlers/DataParser';
 import Image from 'next/image';
 import plusIcon from '../../../public/plus.png'
 import IBill from '@/interfaces/IBill';
 import * as DataParser from '../../handlers/DataParser';
+import { useRouter } from 'next/router';
 
 
 interface IShareSyncTokenModalProps {
@@ -21,16 +21,24 @@ interface IShareSyncTokenModalProps {
 export default function BillCard(props: React.PropsWithChildren<IShareSyncTokenModalProps>) {
     const authContext: IAuthContext = useAuth();
     const dbContext: IDataBaseContext = useDB();
+    const router = useRouter();
 
     function handleAddBill() {
-        dbContext.addBill(authContext.user, dbContext.selectedConnection).then(_ => {
+        dbContext.addBill(authContext.user, dbContext.selectedConnection).then(billName => {
             props.reloadBills();
+            router.push({
+                pathname: redirectPaths[RedirectPathOptions.ManagerPage],
+                query: { date: billName, token: dbContext.selectedConnection }
+            });
         });
-        // TODO: 2. Open ui for bill editing
     }
 
     function handleOpenBill() {
-        // TODO: 1. Open ui for bill editing
+        if (props.bill === undefined) { return }
+        router.push({
+            pathname: redirectPaths[RedirectPathOptions.ManagerPage],
+            query: { date: DataParser.getDateNameByMoment(props.bill.date), token: dbContext.selectedConnection }
+        });
     }
 
     return (

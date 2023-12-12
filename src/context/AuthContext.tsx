@@ -12,7 +12,8 @@ export const redirectPaths: string[] = [
     '/auth/register',
     '/auth/loading-page',
     '/auth/locked-page',
-    '/dashboard'
+    '/dashboard',
+    '/manager'
 ];
 
 export enum RedirectPathOptions {
@@ -23,6 +24,7 @@ export enum RedirectPathOptions {
     LoadingPage = 3,
     LockedPage = 4,
     DashBoardPage = 5,
+    ManagerPage = 6,
 }
 
 export interface IAuthContext {

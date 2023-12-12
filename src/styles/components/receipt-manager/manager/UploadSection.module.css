@@ -1,0 +1,217 @@
+/** @format */
+
+.uploadSection {
+    margin: calc(5vh - 64px) auto 5vh auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    box-shadow: var(--shadowElevation_4);
+
+    width: 90%;
+    height: 90vh;
+    padding: 0px !important;
+}
+
+.uploadSectionHeader {
+    width: 100%;
+    background-color: var(--bg-color-20);
+    display: flex;
+    border-top-right-radius: var(--border-radius);
+    border-top-left-radius: var(--border-radius);
+    border-bottom: 1px solid var(--bg-color-40);
+    padding: 16px 32px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.uploadSectionHeaderControls {
+    display: flex;
+    gap: 8px;
+}
+
+.uploadSectionContent {
+    height: 100%;
+    width: 100%;
+    padding: 32px;
+    /* justify-content: center; */
+    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 180px);
+    grid-template-rows: repeat(auto-fit, 190px);
+    gap: 16px;
+    overflow: auto;
+    border-bottom-left-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+}
+
+
+
+
+/* Old stuff */
+.receiptManager {
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.center {
+    justify-content: center;
+}
+
+.split {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+
+    justify-content: center;
+    gap: 32px;
+    padding: 32px;
+}
+
+.personCell {
+    flex-grow: 1;
+}
+
+.personHeader {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.personName {
+    background-color: transparent;
+    border: none;
+    font-size: x-large;
+    max-width: 10ch;
+}
+
+.fancyButton {
+    padding: 4px 8px;
+    margin: 0 8px;
+    background-color: var(--bg-color-25);
+    border: 1px solid var(--bg-color-50);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    box-shadow:
+        0 0 0 1px hsla(0, 0%, 0%, .6),
+        0 2px 3px hsla(0, 0%, 0%, .6);
+    transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.fancyButton:hover {
+    background-color: var(--bg-color-30);
+    border-color: var(--bg-color-70);
+    box-shadow:
+        0 0 0 1px hsla(0, 0%, 0%, .6),
+        0 2px 3px hsla(0, 0%, 0%, .6),
+        0 4px 3px hsla(0, 0%, 0%, .4);
+}
+
+
+
+.personAddItemWrapper {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-around;
+
+    margin-top: 32px;
+    margin-bottom: 32px;
+}
+
+.personAddItemWrapper button {
+    padding: 4px 8px;
+    background-color: var(--bg-color-25);
+    border: 1px solid var(--bg-color-50);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    box-shadow:
+        0 0 0 1px hsla(0, 0%, 0%, .6),
+        0 2px 3px hsla(0, 0%, 0%, .6);
+    transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.personAddItemWrapper button:hover {
+    background-color: var(--bg-color-30);
+    border-color: var(--bg-color-70);
+    box-shadow:
+        0 0 0 1px hsla(0, 0%, 0%, .6),
+        0 2px 3px hsla(0, 0%, 0%, .6),
+        0 4px 3px hsla(0, 0%, 0%, .4);
+}
+
+.personAddItemWrapper input[type='text'],
+.personAddItemWrapper input[type='number'] {
+    appearance: none;
+    padding: 0 4px;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px dotted var(--bg-color-70);
+    transition: border 200ms ease;
+}
+
+.personAddItemWrapper input[type='text']:is(:hover, :focus-visible),
+.personAddItemWrapper input[type='number']:is(:hover, :focus-visible) {
+    outline: none;
+    border-bottom-color: var(--bg-color-90);
+}
+
+.personAddItemWrapper > *:nth-child(1) {
+    width: 25ch;
+}
+
+.personAddItemWrapper > *:nth-child(2) {
+    width: 8ch;
+}
+
+.personAddItemWrapper > *:nth-child(3) {
+    width: 8ch;
+}
+
+
+
+
+/* Enable hover only on non-touch devices */
+@media (hover: hover) and (pointer: fine) {}
+
+@media (prefers-reduced-motion) {}
+
+
+
+/* Mobile */
+@media (max-width: 650px) {
+    .personCell {
+        font-size: small;
+    }
+
+    .personHeader button {
+        padding: 4px 4px;
+        font-size: small;
+    }
+
+}
+
+@media (max-width: 550px) {
+    .personCell {
+        font-size: x-small;
+    }
+
+    .personHeader button {
+        padding: 3px 3px;
+        font-size: 0.5rem;
+    }
+}
+
+@media (max-width: 400px) {}
+
+@media (max-width: 300px) {}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 601px) and (max-width: 1120px) {}
+
+@media (prefers-color-scheme: dark) {}
