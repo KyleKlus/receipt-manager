@@ -6,12 +6,13 @@ import * as CSVParser from '@/handlers/DataParser';
 import PersonCard from '@/components/receipt-manager/personCell/PersonCard';
 import ReceiptsTable from '@/components/receipt-manager/personCell/ReceiptsTable';
 import { Category } from '@/handlers/DataParser';
-import { IReceiptItem } from '@/interfaces/IReceiptItem';
+import { IReceiptItem } from '@/interfaces/data/IReceiptItem';
 import UploadSection from './UploadSection';
 import ResultSection from './ResultSection';
 import { IAuthContext, useAuth } from '@/context/AuthContext';
 import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
+import { IAccountingDataBaseContext, useAccountingDB } from '@/context/AccountingDatabaseContext';
 
 interface IReceiptManagerProps {
     billDate: string;
@@ -22,15 +23,10 @@ export default function ReceiptManager(props: React.PropsWithChildren<IReceiptMa
     const authContext: IAuthContext = useAuth();
     const userDBContext: IUserDataBaseContext = useUserDB();
     const billDBContext: IBillDataBaseContext = useBillDB();
+    const accountingDBContext: IAccountingDataBaseContext = useAccountingDB();
 
     const [isResultReady, setIsResultReady] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-
-    const [firstPersonName, setFirstPersonName] = useState<string>('');
-    const [firstReceipts, setFirstReceipts] = useState<IReceipt[]>([]);
-
-    const [secondPersonName, setSecondPersonName] = useState<string>('');
-    const [secondReceipts, setSecondReceipts] = useState<IReceipt[]>([]);
 
     useEffect(() => {
         if (isLoading) {
@@ -39,10 +35,20 @@ export default function ReceiptManager(props: React.PropsWithChildren<IReceiptMa
     })
 
     async function loadData() {
-        if (authContext.user === null || authContext.user.displayName == null) { return; }
-        setFirstPersonName(authContext.user.displayName);
+        if (authContext.user === null) { return; }
+        if (authContext.user.displayName == null) { return; }
+
+        accountingDBContext.saveName(authContext.user.displayName, true);
         const secondPersonName: string = await userDBContext.getUserNameByToken(authContext.user, props.token);
-        setSecondPersonName(secondPersonName);
+        accountingDBContext.saveName(secondPersonName, false);
+
+        const receipts = await accountingDBContext.getReceipts(authContext.user, props.token, props.billDate);
+        const firstReceipts = receipts.filter(receipt => receipt.payedByUid === authContext.user?.uid);
+        accountingDBContext.saveReceipts(firstReceipts, true);
+
+        const secondReceipts = receipts.filter(receipt => receipt.payedByUid !== authContext.user?.uid);
+        accountingDBContext.saveReceipts(secondReceipts, false);
+
         setIsLoading(false);
     }
 

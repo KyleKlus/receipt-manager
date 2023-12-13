@@ -1,13 +1,13 @@
 /** @format */
 import styles from '@/styles/components/receipt-manager/personCell/PersonCard.module.css';
 import { ChangeEvent, useState } from 'react';
-import { IReceiptItem } from '@/interfaces/IReceiptItem';
+import { IReceiptItem } from '@/interfaces/data/IReceiptItem';
 import { IReceipt } from '@/interfaces/data/IReceipt';
 import * as DataParser from '@/handlers/DataParser';
 import * as Calculator from '@/handlers/Calculator';
 import ReceiptsOverview from './ReceiptsOverview';
 import moment from 'moment';
-import { IResult } from '@/interfaces/IResult';
+import { IResult } from '@/interfaces/data/IResult';
 
 export default function PersonCard(props: {
     myName: string,

@@ -4,7 +4,7 @@ import React from 'react';
 import * as userDBService from '@/services/fireStores/firebaseUserStore';
 import { User } from 'firebase/auth';
 import IConnection from '@/interfaces/app/IConnection';
-import { IUser } from '@/interfaces/IUser';
+import { IUser } from '@/interfaces/app/IUser';
 
 export interface IUserDataBaseContext {
     selectedConnection: string,

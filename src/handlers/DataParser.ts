@@ -1,6 +1,6 @@
 import { IReceipt } from "@/interfaces/data/IReceipt";
-import { IReceiptItem } from "@/interfaces/IReceiptItem";
-import { IResult } from "@/interfaces/IResult";
+import { IReceiptItem } from "@/interfaces/data/IReceiptItem";
+import { IResult } from "@/interfaces/data/IResult";
 import moment, { Moment } from "moment";
 import * as XLSX from 'xlsx';
 

@@ -1,8 +1,8 @@
 import { User } from "firebase/auth";
 import firebase_app from "../firebase";
-import { DocumentData, DocumentReference, QueryDocumentSnapshot, QuerySnapshot, Timestamp, collection, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
+import { DocumentData, DocumentReference, QueryDocumentSnapshot, QuerySnapshot, Timestamp, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
 import IConnection from "@/interfaces/app/IConnection";
-import { IUser } from "@/interfaces/IUser";
+import { IUser } from "@/interfaces/app/IUser";
 import IBill from "@/interfaces/data/IBill";
 import moment, { Moment } from "moment";
 
@@ -46,7 +46,7 @@ export async function getDocumentCollectionData(
 
     docsSnap.forEach(doc => {
         dataArray.push(dataConverter.fromFirestore(doc));
-    })
+    });
 
     return dataArray;
 }
@@ -55,7 +55,7 @@ export async function getDocumentData(
     documentName: string,
     documentCollectionName: string,
     dataConverter: any
-): Promise<any> {
+): Promise<any | undefined> {
     const docRef = doc(firebase_db, documentCollectionName, documentName).withConverter(dataConverter);
     const docSnap = await getDoc(docRef);
 
@@ -64,6 +64,30 @@ export async function getDocumentData(
     const data = docSnap.data();
 
     return data;
+}
+
+export async function addDocument(
+    documentName: string,
+    documentCollectionName: string,
+    dataConverter: any,
+    data: any): Promise<boolean> {
+    if (await isDocumentExisting(documentName, documentCollectionName)) {
+        return false;
+    }
+
+    await setDocumentData(documentName, documentCollectionName, dataConverter, data);
+    return true;
+}
+
+export async function deleteDocument(
+    documentName: string,
+    documentCollectionName: string): Promise<boolean> {
+    if (await isDocumentExisting(documentName, documentCollectionName)) {
+        return false;
+    }
+
+    await deleteDoc(doc(firebase_db, documentCollectionName, documentName));
+    return true;
 }
 
 export async function setDocumentData(

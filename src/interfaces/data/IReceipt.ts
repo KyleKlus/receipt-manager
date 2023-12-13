@@ -1,5 +1,5 @@
 import { Category } from "@/handlers/DataParser";
-import { IReceiptItem } from "../IReceiptItem";
+import { IReceiptItem } from "./IReceiptItem";
 
 export interface IReceipt {
     receiptId: string;

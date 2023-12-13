@@ -1,74 +1,66 @@
 import { User } from "firebase/auth";
-import { DocumentData, DocumentReference, QueryDocumentSnapshot, QuerySnapshot, Timestamp, collection, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
-import IConnection from "@/interfaces/app/IConnection";
-import { IUser } from "@/interfaces/IUser";
-import IBill from "@/interfaces/data/IBill";
-import moment, { Moment } from "moment";
+import { DocumentData, QueryDocumentSnapshot, } from "firebase/firestore";
 
+import { DB_ACCESS_NAMES, addDocument, deleteDocument, getDocumentCollectionData, getDocumentData, updateDocumentData } from "./firebaseStore";
 import * as DataParser from '../../handlers/DataParser';
-import firebase_db, { DB_ACCESS_NAMES, getDocumentData, isDocumentExisting } from "./firebaseStore";
+import { IReceiptItem } from "@/interfaces/data/IReceiptItem";
 
-export const billConverter = {
-    toFirestore: (bill: IBill) => {
-        const timeStampDate: Timestamp = Timestamp.fromDate(bill.date.toDate());
+export const itemConverter = {
+    toFirestore: (item: IReceiptItem) => {
         return {
-            date: timeStampDate,
-            mostCommonCategory: DataParser.getNameOfCategory(bill.mostCommonCategory),
-            numberOfItems: bill.numberOfItems,
-            totalPrice: bill.totalPrice
+            itemId: item.itemId,
+            name: item.name,
+            price: item.price,
+            amount: item.amount,
+            category: DataParser.getNameOfCategory(item.category),
+            ownerUids: item.ownerUids
         };
     },
     fromFirestore: (snapshot: QueryDocumentSnapshot<DocumentData, DocumentData>) => {
         const data = snapshot.data();
-        const bill: IBill = {
-            date: moment(data.date.toDate()),
-            mostCommonCategory: DataParser.getCategoryByName(data.mostCommonCategory),
-            numberOfItems: data.numberOfItems,
-            totalPrice: data.totalPrice
+        const item: IReceiptItem = {
+            itemId: data.itemId,
+            name: data.name,
+            price: data.price,
+            amount: data.amount,
+            category: DataParser.getCategoryByName(data.category),
+            ownerUids: data.ownerUids
         }
-        return bill;
+        return item;
     }
 };
 
-export async function getBillsByToken(user: User | null, token: string): Promise<IBill[]> {
+export async function getItems(user: User | null, token: string, date: string, receiptId: string): Promise<IReceiptItem[]> {
     if (user === null || user.displayName === null) { return []; } // TODO: add error
-    const bills: IBill[] = [];
+    const itemCollectionOfConnection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.BILLS_DB_NAME, date, DB_ACCESS_NAMES.RECEIPTS_DB_NAME, receiptId, DB_ACCESS_NAMES.ITEMS_DB_NAME].join('/');
 
-    const billCollectionOfConnection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.BILLS_DB_NAME].join('/');
-
-    const billDocsSnap: QuerySnapshot<DocumentData, DocumentData> = await getDocs(collection(firebase_db, billCollectionOfConnection));
-
-    billDocsSnap.docs.forEach(doc => {
-        bills.push(billConverter.fromFirestore(doc));
-    });
-
-    return bills.reverse();
+    return await getDocumentCollectionData(itemCollectionOfConnection, itemConverter);
 }
 
-export async function getBillByTokenAndDate(user: User | null, token: string, date: string): Promise<IBill | undefined> {
+export async function getReceiptItem(user: User | null, token: string, date: string, receiptId: string, itemId: string): Promise<IReceiptItem | undefined> {
     if (user === null || user.displayName === null) { return undefined; } // TODO: add error
-    const billCollectionOfConnection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.BILLS_DB_NAME].join('/');
+    const itemCollectionOfConnection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.BILLS_DB_NAME, date, DB_ACCESS_NAMES.RECEIPTS_DB_NAME, receiptId, DB_ACCESS_NAMES.ITEMS_DB_NAME].join('/');
 
-    return await getDocumentData(date, billCollectionOfConnection, billConverter);
+    return await getDocumentData(itemCollectionOfConnection, itemId, itemConverter);
 }
 
-export async function addBill(user: User | null, token: string): Promise<string> {
-    if (user === null || user.displayName === null) { return ''; } // TODO: add error
-    const billCollectionOfConnection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.BILLS_DB_NAME].join('/');
+export async function addReceiptItem(user: User | null, token: string, date: string, receiptId: string, item: IReceiptItem): Promise<boolean> {
+    if (user === null || user.displayName === null) { return false; } // TODO: add error
+    const itemCollectionOfConnection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.BILLS_DB_NAME, date, DB_ACCESS_NAMES.RECEIPTS_DB_NAME, receiptId, DB_ACCESS_NAMES.ITEMS_DB_NAME].join('/');
 
-    const newBill: IBill = {
-        date: moment(),
-        mostCommonCategory: DataParser.Category.None,
-        numberOfItems: 0,
-        totalPrice: 0
-    }
+    return await addDocument(itemCollectionOfConnection, item.itemId, itemConverter, item);
+}
 
-    const billName: string = DataParser.getDateNameByMoment(newBill.date);
+export async function updateReceiptItem(user: User | null, token: string, date: string, receiptId: string, itemId: string, item: IReceiptItem): Promise<boolean> {
+    if (user === null || user.displayName === null) { return false; } // TODO: add error
+    const itemCollectionOfConnection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.BILLS_DB_NAME, date, DB_ACCESS_NAMES.RECEIPTS_DB_NAME, receiptId, DB_ACCESS_NAMES.ITEMS_DB_NAME].join('/');
 
-    return await setDoc(
-        doc(firebase_db, billCollectionOfConnection, billName),
-        billConverter.toFirestore(newBill)
-    ).then(_ => {
-        return billName;
-    });
+    return await updateDocumentData(itemCollectionOfConnection, itemId, itemConverter, item);
+}
+
+export async function deleteReceiptItem(user: User | null, token: string, date: string, receiptId: string, itemId: string): Promise<boolean> {
+    if (user === null || user.displayName === null) { return false; } // TODO: add error
+    const itemCollectionOfConnection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.BILLS_DB_NAME, date, DB_ACCESS_NAMES.RECEIPTS_DB_NAME, receiptId, DB_ACCESS_NAMES.ITEMS_DB_NAME].join('/');
+
+    return await deleteDocument(itemCollectionOfConnection, itemId);
 }

@@ -4,6 +4,7 @@
 import AuthProvider from '@/context/AuthContext';
 import UserDataBaseProvider from '@/context/UserDatabaseContext';
 import BillDataBaseProvider from '@/context/BillDatabaseContext';
+import AccountingDataBaseProvider from '@/context/AccountingDatabaseContext';
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
 import { Fira_Code } from "next/font/google";
@@ -37,8 +38,10 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       <AuthProvider>
         <UserDataBaseProvider>
           <BillDataBaseProvider>
-            {/* <Component {...pageProps} /> */}
-            {getLayout(<Component {...pageProps} />)}
+            <AccountingDataBaseProvider>
+              {/* <Component {...pageProps} /> */}
+              {getLayout(<Component {...pageProps} />)}
+            </AccountingDataBaseProvider>
           </BillDataBaseProvider>
         </UserDataBaseProvider>
       </AuthProvider>

@@ -9,9 +9,9 @@ import IBill from '@/interfaces/data/IBill';
 
 export interface IBillDataBaseContext {
     bills: IBill[],
+    currentBill: IBill | undefined,
     saveBills: (bills: IBill[]) => void,
     saveCurrentBill: (bill: IBill) => void,
-    generateNewId: (user: User | null) => string,
     getBillsByToken: (user: User | null, token: string) => Promise<IBill[]>
     getBillByTokenAndDate: (user: User | null, token: string, date: string) => Promise<IBill | undefined>
     addBill: (user: User | null, token: string) => Promise<string>;
@@ -19,9 +19,9 @@ export interface IBillDataBaseContext {
 
 const defaultValue: IBillDataBaseContext = {
     bills: [],
+    currentBill: undefined,
     saveBills: (bills: IBill[]) => { },
     saveCurrentBill: (bill: IBill) => { },
-    generateNewId: (user: User | null) => '',
     getBillsByToken: (user: User | null, token: string) => { return new Promise<IBill[]>(() => { }); },
     getBillByTokenAndDate: (user: User | null, token: string, date: string) => { return new Promise<IBill | undefined>(() => { }); },
     addBill: (user: User | null, token: string) => { return new Promise<string>(() => { }); }
@@ -41,10 +41,6 @@ const BillDataBaseProvider: React.FC<{ children: React.ReactNode }> = (props) =>
         setCurrentBill(bill);
     }
 
-    function generateNewId(): string {
-        return crypto.randomUUID().split('-').slice(0, -1).join('-');
-    }
-
     async function getBillsByToken(user: User | null, token: string): Promise<IBill[]> {
         return await billDBService.getBillsByToken(user, token);
     }
@@ -59,9 +55,9 @@ const BillDataBaseProvider: React.FC<{ children: React.ReactNode }> = (props) =>
 
     return <BillDataBaseContext.Provider value={{
         bills,
+        currentBill,
         saveBills,
         saveCurrentBill,
-        generateNewId,
         getBillsByToken,
         getBillByTokenAndDate,
         addBill,

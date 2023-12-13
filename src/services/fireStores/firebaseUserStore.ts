@@ -1,7 +1,7 @@
 import { User } from "firebase/auth";
 import { DocumentData, DocumentReference, QueryDocumentSnapshot, QuerySnapshot, Timestamp, collection, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
 import IConnection from "@/interfaces/app/IConnection";
-import { IUser } from "@/interfaces/IUser";
+import { IUser } from "@/interfaces/app/IUser";
 import IBill from "@/interfaces/data/IBill";
 import moment, { Moment } from "moment";
 
@@ -181,7 +181,6 @@ export async function hasUserTokenAccess(user: User | null, token: string): Prom
     if (userData === undefined) {
         return false;
     }
-    console.log(isTokenInTokenArray(token, userData.activeSyncTokens));
 
     return isTokenInTokenArray(token, userData.activeSyncTokens);
 }
@@ -193,7 +192,7 @@ export async function getUserNameByToken(user: User | null, token: string): Prom
     const userDocsSnap = (await getDocs(collection(firebase_db, DB_ACCESS_NAMES.USERS_DB_NAME)));
 
     userDocsSnap.forEach(doc => {
-        const userData = doc.data().d;
+        const userData = doc.data();
         if (isTokenInTokenArray(token, userData.activeSyncTokens)) {
             userName = userData.displayName;
             return userName
