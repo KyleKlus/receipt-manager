@@ -25,7 +25,12 @@
     align-items: center;
 }
 
-.uploadSectionHeaderModeWrapper{
+.uploadSectionHeaderTitleWrapper {
+    display: flex;
+    gap: 1.5ch;
+}
+
+.uploadSectionHeaderModeWrapper {
     border-radius: var(--border-radius);
     border: 1px solid var(--bg-color-60);
 }
@@ -58,20 +63,27 @@
 .uploadSectionContent {
     height: 100%;
     width: 100%;
-    padding: 32px;
     /* justify-content: center; */
     align-items: center;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, 180px);
-    grid-template-rows: repeat(auto-fit, 190px);
-    gap: 16px;
+    display: flex;
+    flex-direction: column;
     overflow: auto;
     border-bottom-left-radius: var(--border-radius);
     border-bottom-right-radius: var(--border-radius);
 }
 
-
-
+.uploadSectionLoadingContent {
+    height: 100%;
+    width: 100%;
+    padding: 32px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border-bottom-left-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+}
 
 /* Old stuff */
 .receiptManager {

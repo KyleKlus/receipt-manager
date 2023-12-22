@@ -19,6 +19,10 @@ export enum Category {
     Stationery,
     Travel,
     Misc,
+    Rent,
+    Formalities,
+    Leisure,
+    Discount,
     None
 }
 
@@ -86,7 +90,7 @@ export function downloadEXCEL(name: string, myName: string, otherName: string, m
     XLSX.writeFileXLSX(wb, name + '.xlsx', { type: 'file' });
 }
 
-export function parseFileToReceipts(file: File, ownerName: string): Promise<IReceipt[]> {
+export function parseFileToReceipts(file: File, payedByUid: string, sharedByUid: string): Promise<IReceipt[]> {
     let receipts: IReceipt[] = []
 
     let reader = new FileReader();
@@ -101,15 +105,15 @@ export function parseFileToReceipts(file: File, ownerName: string): Promise<IRec
             const result = reader.result;
 
             if (result !== null && result !== undefined) {
-                const receiptsHeader: string[] = result.toString().split('\n')[0].split(',');
-                const receiptHeaderCount: number = receiptsHeader.length;
-                const itemHeader: string[] = receiptsHeader.reverse()[0].split('|');
-                const itemHeaderCount: number = itemHeader.length;
+                const receiptsColumns: string[] = result.toString().split('\n')[0].split(',');
+                const receiptColumnsCount: number = receiptsColumns.length;
+                const itemColumns: string[] = receiptsColumns.reverse()[0].split('|');
+                const itemColumnsCount: number = itemColumns.length;
                 const receiptsAsText: string[] = result.toString().split('\n').slice(1).filter((item) => { return item.length > 1 });
 
                 for (let i: number = 0; i < receiptsAsText.length; i++) {
                     const receipt: string[] = receiptsAsText[i].split(',');
-                    const receiptItems: string[][] = _listToMatrix(receipt.slice(receiptHeaderCount).join('').replaceAll('"', '').split('|'), itemHeaderCount).filter((item) => { return item.length > 1 });
+                    const receiptItems: string[][] = _listToMatrix(receipt.slice(receiptColumnsCount).join('').replaceAll('"', '').split('|'), itemColumnsCount).filter((item) => { return item.length > 1 });
 
                     let totalPrice = 0;
 
@@ -122,13 +126,12 @@ export function parseFileToReceipts(file: File, ownerName: string): Promise<IRec
                         totalPrice += price;
 
                         return {
+                            itemId: _generateNewId(),
+                            ownerUids: [payedByUid, sharedByUid],
                             name: itemName,
-                            price: price,
+                            price: Math.round(price * 100) / 100,
                             amount: itemAmount,
-                            isMine: false,
-                            isShared: true,
-                            isRejected: false,
-                            category: DEFAULT_CATEGORY
+                            category: price < 0 ? Category.Discount : DEFAULT_CATEGORY
                         }
                     })
 
@@ -137,14 +140,13 @@ export function parseFileToReceipts(file: File, ownerName: string): Promise<IRec
                     storeName = storeName !== '' ? storeName : 'Unrecognized Store';
 
                     const parsedReceipt: IReceipt = {
+                        receiptId: _generateNewId(),
+                        payedByUid: payedByUid,
                         store: storeName,
-                        owner: ownerName,
-                        totalPrice: Math.floor(totalPrice * 100) / 100,
+                        totalPrice: Math.round(totalPrice * 100) / 100,
                         items: parsedReceiptItems,
-                        categoryForAllItems: Category.None,
-                        isAllShared: false,
-                        isAllRejected: false,
-                        isAllMine: false,
+                        amount: parsedReceiptItems.length,
+                        mostCommonCategory: DEFAULT_CATEGORY
                     }
 
                     receipts = receipts.concat(parsedReceipt)
@@ -183,6 +185,11 @@ function _firstCharToUppercase(text: string): string {
     }
     return '';
 }
+
+function _generateNewId(): string {
+    return crypto.randomUUID().split('-').slice(0, -1).join('-');
+}
+
 
 function _prepCSVDataReceipts(myReceipts: IReceipt[], otherReceipts: IReceipt[]): string {
     let dataString: string = '';

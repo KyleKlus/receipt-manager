@@ -10,7 +10,7 @@ export const itemConverter = {
         return {
             itemId: item.itemId,
             name: item.name,
-            price: item.price,
+            price: Math.round(item.price * 100) / 100,
             amount: item.amount,
             category: DataParser.getNameOfCategory(item.category),
             ownerUids: item.ownerUids
@@ -21,7 +21,7 @@ export const itemConverter = {
         const item: IReceiptItem = {
             itemId: data.itemId,
             name: data.name,
-            price: data.price,
+            price: Math.round(data.price * 100) / 100,
             amount: data.amount,
             category: DataParser.getCategoryByName(data.category),
             ownerUids: data.ownerUids
@@ -51,11 +51,11 @@ export async function addReceiptItem(user: User | null, token: string, date: str
     return await addDocument(itemCollectionOfConnection, item.itemId, itemConverter, item);
 }
 
-export async function updateReceiptItem(user: User | null, token: string, date: string, receiptId: string, itemId: string, item: IReceiptItem): Promise<boolean> {
+export async function updateReceiptItem(user: User | null, token: string, date: string, receiptId: string, item: IReceiptItem): Promise<boolean> {
     if (user === null || user.displayName === null) { return false; } // TODO: add error
     const itemCollectionOfConnection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.BILLS_DB_NAME, date, DB_ACCESS_NAMES.RECEIPTS_DB_NAME, receiptId, DB_ACCESS_NAMES.ITEMS_DB_NAME].join('/');
 
-    return await updateDocumentData(itemCollectionOfConnection, itemId, itemConverter, item);
+    return await updateDocumentData(itemCollectionOfConnection, item.itemId, itemConverter, item);
 }
 
 export async function deleteReceiptItem(user: User | null, token: string, date: string, receiptId: string, itemId: string): Promise<boolean> {

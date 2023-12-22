@@ -17,6 +17,7 @@ export default function ResultSection(props: React.PropsWithChildren<IResultSect
         </div>
       </div>
       <div className={[styles.resultSectionContent].join(' ')}>
+        
       </div>
     </Card>
   </div>;

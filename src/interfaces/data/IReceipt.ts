@@ -1,5 +1,6 @@
 import { Category } from "@/handlers/DataParser";
 import { IReceiptItem } from "./IReceiptItem";
+import { Moment } from "moment";
 
 export interface IReceipt {
     receiptId: string;
@@ -7,5 +8,6 @@ export interface IReceipt {
     store: string;
     totalPrice: number;
     mostCommonCategory: Category;
+    amount: number;
     items: IReceiptItem[];
 }

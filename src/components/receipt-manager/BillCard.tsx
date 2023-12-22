@@ -65,7 +65,7 @@ export default function BillCard(props: React.PropsWithChildren<IShareSyncTokenM
                             <Image src={plusIcon} alt='add Bill' width={24} height={24} />
                         </button>
                         : <ul className={[styles.billInfos].join(' ')}>
-                            <li>Cost: {props.bill.totalPrice}</li>
+                            <li>Cost: {props.bill.totalPrice}€</li>
                             <li>Items: {props.bill.numberOfItems}</li>
                             <li>Category: {DataParser.getNameOfCategory(props.bill.mostCommonCategory)}</li>
                         </ul>

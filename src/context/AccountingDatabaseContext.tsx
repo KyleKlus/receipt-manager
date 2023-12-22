@@ -12,46 +12,56 @@ import { IReceiptItem } from '@/interfaces/data/IReceiptItem';
 export interface IAccountingDataBaseContext {
     firstName: string,
     secondName: string,
+    firstUid: string,
+    secondUid: string,
     firstReceipts: IReceipt[],
     secondReceipts: IReceipt[],
     saveName: (name: string, isFirst: boolean) => void
+    saveUid: (uid: string, isFirst: boolean) => void
     saveReceipts: (receipts: IReceipt[], isFirst: boolean) => void,
     getReceipts: (user: User | null, token: string, date: string) => Promise<IReceipt[]>
-    generateNewId: (user: User | null) => string,
-    addReceipt: (user: User | null, token: string, date: string, receipt: IReceipt) => Promise<boolean>;
-    updateReceipt: (user: User | null, token: string, date: string, receiptId: string, receipt: IReceipt) => Promise<boolean>;
-    deleteReceipt: (user: User | null, token: string, date: string, receiptId: string) => Promise<boolean>;
-    getItems: (user: User | null, token: string, date: string, receiptId: string) => Promise<IReceiptItem[]>;
-    addItemToReceipt: (user: User | null, token: string, date: string, receiptId: string, item: IReceiptItem) => Promise<boolean>;
-    deleteItem: (user: User | null, token: string, date: string, receiptId: string, itemId: string) => Promise<boolean>;
-    updateItem: (user: User | null, token: string, date: string, receiptId: string, itemId: string, item: IReceiptItem) => Promise<boolean>;
+    generateNewId: () => string,
+    addReceipt: (user: User | null, token: string, date: string, receipt: IReceipt) => Promise<boolean>,
+    updateReceipt: (user: User | null, token: string, date: string, receipt: IReceipt) => Promise<boolean>,
+    updateReceiptStats: (user: User | null, token: string, date: string, receipt: IReceipt) => Promise<IReceipt | undefined>,
+    deleteReceipt: (user: User | null, token: string, date: string, receiptId: string) => Promise<boolean>,
+    getItems: (user: User | null, token: string, date: string, receiptId: string) => Promise<IReceiptItem[]>,
+    addItemToReceipt: (user: User | null, token: string, date: string, receiptId: string, item: IReceiptItem) => Promise<boolean>,
+    deleteItem: (user: User | null, token: string, date: string, receiptId: string, itemId: string) => Promise<boolean>,
+    updateItem: (user: User | null, token: string, date: string, receiptId: string, item: IReceiptItem) => Promise<boolean>
 }
 
 const defaultValue: IAccountingDataBaseContext = {
     firstName: '',
     secondName: '',
+    firstUid: '',
+    secondUid: '',
     firstReceipts: [],
     secondReceipts: [],
     saveName: (name: string, isFirst: boolean) => { return; },
+    saveUid: (uid: string, isFirst: boolean) => { return; },
     saveReceipts: (receipts: IReceipt[], isFirst: boolean) => { return new Promise<void>(() => { }); },
     getReceipts: (user: User | null, token: string, date: string) => { return new Promise<IReceipt[]>(() => { }); },
-    generateNewId: (user: User | null) => { return ''; },
+    generateNewId: () => { return ''; },
     addReceipt: (user: User | null, token: string, date: string, receipt: IReceipt) => { return new Promise<boolean>(() => { }); },
-    updateReceipt: (user: User | null, token: string, date: string, receiptId: string, receipt: IReceipt) => { return new Promise<boolean>(() => { }); },
+    updateReceipt: (user: User | null, token: string, date: string, receipt: IReceipt) => { return new Promise<boolean>(() => { }); },
+    updateReceiptStats: (user: User | null, token: string, date: string, receipt: IReceipt) => { return new Promise<IReceipt | undefined>(() => { }); },
     deleteReceipt: (user: User | null, token: string, date: string, receiptId: string) => { return new Promise<boolean>(() => { }); },
     getItems: (user: User | null, token: string, date: string, receiptId: string) => { return new Promise<IReceiptItem[]>(() => { }); },
     addItemToReceipt: (user: User | null, token: string, date: string, receiptId: string, item: IReceiptItem) => { return new Promise<boolean>(() => { }); },
     deleteItem: (user: User | null, token: string, date: string, receiptId: string, itemId: string) => { return new Promise<boolean>(() => { }); },
-    updateItem: (user: User | null, token: string, date: string, receiptId: string, itemId: string, item: IReceiptItem) => { return new Promise<boolean>(() => { }); },
+    updateItem: (user: User | null, token: string, date: string, receiptId: string, item: IReceiptItem) => { return new Promise<boolean>(() => { }); },
 }
 
 const AccountingDataBaseContext: React.Context<IAccountingDataBaseContext> = createContext<IAccountingDataBaseContext>(defaultValue);
 
 const AccountingDataBaseProvider: React.FC<{ children: React.ReactNode }> = (props) => {
     const [firstName, setFirstName] = useState<string>('');
+    const [firstUid, setFirstUid] = useState<string>('');
     const [firstReceipts, setFirstReceipts] = useState<IReceipt[]>([]);
 
     const [secondName, setSecondName] = useState<string>('');
+    const [secondUid, setSecondUid] = useState<string>('');
     const [secondReceipts, setSecondReceipts] = useState<IReceipt[]>([]);
 
     function saveName(name: string, isFirst: boolean) {
@@ -59,6 +69,14 @@ const AccountingDataBaseProvider: React.FC<{ children: React.ReactNode }> = (pro
             setFirstName(name);
         } else {
             setSecondName(name);
+        }
+    }
+
+    function saveUid(uid: string, isFirst: boolean) {
+        if (isFirst) {
+            setFirstUid(uid);
+        } else {
+            setSecondUid(uid);
         }
     }
 
@@ -75,8 +93,6 @@ const AccountingDataBaseProvider: React.FC<{ children: React.ReactNode }> = (pro
     }
 
     async function getReceipts(user: User | null, token: string, date: string): Promise<IReceipt[]> {
-        console.log('test')
-
         return await receiptDBService.getReceipts(user, token, date);
     }
 
@@ -84,8 +100,12 @@ const AccountingDataBaseProvider: React.FC<{ children: React.ReactNode }> = (pro
         return await receiptDBService.addReceipt(user, token, date, receipt);
     }
 
-    async function updateReceipt(user: User | null, token: string, date: string, receiptId: string, receipt: IReceipt): Promise<boolean> {
-        return await receiptDBService.updateReceipt(user, token, date, receiptId, receipt);
+    async function updateReceipt(user: User | null, token: string, date: string, receipt: IReceipt): Promise<boolean> {
+        return await receiptDBService.updateReceipt(user, token, date, receipt);
+    }
+
+    async function updateReceiptStats(user: User | null, token: string, date: string, receipt: IReceipt): Promise<IReceipt | undefined> {
+        return await receiptDBService.updateReceiptStats(user, token, date, receipt);
     }
 
     async function deleteReceipt(user: User | null, token: string, date: string, receiptId: string): Promise<boolean> {
@@ -104,22 +124,26 @@ const AccountingDataBaseProvider: React.FC<{ children: React.ReactNode }> = (pro
         return await itemDBService.deleteReceiptItem(user, token, date, receiptId, itemId);
     }
 
-    async function updateItem(user: User | null, token: string, date: string, receiptId: string, itemId: string, item: IReceiptItem): Promise<boolean> {
-        return await itemDBService.updateReceiptItem(user, token, date, receiptId, itemId, item);
+    async function updateItem(user: User | null, token: string, date: string, receiptId: string, item: IReceiptItem): Promise<boolean> {
+        return await itemDBService.updateReceiptItem(user, token, date, receiptId, item);
     }
 
     return <AccountingDataBaseContext.Provider value={{
         firstName,
         secondName,
+        firstUid,
+        secondUid,
         firstReceipts,
         secondReceipts,
         saveName,
+        saveUid,
         saveReceipts,
         generateNewId,
         getReceipts,
         addReceipt,
         deleteReceipt,
         updateReceipt,
+        updateReceiptStats,
         getItems,
         addItemToReceipt,
         deleteItem,

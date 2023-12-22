@@ -54,7 +54,15 @@ function Home() {
 
   async function fetchBills(selectedConnection: string) {
     if (selectedConnection === '') { return; }
-    billDBContext.saveBills(await billDBContext.getBillsByToken(authContext.user, selectedConnection));
+    const bills = await billDBContext.getBillsByToken(authContext.user, selectedConnection);
+    for (let index = 0; index < bills.length; index++) {
+      const updatedBill = await billDBContext.updateBillStats(authContext.user, selectedConnection, bills[index], true);
+      if (updatedBill !== undefined) {
+        bills[index] = updatedBill;
+      }
+    }
+
+    billDBContext.saveBills(bills);
   }
 
   return (

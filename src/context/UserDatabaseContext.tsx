@@ -18,7 +18,8 @@ export interface IUserDataBaseContext {
     getActiveConnections: (user: User | null) => Promise<IConnection[]>,
     moveActivePendingTokensToActiveTokens: (user: User | null) => Promise<IConnection[]>,
     hasUserTokenAccess: (user: User | null, token: string) => Promise<boolean>,
-    getUserNameByToken: (user: User | null, token: string) => Promise<string>
+    getUserNameByToken: (user: User | null, token: string) => Promise<string>,
+    getUserUidByToken: (user: User | null, token: string) => Promise<string>,
 }
 
 const defaultValue: IUserDataBaseContext = {
@@ -33,7 +34,8 @@ const defaultValue: IUserDataBaseContext = {
     getActiveConnections: (user: User | null) => { return new Promise<IConnection[]>(() => { }); },
     moveActivePendingTokensToActiveTokens: (user: User | null) => { return new Promise<IConnection[]>(() => { }); },
     hasUserTokenAccess: (user: User | null, token: string) => { return new Promise<boolean>(() => { }); },
-    getUserNameByToken: (user: User | null, token: string) => { return new Promise<string>(() => { }); }
+    getUserNameByToken: (user: User | null, token: string) => { return new Promise<string>(() => { }); },
+    getUserUidByToken: (user: User | null, token: string) => { return new Promise<string>(() => { }); }
 
 }
 
@@ -83,6 +85,10 @@ const UserDataBaseProvider: React.FC<{ children: React.ReactNode }> = (props) =>
         return await userDBService.getUserNameByToken(user, token)
     }
 
+    async function getUserUidByToken(user: User | null, token: string): Promise<string> {
+        return await userDBService.getUserUidByToken(user, token)
+    }
+
     return <UserDataBaseContext.Provider value={{
         selectedConnection,
         activeConnections,
@@ -95,7 +101,8 @@ const UserDataBaseProvider: React.FC<{ children: React.ReactNode }> = (props) =>
         generateNewSyncToken,
         getActiveConnections,
         hasUserTokenAccess,
-        getUserNameByToken
+        getUserNameByToken,
+        getUserUidByToken
     }}>{props.children}</UserDataBaseContext.Provider>;
 };
 

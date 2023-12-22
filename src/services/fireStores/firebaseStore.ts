@@ -1,14 +1,13 @@
-import { User } from "firebase/auth";
 import firebase_app from "../firebase";
-import { DocumentData, DocumentReference, QueryDocumentSnapshot, QuerySnapshot, Timestamp, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
-import IConnection from "@/interfaces/app/IConnection";
-import { IUser } from "@/interfaces/app/IUser";
-import IBill from "@/interfaces/data/IBill";
-import moment, { Moment } from "moment";
-
-import * as DataParser from '../../handlers/DataParser';
+import { collection, deleteDoc, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
 
 const firebase_db = getFirestore(firebase_app);
+
+export enum UpdateStrategy {
+    SELF_UPDATE,
+    UP_UPDATE,
+    FULL_UPDATE
+}
 
 interface IDBNames {
     USERS_DB_NAME: string,
@@ -52,8 +51,8 @@ export async function getDocumentCollectionData(
 }
 
 export async function getDocumentData(
-    documentName: string,
     documentCollectionName: string,
+    documentName: string,
     dataConverter: any
 ): Promise<any | undefined> {
     const docRef = doc(firebase_db, documentCollectionName, documentName).withConverter(dataConverter);
@@ -67,22 +66,24 @@ export async function getDocumentData(
 }
 
 export async function addDocument(
-    documentName: string,
     documentCollectionName: string,
+    documentName: string,
     dataConverter: any,
-    data: any): Promise<boolean> {
-    if (await isDocumentExisting(documentName, documentCollectionName)) {
+    data: any
+): Promise<boolean> {
+    if (await isDocumentExisting(documentCollectionName, documentName)) {
         return false;
     }
 
-    await setDocumentData(documentName, documentCollectionName, dataConverter, data);
+    await setDocumentData(documentCollectionName, documentName, dataConverter, data);
     return true;
 }
 
 export async function deleteDocument(
-    documentName: string,
-    documentCollectionName: string): Promise<boolean> {
-    if (await isDocumentExisting(documentName, documentCollectionName)) {
+    documentCollectionName: string,
+    documentName: string
+): Promise<boolean> {
+    if (!(await isDocumentExisting(documentCollectionName, documentName))) {
         return false;
     }
 
@@ -91,8 +92,8 @@ export async function deleteDocument(
 }
 
 export async function setDocumentData(
-    documentName: string,
     documentCollectionName: string,
+    documentName: string,
     dataConverter: any,
     data: any
 ): Promise<void> {
@@ -102,14 +103,14 @@ export async function setDocumentData(
 }
 
 export async function updateDocumentData(
-    documentName: string,
     documentCollectionName: string,
+    documentName: string,
     dataConverter: any,
     data: any
 ): Promise<boolean> {
     const docRef = doc(firebase_db, documentCollectionName, documentName);
 
-    if (!(await isDocumentExisting(documentName, documentCollectionName))) {
+    if (!(await isDocumentExisting(documentCollectionName, documentName))) {
         return false
     }
 
@@ -117,7 +118,10 @@ export async function updateDocumentData(
     return true;
 }
 
-export async function isDocumentExisting(documentName: string, documentCollectionName: string): Promise<boolean> {
+export async function isDocumentExisting(
+    documentCollectionName: string,
+    documentName: string
+): Promise<boolean> {
     const docRef = doc(firebase_db, documentCollectionName, documentName);
     const docSnap = await getDoc(docRef);
 
