@@ -1,44 +1,44 @@
 /** @format */
-import styles from '@/styles/components/receipt-manager/personCell/ReceiptsOverview.module.css';
+import { IAccountingDataBaseContext, useAccountingDB } from '@/context/AccountingDatabaseContext';
+import { IAuthContext, useAuth } from '@/context/AuthContext';
+import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
+import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
+import * as Calculator from '@/handlers/Calculator';
+import { IReceipt } from '@/interfaces/data/IReceipt';
+import styles from '@/styles/components/receipt-manager/manager/ResultCard.module.css';
 
-export default function ReceiptsOverview(props: {
-    myName: string,
-    otherName: string,
-    myReceiptsExpenses: number;
-
-    myItemsFromMe: number;
-    sharedFromMe: number;
-    myExpensesFromMe: number;
-
-    myItemsFromOther: number;
-    sharedFromOther: number;
-    myExpensesFromOther: number
-
-    myTotalExpenses: number;
-
-    rejectedFromMe: number;
-
-    result: number,
+export default function ResultCard(props: {
+    isFirstPerson: boolean
 }) {
-    const {
-        myName,
-        otherName,
-        myReceiptsExpenses,
+    const accountingDB: IAccountingDataBaseContext = useAccountingDB();
+    const billDB: IBillDataBaseContext = useBillDB();
+    const userDB: IUserDataBaseContext = useUserDB();
+    const auth: IAuthContext = useAuth();
 
-        myItemsFromMe,
-        sharedFromMe,
-        myExpensesFromMe,
+    const myName: string = props.isFirstPerson ? accountingDB.firstName : accountingDB.secondName;
+    const otherName: string = !props.isFirstPerson ? accountingDB.firstName : accountingDB.secondName;
 
-        myItemsFromOther,
-        sharedFromOther,
-        myExpensesFromOther,
+    const myReceipts: IReceipt[] = props.isFirstPerson ? accountingDB.firstReceipts : accountingDB.secondReceipts;
+    const otherReceipts: IReceipt[] = !props.isFirstPerson ? accountingDB.firstReceipts : accountingDB.secondReceipts;
 
-        myTotalExpenses,
+    const myReceiptsExpenses: number = Calculator.calcReceiptsExpenses(myReceipts);
+    const otherReceiptsExpenses: number = Calculator.calcReceiptsExpenses(otherReceipts);
 
-        rejectedFromMe,
+    const myItemsFromMe: number = Calculator.calcPersonalExpenses(myReceipts);
+    const otherItemsFromOther: number = Calculator.calcPersonalExpenses(otherReceipts);
+    const sharedFromMe: number = Calculator.calcSharedExpenses(myReceipts);
+    const myExpensesFromMe: number = Math.floor((myItemsFromMe + sharedFromMe) * 100) / 100;
 
-        result,
-    } = props;
+    const myItemsFromOther: number = Calculator.calcRejectedExpenses(otherReceipts);
+    const otherItemsFromMe: number = Calculator.calcRejectedExpenses(myReceipts);
+    const sharedFromOther: number = Calculator.calcSharedExpenses(otherReceipts);
+    const myExpensesFromOther: number = Math.floor((myItemsFromOther + sharedFromOther) * 100) / 100;
+
+    const myTotalExpenses: number = Math.floor((myExpensesFromOther + myExpensesFromMe) * 100) / 100;
+
+
+    const rejectedFromMe: number = Calculator.calcRejectedExpenses(myReceipts);
+    const result: number = Math.floor((myTotalExpenses - myReceiptsExpenses) * 100) / 100;
 
     return (
         <div className={[styles.receiptsOverview].join(' ')}>

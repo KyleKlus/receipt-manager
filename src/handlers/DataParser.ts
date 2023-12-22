@@ -49,20 +49,29 @@ export function getDateNameByDateString(dateString: string): string {
     return getDateNameByMoment(moment(dateString));
 }
 
-export function downloadCSV(name: string, myReceipts: IReceipt[], otherReceipts: IReceipt[]) {
-    const data: string[] = [_prepCSVDataReceipts(myReceipts, otherReceipts)];
-    if (name === undefined || data === undefined || name === '' || data.length === 0 || data[0] === '') { return; }
-    const link = document.createElement('a');
-    const fileBlob = new Blob(data, { type: 'text/csv' });
-    link.href = URL.createObjectURL(fileBlob);
-    link.download = name + '.csv';
-    document.body.appendChild(link);
-    link.click();
-}
+// export function downloadCSV(name: string, myReceipts: IReceipt[], otherReceipts: IReceipt[]) {
+//     const data: string[] = [_prepCSVDataReceipts(myReceipts, otherReceipts, )];
+//     if (name === undefined || data === undefined || name === '' || data.length === 0 || data[0] === '') { return; }
+//     const link = document.createElement('a');
+//     const fileBlob = new Blob(data, { type: 'text/csv' });
+//     link.href = URL.createObjectURL(fileBlob);
+//     link.download = name + '.csv';
+//     document.body.appendChild(link);
+//     link.click();
+// }
 
-export function downloadEXCEL(name: string, myName: string, otherName: string, myReceipts: IReceipt[], otherReceipts: IReceipt[], result: IResult) {
-    const myData: string = _prepCSVDataReceipts(myReceipts, otherReceipts);
-    const otherData: string = _prepCSVDataReceipts(otherReceipts, myReceipts);
+export function downloadEXCEL(
+    name: string,
+    myName: string,
+    otherName: string,
+    myUid: string,
+    otherUid: string,
+    myReceipts: IReceipt[],
+    otherReceipts: IReceipt[],
+    result: IResult
+) {
+    const myData: string = _prepCSVDataReceipts(myReceipts, otherReceipts, myUid, otherUid);
+    const otherData: string = _prepCSVDataReceipts(otherReceipts, myReceipts, otherUid, myUid);
     const resultData: string = _prepCSVDataTotal(result);
 
     if (name === undefined || myData === undefined || name === '' || myData.length === 0 || myData[0] === '') { return; }
@@ -191,7 +200,7 @@ function _generateNewId(): string {
 }
 
 
-function _prepCSVDataReceipts(myReceipts: IReceipt[], otherReceipts: IReceipt[]): string {
+function _prepCSVDataReceipts(myReceipts: IReceipt[], otherReceipts: IReceipt[], myUid: string, otherUid: string): string {
     let dataString: string = '';
 
     if (myReceipts === undefined || otherReceipts === undefined) { return dataString; }
@@ -203,8 +212,8 @@ function _prepCSVDataReceipts(myReceipts: IReceipt[], otherReceipts: IReceipt[])
     myReceipts.slice(0).forEach((itemArray) => {
         for (let index = 0; index < itemArray.items.length; index++) {
             const item = itemArray.items[index];
-            if (item.isRejected) { continue; }
-            if (item.isShared) {
+            if (isOthers(item, otherUid)) { continue; }
+            if (isShared(item)) {
                 item.price = item.price / 2;
             }
             filteredList.push(item);
@@ -214,8 +223,8 @@ function _prepCSVDataReceipts(myReceipts: IReceipt[], otherReceipts: IReceipt[])
     otherReceipts.slice(0).forEach((itemArray) => {
         for (let index = 0; index < itemArray.items.length; index++) {
             const item = itemArray.items[index];
-            if (item.isMine) { continue; }
-            if (item.isShared) {
+            if (isMine(item, myUid)) { continue; }
+            if (isShared(item)) {
                 item.price = item.price / 2;
             }
             otherFilteredList.push(item);
@@ -225,12 +234,12 @@ function _prepCSVDataReceipts(myReceipts: IReceipt[], otherReceipts: IReceipt[])
     const data = filteredList.concat(otherFilteredList).slice(0).map((e) => {
         return {
             name: e.name,
-            price: e.price.toString().replace('.', ','),
+            price: e.price.toFixed(2).replace('.', ','),
             amount: e.amount.toString().replace('.', ','),
             category: Category[e.category],
-            mine: e.isMine,
-            shared: e.isShared,
-            rejected: e.isRejected,
+            mine: isMine(e, myUid),
+            shared: isShared(e),
+            rejected: isOthers(e, otherUid),
         }
     }).slice(0);
 
@@ -280,4 +289,16 @@ function _prepCSVDataTotal(resultData: IResult): string {
     const csvData: string = csvDataArray.join('\n');
 
     return csvData;
+}
+
+export function isMine(item: IReceiptItem, myUid: string): boolean {
+    return item.ownerUids.length === 1 && item.ownerUids.indexOf(myUid) !== -1;
+}
+
+export function isShared(item: IReceiptItem): boolean {
+    return item.ownerUids.length === 0 || item.ownerUids.length === 2;
+}
+
+export function isOthers(item: IReceiptItem, otherUid: string): boolean {
+    return isMine(item, otherUid);
 }
