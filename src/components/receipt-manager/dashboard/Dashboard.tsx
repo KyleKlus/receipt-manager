@@ -1,9 +1,9 @@
 /** @format */
-import styles from '@/styles/components/receipt-manager/Dashboard.module.css';
+import styles from '@/styles/components/receipt-manager/dashboard/Dashboard.module.css';
 import { IAuthContext, useAuth } from '@/context/AuthContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import Select from 'react-select';
-import Card from '../Card';
+import Card from '../../Card';
 import BillCard from './BillCard';
 import * as DataParser from '@/handlers/DataParser';
 import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';

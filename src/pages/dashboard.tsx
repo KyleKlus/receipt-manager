@@ -7,9 +7,9 @@ import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import Content from '@/components/Content';
 import withAuth from '@/components/withAuth';
 import Layout from '@/components/Layout';
-import ShareSyncTokenModal from '@/components/receipt-manager/ShareSyncTokenModal';
+import ShareSyncTokenModal from '@/components/receipt-manager/dashboard/ShareSyncTokenModal';
 
-import Dashboard from '@/components/receipt-manager/Dashboard';
+import Dashboard from '@/components/receipt-manager/dashboard/Dashboard';
 import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
 
 function Home() {

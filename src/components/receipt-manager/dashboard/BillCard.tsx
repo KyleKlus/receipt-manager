@@ -1,13 +1,13 @@
 /** @format */
-import styles from '@/styles/components/receipt-manager/BillCard.module.css';
+import styles from '@/styles/components/receipt-manager/dashboard/BillCard.module.css';
 import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
-import Card from '../Card';
+import Card from '../../Card';
 import { Category } from '@/handlers/DataParser';
+import * as DataParser from '@/handlers/DataParser';
 import Image from 'next/image';
-import plusIcon from '../../../public/plus.png'
+import plusIcon from '../../../../public/plus.png'
 import IBill from '@/interfaces/data/IBill';
-import * as DataParser from '../../handlers/DataParser';
 import { useRouter } from 'next/router';
 import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
 

@@ -7,7 +7,7 @@ import Layout from '@/components/Layout';
 import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import ItemsPage from '@/components/receipt-manager/ItemsPage';
+import ItemsPage from '@/components/receipt-manager/items-page/ItemsPage';
 
 function Home() {
   const authContext: IAuthContext = useAuth();

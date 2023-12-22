@@ -1,6 +1,7 @@
 import { Category } from "@/handlers/DataParser";
 import { IReceiptItem } from "./IReceiptItem";
-import { Moment } from "moment";
+
+// TODO: add more stats
 
 export interface IReceipt {
     receiptId: string;

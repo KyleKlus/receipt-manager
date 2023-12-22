@@ -8,7 +8,7 @@ import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
 import IBill from '@/interfaces/data/IBill';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import StatisticsPage from '@/components/receipt-manager/StatisticsPage';
+import StatisticsPage from '@/components/receipt-manager/statistics-page/StatisticsPage';
 
 function Home() {
   const authContext: IAuthContext = useAuth();
@@ -51,8 +51,8 @@ function Home() {
   return (
     <Layout>
       <Content className={['applyHeaderOffset', 'dotted'].join(' ')}>
-        {isLoading&&
-          <StatisticsPage isLoading={isLoading} selectConnectionsOptions={selectConnectionsOptions}/>
+        {isLoading &&
+          <StatisticsPage isLoading={isLoading} selectConnectionsOptions={selectConnectionsOptions} />
         }
       </Content>
     </Layout>

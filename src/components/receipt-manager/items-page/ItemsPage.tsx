@@ -1,14 +1,14 @@
 /** @format */
-import styles from '@/styles/components/receipt-manager/ItemsPage.module.css';
+import styles from '@/styles/components/receipt-manager/items-page/ItemsPage.module.css';
 import { IAuthContext, useAuth } from '@/context/AuthContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import Select from 'react-select';
-import Card from '../Card';
+import Card from '../../Card';
 import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
 import { useEffect, useState } from 'react';
 import { IAccountingDataBaseContext, useAccountingDB } from '@/context/AccountingDatabaseContext';
 import { IReceipt } from '@/interfaces/data/IReceipt';
-import ViewableReceipt from './manager/Receipt/ViewableReceipt';
+import ViewableReceipt from './ViewableReceipt/ViewableReceipt';
 
 
 interface IItemsPageProps {
