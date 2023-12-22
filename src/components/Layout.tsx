@@ -8,7 +8,6 @@ import Main from '@/components/Main';
 import { RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
 import Content from './Content';
 import { useRouter } from 'next/router';
-import IConnection from '@/interfaces/app/IConnection';
 import { useUserDB } from '@/context/UserDatabaseContext';
 
 const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
@@ -21,7 +20,7 @@ interface ILayoutProps {
 
 export default function Layout(props: React.PropsWithChildren<ILayoutProps>) {
     const authContext = useAuth();
-    const dbContext = useUserDB();
+    const userDB = useUserDB();
     const router = useRouter();
 
     const handleLogout = () => {
@@ -79,25 +78,25 @@ export default function Layout(props: React.PropsWithChildren<ILayoutProps>) {
                                 }}
                             >D</button>
                             <button
-                                disabled={dbContext.activeConnections.length === 0 && isCurrentWindow(router.pathname, redirectPaths[RedirectPathOptions.DashBoardPage])}
+                                disabled={userDB.activeConnections.length === 0 && isCurrentWindow(router.pathname, redirectPaths[RedirectPathOptions.DashBoardPage])}
                                 className={[
                                     styles.functionButton,
                                     applyCurrentWindowStyle(router.pathname, '/items')
                                 ].join(' ')}
                                 onClick={() => {
                                     !isCurrentWindow(router.pathname, '/items')
-                                        && router.push('/items')
+                                        && router.push({ pathname: '/items', query: { token: userDB.selectedConnection } })
                                 }}
                             >I</button>
                             <button
-                                disabled={dbContext.activeConnections.length === 0 && isCurrentWindow(router.pathname, redirectPaths[RedirectPathOptions.DashBoardPage])}
+                                disabled={userDB.activeConnections.length === 0 && isCurrentWindow(router.pathname, redirectPaths[RedirectPathOptions.DashBoardPage])}
                                 className={[
                                     styles.functionButton,
                                     applyCurrentWindowStyle(router.pathname, '/statistics')
                                 ].join(' ')}
                                 onClick={() => {
                                     !isCurrentWindow(router.pathname, '/statistics')
-                                        && router.push('/statistics')
+                                        && router.push({ pathname: '/statistics', query: { token: userDB.selectedConnection } })
                                 }}
                             >S</button>
                         </div>
