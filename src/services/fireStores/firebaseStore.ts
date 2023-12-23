@@ -1,13 +1,8 @@
 import firebase_app from "../firebase";
-import { collection, deleteDoc, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
+import { collection, connectFirestoreEmulator, deleteDoc, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
 
 const firebase_db = getFirestore(firebase_app);
-
-export enum UpdateStrategy {
-    SELF_UPDATE,
-    UP_UPDATE,
-    FULL_UPDATE
-}
+connectFirestoreEmulator(firebase_db, '127.0.0.1', 8080); // TODO: remove in prod
 
 interface IDBNames {
     USERS_DB_NAME: string,

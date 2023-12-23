@@ -28,7 +28,7 @@ export default function AddItemRow(props: React.PropsWithChildren<IAddItemRowPro
     });
 
     return (
-        <div className={[styles.itemEditRow].join(' ')}>
+        <div className={[styles.itemEditRow, props.className].join(' ')}>
             <input
                 type='number'
                 placeholder='Amount'

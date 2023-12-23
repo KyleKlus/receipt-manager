@@ -3,8 +3,6 @@ import styles from '@/styles/components/receipt-manager/manager/ReceiptManager.m
 import { useEffect, useState } from 'react';
 import { IReceipt } from '@/interfaces/data/IReceipt';
 import * as DataParser from '@/handlers/DataParser';
-import PersonCard from '@/components/receipt-manager/personCell/PersonCard';
-import ReceiptsTable from '@/components/receipt-manager/personCell/ReceiptsTable';
 import { Category } from '@/handlers/DataParser';
 import { IReceiptItem } from '@/interfaces/data/IReceiptItem';
 import UploadSection from './UploadSection';
@@ -56,9 +54,10 @@ export default function ReceiptManager(props: React.PropsWithChildren<IReceiptMa
         if (authContext.user === null) { return; }
         if (authContext.user.displayName == null) { return; }
 
-        accountingDBContext.saveName(authContext.user.displayName, true);
+        accountingDBContext.saveName(authContext.user.displayName.split(' ')[0], true);
         const secondPersonName: string = await userDBContext.getUserNameByToken(authContext.user, props.token);
-        accountingDBContext.saveName(secondPersonName, false);
+
+        accountingDBContext.saveName(secondPersonName.split(' ')[0], false);
     }
 
     async function loadUids() {

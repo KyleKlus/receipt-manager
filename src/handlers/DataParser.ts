@@ -199,39 +199,35 @@ function _generateNewId(): string {
     return crypto.randomUUID().split('-').slice(0, -1).join('-');
 }
 
-
 function _prepCSVDataReceipts(myReceipts: IReceipt[], otherReceipts: IReceipt[], myUid: string, otherUid: string): string {
     let dataString: string = '';
 
     if (myReceipts === undefined || otherReceipts === undefined) { return dataString; }
     if (myReceipts.length === 0 && otherReceipts.length === 0) { return dataString; }
 
-    let filteredList: IReceiptItem[] = []
-    let otherFilteredList: IReceiptItem[] = [];
+    let myFilteredList: IReceiptItem[] = []
 
-    myReceipts.slice(0).forEach((itemArray) => {
-        for (let index = 0; index < itemArray.items.length; index++) {
-            const item = itemArray.items[index];
-            if (isOthers(item, otherUid)) { continue; }
-            if (isShared(item)) {
-                item.price = item.price / 2;
+    const addMyItemsFromReceiptsToList = (receipts: IReceipt[]) => {
+        receipts.slice(0).forEach((receipt) => {
+            for (let index = 0; index < receipt.items.length; index++) {
+                const item = receipt.items[index];
+
+                if (isOthers(item, otherUid)) {
+                    continue;
+                }
+
+                if (isShared(item)) {
+                    item.price = item.price / 2;
+                }
+                myFilteredList.push(item);
             }
-            filteredList.push(item);
-        }
-    });
+        });
+    }
 
-    otherReceipts.slice(0).forEach((itemArray) => {
-        for (let index = 0; index < itemArray.items.length; index++) {
-            const item = itemArray.items[index];
-            if (isMine(item, myUid)) { continue; }
-            if (isShared(item)) {
-                item.price = item.price / 2;
-            }
-            otherFilteredList.push(item);
-        }
-    });
+    addMyItemsFromReceiptsToList(myReceipts);
+    addMyItemsFromReceiptsToList(otherReceipts);
 
-    const data = filteredList.concat(otherFilteredList).slice(0).map((e) => {
+    const data = myFilteredList.slice(0).map((e) => {
         return {
             name: e.name,
             price: e.price.toFixed(2).replace('.', ','),

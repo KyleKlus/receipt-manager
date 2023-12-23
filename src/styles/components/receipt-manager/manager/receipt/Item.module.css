@@ -3,7 +3,10 @@
 .itemRow,
 .itemEditRow {
     padding: 4px 0;
-    width: 100%;
+    margin: 0 4px;
+    width: calc(100% - 8px);
+
+    /* width: 100%; */
     display: flex;
     border-bottom: 1px solid var(--bg-color-40);
 }

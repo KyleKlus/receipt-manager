@@ -5,7 +5,7 @@ import { IAuthContext, useAuth } from '@/context/AuthContext';
 import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import styles from '@/styles/components/receipt-manager/manager/UploadSection.module.css';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 
 import * as DataParser from '@/handlers/DataParser';
 import Receipt from './Receipt/Receipt';
@@ -65,17 +65,19 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
             // const currentBill = billDB.currentBill;
             // if (currentBill === undefined) { return; }
           }}>{billDB.currentBill?.date.format('DD.MM.YYYY')}</h2>
-          <h2> | {isFirstPersonMode ? accountingDB.firstName : accountingDB.secondName} Receipts</h2>
+          <h2> | {isFirstPersonMode ? accountingDB.firstName : accountingDB.secondName}&apos;s Receipts</h2>
         </div>
-        <div className={[styles.uploadSectionHeaderModeWrapper].join(' ')}>
-          <button disabled={isInEditMode} onClick={() => { setEditMode(true) }}>Edit Mode</button>
-          <button disabled={!isInEditMode} onClick={() => { setEditMode(false) }}>Accounting</button>
-        </div>
+
         <div className={[styles.uploadSectionHeaderControls].join(' ')}>
-          <button onClick={() => { setIsFirstPersonMode(!isFirstPersonMode) }}>{isFirstPersonMode ? 'Next person' : 'Prev. person'}</button>
-          <br />
-          <button onClick={() => { props.setResultReady(true) }}>Result</button>
-          <br />
+          <div className={[styles.uploadSectionHeaderModeWrapper].join(' ')}>
+            <button disabled={isInEditMode} onClick={() => {
+              setEditMode(true);
+            }}>Edit Mode</button>
+            <button disabled={!isInEditMode} onClick={() => {
+              setEditMode(false);
+            }}>Accounting</button>
+          </div>
+          <hr />
           <button onClick={() => {
             if (typeof window !== null && typeof window !== undefined) {
               window.document.getElementById(isFirstPersonMode ? 'firstUpload' : 'secondUpload')!.click()
@@ -112,19 +114,41 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
               setProgress(0);
             }}
           >Clear data</button>
+          <hr />
+          <button onClick={() => { setIsFirstPersonMode(!isFirstPersonMode) }}>{isFirstPersonMode ? 'Next person' : 'Prev. person'}</button>
+          <button onClick={() => { props.setResultReady(true) }}>Result</button>
         </div>
       </div>
+      {isInEditMode && !isLoading &&
+        <AddReceipt addReceipt={async (receipt: IReceipt) => {
+          if (billDB.currentBill === undefined) { return; }
+
+          const outDatedReceipts = accountingDB.firstReceipts;
+          const updatedReceipts = accountingDB.firstReceipts;
+          updatedReceipts.push(receipt);
+
+          accountingDB.saveReceipts([...updatedReceipts], isFirstPersonMode);
+
+          await accountingDB.addReceipt(auth.user, userDB.selectedConnection, billDB.currentBill.name, receipt).then(isSuccessful => {
+            if (!isSuccessful) {
+              accountingDB.saveReceipts([...outDatedReceipts], isFirstPersonMode);
+            }
+          });
+          document.getElementById('add-point')?.scrollIntoView();
+        }} />
+      }
       {isLoading
         ? <div className={[styles.uploadSectionLoadingContent].join(' ')}>
           <progress value={progress} max={100}></progress>
         </div>
         : <div className={[styles.uploadSectionContent].join(' ')}>
-          {accountingDB.firstReceipts.length !== 0 && isFirstPersonMode &&
+          {/* TODO: find a better solution for the edit mode switching */}
+          {accountingDB.firstReceipts.length !== 0 && isFirstPersonMode && !isInEditMode &&
             accountingDB.firstReceipts.map(receipt => {
               return (<Receipt
                 key={receipt.receiptId}
                 receipt={receipt}
-                isInEditMode={isInEditMode}
+                isInEditMode={false}
                 deleteReceipt={async (receipt: IReceipt) => {
                   if (billDB.currentBill === undefined) { return; }
 
@@ -141,12 +165,12 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
                 }} />);
             })
           }
-          {accountingDB.secondReceipts.length !== 0 && !isFirstPersonMode &&
+          {accountingDB.secondReceipts.length !== 0 && !isFirstPersonMode && !isInEditMode &&
             accountingDB.secondReceipts.map(receipt => {
               return (<Receipt
                 key={receipt.receiptId}
                 receipt={receipt}
-                isInEditMode={isInEditMode}
+                isInEditMode={false}
                 deleteReceipt={async (receipt: IReceipt) => {
                   if (billDB.currentBill === undefined) { return; }
                   const outDatedReceipts = accountingDB.secondReceipts;
@@ -162,23 +186,50 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
               />);
             })
           }
-          {isInEditMode &&
-            <AddReceipt addReceipt={async (receipt: IReceipt) => {
-              if (billDB.currentBill === undefined) { return; }
+          {accountingDB.firstReceipts.length !== 0 && isFirstPersonMode && isInEditMode &&
+            accountingDB.firstReceipts.map(receipt => {
+              return (<Receipt
+                key={receipt.receiptId}
+                receipt={receipt}
+                isInEditMode={true}
+                deleteReceipt={async (receipt: IReceipt) => {
+                  if (billDB.currentBill === undefined) { return; }
 
-              const outDatedReceipts = accountingDB.firstReceipts;
-              const updatedReceipts = accountingDB.firstReceipts;
-              updatedReceipts.push(receipt);
+                  const outDatedReceipts = accountingDB.firstReceipts;
+                  const updatedReceipts = accountingDB.firstReceipts.filter(firstReceipt => firstReceipt.receiptId !== receipt.receiptId);
 
-              accountingDB.saveReceipts([...updatedReceipts], isFirstPersonMode);
+                  accountingDB.saveReceipts([...updatedReceipts], true);
 
-              await accountingDB.addReceipt(auth.user, userDB.selectedConnection, billDB.currentBill.name, receipt).then(isSuccessful => {
-                if (!isSuccessful) {
-                  accountingDB.saveReceipts([...outDatedReceipts], isFirstPersonMode);
-                }
-              });
-            }} />
+                  await accountingDB.deleteReceipt(auth.user, userDB.selectedConnection, billDB.currentBill.name, receipt.receiptId).then(isSuccessful => {
+                    if (!isSuccessful) {
+                      accountingDB.saveReceipts([...outDatedReceipts], true);
+                    }
+                  });
+                }} />);
+            })
           }
+          {accountingDB.secondReceipts.length !== 0 && !isFirstPersonMode && isInEditMode &&
+            accountingDB.secondReceipts.map(receipt => {
+              return (<Receipt
+                key={receipt.receiptId}
+                receipt={receipt}
+                isInEditMode={true}
+                deleteReceipt={async (receipt: IReceipt) => {
+                  if (billDB.currentBill === undefined) { return; }
+                  const outDatedReceipts = accountingDB.secondReceipts;
+                  const updatedReceipts = accountingDB.secondReceipts.filter(secondReceipt => secondReceipt.receiptId !== receipt.receiptId);
+                  accountingDB.saveReceipts([...updatedReceipts], false);
+
+                  await accountingDB.deleteReceipt(auth.user, userDB.selectedConnection, billDB.currentBill.name, receipt.receiptId).then(isSuccessful => {
+                    if (!isSuccessful) {
+                      accountingDB.saveReceipts([...outDatedReceipts], false);
+                    }
+                  });
+                }}
+              />);
+            })
+          }
+          <div id={'add-point'} />
         </div>
       }
     </Card>

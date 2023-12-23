@@ -194,8 +194,9 @@ export async function getUserNameByToken(user: User | null, token: string): Prom
     userDocsSnap.forEach(doc => {
         const userData = doc.data();
 
-        if (isTokenInTokenArray(token, userData.activeSyncTokens) && userData.uid !== user.uid) {
+        if ((isTokenInTokenArray(token, userData.activeSyncTokens) || isTokenInTokenArray(token, userData.pendingSyncTokens)) && userData.uid !== user.uid) {
             userName = userData.name;
+
             return userName
         }
     })

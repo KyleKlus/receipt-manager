@@ -7,11 +7,12 @@ import Card from '../../Card';
 import BillCard from './BillCard';
 import * as DataParser from '@/handlers/DataParser';
 import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
+import { useEffect, useState } from 'react';
 
 
 interface IDashboardProps {
-    isModalOpen: boolean;
-    isLoading: boolean;
+    progress: number;
+    isLoadingBills: boolean;
     selectConnectionsOptions: { value: string, label: string }[];
     setIsModalOpen: (state: boolean) => void;
     fetchBills: (token: string) => {}
@@ -21,6 +22,15 @@ export default function Dashboard(props: React.PropsWithChildren<IDashboardProps
     const authContext: IAuthContext = useAuth();
     const dbContext: IUserDataBaseContext = useUserDB();
     const billDBContext: IBillDataBaseContext = useBillDB();
+
+    const [isLoadingBills, setIsLoadingBills] = useState(props.isLoadingBills);
+    const [progress, setProgress] = useState(props.progress);
+
+    useEffect(() => {
+        setIsLoadingBills(props.isLoadingBills);
+        setProgress(props.progress);
+    }, [props]);
+
     return (
         <>
             {dbContext.activeConnections.length > 0
@@ -41,17 +51,22 @@ export default function Dashboard(props: React.PropsWithChildren<IDashboardProps
                                 }} />
                         </div>
                     </div>
-                    <div className={[styles.dashboardContent].join(' ')}>
-                        <BillCard reloadBills={() => { props.fetchBills(dbContext.selectedConnection) }} />
-                        {
-                            billDBContext.bills.map(bill => {
-                                return (<BillCard
-                                    key={DataParser.getDateNameByMoment(bill.date)}
-                                    bill={bill}
-                                    reloadBills={() => { props.fetchBills(dbContext.selectedConnection) }} />);
-                            })
-                        }
-                    </div>
+                    {isLoadingBills
+                        ? <div className={[styles.dashboardLoadingContent].join(' ')}>
+                            <progress value={progress} max={100}></progress>
+                        </div>
+                        : <div className={[styles.dashboardContent].join(' ')}>
+                            <BillCard reloadBills={() => { props.fetchBills(dbContext.selectedConnection) }} />
+                            {
+                                billDBContext.bills.map(bill => {
+                                    return (<BillCard
+                                        key={DataParser.getDateNameByMoment(bill.date)}
+                                        bill={bill}
+                                        reloadBills={() => { props.fetchBills(dbContext.selectedConnection) }} />);
+                                })
+                            }
+                        </div>
+                    }
                 </Card>
                 : <div className={[styles.dashboardStartingScreen].join(' ')}>
                     <h2 className={[].join(' ')}>Connect with other people to be able

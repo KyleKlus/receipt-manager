@@ -26,8 +26,8 @@ export default function AddReceipt(props: React.PropsWithChildren<IAddReceiptPro
     });
 
     return (
-        <div className={[styles.receipt, props.className].join(' ')}>
-            <div className={[styles.receiptTitleWrapper].join(' ')}>
+        <div className={[styles.receipt, styles.addReceipt, props.className].join(' ')}>
+            <div className={[styles.receiptEditWrapper].join(' ')}>
                 <input
                     className={[styles.receiptTitle].join(' ')}
                     type='text'

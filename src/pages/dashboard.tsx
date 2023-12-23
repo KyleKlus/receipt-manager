@@ -19,6 +19,8 @@ function Home() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingBills, setIsLoadingBills] = useState(true);
+  const [progress, setProgress] = useState(0);
 
 
   const selectConnectionsOptions = userDBContext.activeConnections.length > 0
@@ -49,20 +51,30 @@ function Home() {
 
   useEffect(() => {
     // The selected connection has changed
+
     fetchBills(userDBContext.selectedConnection);
+
   }, [userDBContext.selectedConnection])
 
   async function fetchBills(selectedConnection: string) {
     if (selectedConnection === '') { return; }
+    setProgress(0);
+    setIsLoadingBills(true);
     const bills = await billDBContext.getBillsByToken(authContext.user, selectedConnection);
+
+    setProgress((1 / (bills.length + 1)) * 100);
     for (let index = 0; index < bills.length; index++) {
       const updatedBill = await billDBContext.updateBillStats(authContext.user, selectedConnection, bills[index], true);
+      setProgress(((index + 2) / (bills.length + 1)) * 100);
+      console.log(((index + 2) / (bills.length + 1)) * 100)
       if (updatedBill !== undefined) {
         bills[index] = updatedBill;
       }
     }
 
     billDBContext.saveBills(bills);
+    setIsLoadingBills(false);
+    setProgress(0);
   }
 
   return (
@@ -70,8 +82,8 @@ function Home() {
       <Content className={['applyHeaderOffset', 'dotted'].join(' ')}>
         {!isLoading &&
           <Dashboard
-            isModalOpen={isModalOpen}
-            isLoading={isLoading}
+            isLoadingBills={isLoadingBills}
+            progress={progress}
             selectConnectionsOptions={selectConnectionsOptions}
             setIsModalOpen={setIsModalOpen}
             fetchBills={fetchBills} />

@@ -52,7 +52,6 @@ export default function ResultSection(props: React.PropsWithChildren<IResultSect
 
             const myTotalExpenses: number = Math.floor((myExpensesFromOther + myExpensesFromMe) * 100) / 100;
 
-
             const rejectedFromMe: number = Calculator.calcRejectedExpenses(myReceipts, otherUid, myUid);
             const result: number = Math.floor((myTotalExpenses - myReceiptsExpenses) * 100) / 100;
 
@@ -76,7 +75,7 @@ export default function ResultSection(props: React.PropsWithChildren<IResultSect
         </div>
       </div>
       <div className={[styles.resultSectionContent].join(' ')}>
-        <ResultCard isFirstPerson={true} />
+          <ResultCard isFirstPerson={true} />
         <ResultCard isFirstPerson={false} />
       </div>
     </Card>

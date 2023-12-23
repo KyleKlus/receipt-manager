@@ -110,7 +110,7 @@ export default function Receipt(props: React.PropsWithChildren<IReceiptProps>) {
     return (
         <div className={[styles.receipt, props.className].join(' ')}>
             {isInEditMode
-                ? <div className={[styles.receiptTitleWrapper].join(' ')}>
+                ? <div className={[styles.receiptEditWrapper].join(' ')}>
                     <input
                         className={[styles.receiptTitle].join(' ')}
                         type='text'

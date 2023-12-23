@@ -13,6 +13,8 @@
     padding: 0px !important;
 }
 
+
+
 .uploadSectionHeader {
     width: 100%;
     background-color: var(--bg-color-20);
@@ -57,7 +59,7 @@
 
 .uploadSectionHeaderControls {
     display: flex;
-    gap: 8px;
+    gap: 16px;
 }
 
 .uploadSectionContent {
@@ -70,6 +72,17 @@
     overflow: auto;
     border-bottom-left-radius: var(--border-radius);
     border-bottom-right-radius: var(--border-radius);
+    position: relative;
+}
+
+.loader {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--bg-color-10);
+    z-index: 21;
 }
 
 .uploadSectionLoadingContent {

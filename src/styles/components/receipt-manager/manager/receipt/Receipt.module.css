@@ -6,24 +6,41 @@
     display: flex;
     border-right: 1px solid var(--bg-color-40);
     flex-direction: column;
-    padding-bottom: 64px;
+    padding-top: 24px;
 }
 
-.receiptTitleWrapper {
-    width: 100%;
-    border-bottom: 1px solid var(--bg-color-40);
-    border-top: 1px solid var(--bg-color-40);
+.addReceipt {
+    padding: 0;
+}
 
+.addReceipt .receiptEditWrapper {
+    border-top: none;
+}
+
+.receiptEditWrapper {
+    /* width: 100%; */
+    width: calc(100% - 8px);
+
+    /* border-top: 1px solid var(--bg-color-40); */
+    border-bottom: 1px solid var(--bg-color-40);
     display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px 0;
+    margin: 0 4px;
 }
 
 .receiptTitle {
-    border-top: 1px solid var(--bg-color-40);
-    width: 100%;
+    display: unset;
+    width: calc(100% - 8px);
     padding: 8px 16px;
     border-bottom: 1px solid var(--bg-color-40);
     font-size: larger;
     font-weight: bold;
+}
+
+:not(.receiptEditWrapper) > .receiptTitle{
+    margin: 0 4px;
 }
 
 .receiptContent {
