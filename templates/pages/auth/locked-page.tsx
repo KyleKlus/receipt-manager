@@ -90,7 +90,7 @@ function Home() {
         <div id={'top'}></div>
         <Content className={['applyHeaderOffset'].join(' ')}>
           <Card>
-            <button onClick={() => {
+            {/* <button onClick={() => {
               if (authContext.user === null) { return; }
               dbContext.addUserDocument(authContext.user, authContext.user?.displayName + '_secrets', { secret: '42', uid: authContext.user?.uid });
             }}>Add a document</button>
@@ -105,7 +105,7 @@ function Home() {
             <button onClick={() => {
               if (authContext.user === null) { return; }
               dbContext.readUserDocument(authContext.user, authContext.user?.displayName + '_secrets');
-            }}>Read a document</button>
+            }}>Read a document</button> */}
           </Card>
         </Content>
         <Footer />

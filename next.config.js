@@ -17,14 +17,7 @@ const nextConfig = {
     NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: '531877776041',
     NEXT_PUBLIC_FIREBASE_APP_ID: '1:531877776041:web:5229281461b26e7cfef7b8',
     NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: 'G-M4R39LKG7B',
-  },
-  webpack: (config) => {
-    config.module.rules?.push({
-      test: /templates/,
-      loader: "ignore-loader",
-    });
-    return config;
-  },
+  }
 };
 
 module.exports = nextConfig;
