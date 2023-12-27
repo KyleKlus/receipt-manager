@@ -2,9 +2,11 @@ import firebase_app from "../firebase";
 import { collection, connectFirestoreEmulator, deleteDoc, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
 
 const firebase_db = getFirestore(firebase_app);
-connectFirestoreEmulator(firebase_db, '127.0.0.1', 8080); // TODO: remove in prod
+// connectFirestoreEmulator(firebase_db, '127.0.0.1', 8080); // TODO: remove in prod
 
 interface IDBNames {
+    YEARS_DB_NAME: string,
+    MONTHS_DB_NAME: string,
     USERS_DB_NAME: string,
     CONNECTION_DB_NAME: string,
     BILLS_DB_NAME: string,
@@ -13,6 +15,8 @@ interface IDBNames {
 }
 
 const testNames: IDBNames = {
+    YEARS_DB_NAME: 'test_years',
+    MONTHS_DB_NAME: 'test_months',
     USERS_DB_NAME: 'test_users',
     CONNECTION_DB_NAME: 'test_connections',
     BILLS_DB_NAME: 'test_bills',
@@ -21,6 +25,8 @@ const testNames: IDBNames = {
 }
 
 const productionNames: IDBNames = {
+    YEARS_DB_NAME: 'years',
+    MONTHS_DB_NAME: 'months',
     USERS_DB_NAME: 'users',
     CONNECTION_DB_NAME: 'connections',
     BILLS_DB_NAME: 'bills',
@@ -28,16 +34,16 @@ const productionNames: IDBNames = {
     ITEMS_DB_NAME: 'items'
 }
 
-export const DB_ACCESS_NAMES: IDBNames = testNames;
+export const DB_ACCESS_NAMES: IDBNames = productionNames;
 
 export async function getDocumentCollectionData(
     documentCollectionName: string,
     dataConverter: any
 ): Promise<any[]> {
     const docsSnap = await getDocs(collection(firebase_db, documentCollectionName));
+    if (docsSnap.size === 0) { return [] }
 
     const dataArray: any[] = [];
-
     docsSnap.forEach(doc => {
         dataArray.push(dataConverter.fromFirestore(doc));
     });

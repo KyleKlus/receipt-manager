@@ -12,11 +12,11 @@ export interface IBillDataBaseContext {
     currentBill: IBill | undefined,
     saveBills: (bills: IBill[]) => void,
     saveCurrentBill: (bill: IBill) => void,
-    getBillsByToken: (user: User | null, token: string) => Promise<IBill[]>,
-    getBillByTokenAndDate: (user: User | null, token: string, date: string) => Promise<IBill | undefined>,
-    addBill: (user: User | null, token: string) => Promise<string>,
-    updateBill: (user: User | null, token: string, bill: IBill) => Promise<boolean>,
-    updateBillStats: (user: User | null, token: string, bill: IBill, isFullUpdate: boolean) => Promise<IBill | undefined>
+    getBills: (user: User | null, token: string, year: string, month: string) => Promise<IBill[]>,
+    getBill: (user: User | null, token: string, year: string, month: string, date: string) => Promise<IBill | undefined>,
+    addBill: (user: User | null, token: string, year: string, month: string) => Promise<string>,
+    updateBill: (user: User | null, token: string, year: string, month: string, bill: IBill) => Promise<boolean>,
+    updateBillStats: (user: User | null, token: string, year: string, month: string, bill: IBill, isFullUpdate: boolean) => Promise<IBill | undefined>
 }
 
 const defaultValue: IBillDataBaseContext = {
@@ -24,11 +24,11 @@ const defaultValue: IBillDataBaseContext = {
     currentBill: undefined,
     saveBills: (bills: IBill[]) => { },
     saveCurrentBill: (bill: IBill) => { },
-    getBillsByToken: (user: User | null, token: string) => { return new Promise<IBill[]>(() => { }); },
-    getBillByTokenAndDate: (user: User | null, token: string, date: string) => { return new Promise<IBill | undefined>(() => { }); },
-    addBill: (user: User | null, token: string) => { return new Promise<string>(() => { }); },
-    updateBill: (user: User | null, token: string, bill: IBill) => { return new Promise<boolean>(() => { }); },
-    updateBillStats: (user: User | null, token: string, bill: IBill, isFullUpdate: boolean) => { return new Promise<IBill | undefined>(() => { }); }
+    getBills: (user: User | null, token: string, year: string, month: string) => { return new Promise<IBill[]>(() => { }); },
+    getBill: (user: User | null, token: string, year: string, month: string, date: string) => { return new Promise<IBill | undefined>(() => { }); },
+    addBill: (user: User | null, token: string, year: string, month: string) => { return new Promise<string>(() => { }); },
+    updateBill: (user: User | null, token: string, year: string, month: string, bill: IBill) => { return new Promise<boolean>(() => { }); },
+    updateBillStats: (user: User | null, token: string, year: string, month: string, bill: IBill, isFullUpdate: boolean) => { return new Promise<IBill | undefined>(() => { }); }
 }
 
 const BillDataBaseContext: React.Context<IBillDataBaseContext> = createContext<IBillDataBaseContext>(defaultValue);
@@ -45,25 +45,25 @@ const BillDataBaseProvider: React.FC<{ children: React.ReactNode }> = (props) =>
         setCurrentBill(bill);
     }
 
-    async function getBillsByToken(user: User | null, token: string): Promise<IBill[]> {
-        return await billDBService.getBillsByToken(user, token);
+    async function getBills(user: User | null, token: string, year: string, month: string): Promise<IBill[]> {
+
+        return await billDBService.getBills(user, token, year, month);
     }
 
-    async function getBillByTokenAndDate(user: User | null, token: string, date: string): Promise<IBill | undefined> {
-        return await billDBService.getBillByTokenAndDate(user, token, date);
+    async function getBill(user: User | null, token: string, year: string, month: string, date: string): Promise<IBill | undefined> {
+        return await billDBService.getBill(user, token, year, month, date);
     }
 
-    async function addBill(user: User | null, token: string): Promise<string> {
-        return await billDBService.addBill(user, token);
+    async function addBill(user: User | null, token: string, year: string, month: string): Promise<string> {
+        return await billDBService.addBill(user, token, year, month);
     }
 
-
-    async function updateBill(user: User | null, token: string, bill: IBill): Promise<boolean> {
-        return await billDBService.updateBill(user, token, bill);
+    async function updateBill(user: User | null, token: string, year: string, month: string, bill: IBill): Promise<boolean> {
+        return await billDBService.updateBill(user, token, year, month, bill);
     }
 
-    async function updateBillStats(user: User | null, token: string, bill: IBill, isFullUpdate: boolean): Promise<IBill | undefined> {
-        return await billDBService.updateBillStats(user, token, bill, isFullUpdate);
+    async function updateBillStats(user: User | null, token: string, year: string, month: string, bill: IBill, isFullUpdate: boolean): Promise<IBill | undefined> {
+        return await billDBService.updateBillStats(user, token, year, month, bill, isFullUpdate);
     }
 
     return <BillDataBaseContext.Provider value={{
@@ -71,8 +71,8 @@ const BillDataBaseProvider: React.FC<{ children: React.ReactNode }> = (props) =>
         currentBill,
         saveBills,
         saveCurrentBill,
-        getBillsByToken,
-        getBillByTokenAndDate,
+        getBills,
+        getBill,
         addBill,
         updateBill,
         updateBillStats

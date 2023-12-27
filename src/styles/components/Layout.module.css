@@ -44,17 +44,22 @@
 .functionButton {
     width: 32px;
     height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
-.functionButton:disabled{
+.functionButton:disabled {
     color: var(--bg-color-60);
     background-color: var(--bg-color-05);
+    filter: grayscale(1);
 }
 
-.functionButton:hover:disabled{
+.functionButton:hover:disabled {
     color: var(--bg-color-60);
     background-color: var(--bg-color-05);
-    outline-color:var(--bg-color-30);
+    outline-color: var(--bg-color-30);
     cursor: default;
 }
 
@@ -69,6 +74,8 @@
     padding: 0;
 }
 
-.isCurrentWindow, .isCurrentWindow:hover, .isCurrentWindow:focus-within {
+.isCurrentWindow,
+.isCurrentWindow:hover,
+.isCurrentWindow:focus-within {
     border-bottom: 2px solid var(--color-accent-00);
 }

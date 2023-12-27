@@ -11,6 +11,8 @@ import * as DataParser from '@/handlers/DataParser';
 import Receipt from './Receipt/Receipt';
 import { IReceipt } from '@/interfaces/data/IReceipt';
 import AddReceipt from './Receipt/AddReceipt';
+import { IMonthDataBaseContext, useMonthDB } from '@/context/MonthDatabaseContext';
+import { IYearDataBaseContext, useYearDB } from '@/context/YearDatabaseContext';
 
 interface IUploadSectionProps {
   className?: string
@@ -21,6 +23,8 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
   const accountingDB: IAccountingDataBaseContext = useAccountingDB();
   const billDB: IBillDataBaseContext = useBillDB();
   const userDB: IUserDataBaseContext = useUserDB();
+  const yearDBContext: IYearDataBaseContext = useYearDB();
+  const monthDBContext: IMonthDataBaseContext = useMonthDB();
   const auth: IAuthContext = useAuth();
   const [isInEditMode, setEditMode] = useState(false);
   const [isFirstPersonMode, setIsFirstPersonMode] = useState(true);
@@ -31,10 +35,18 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
     setProgress(0);
     setIsLoading(true);
     const files = e.target.files;
-    if (files === null || auth.user === null || billDB.currentBill === undefined) { return };
+    if (
+      files === null ||
+      auth.user === null ||
+      billDB.currentBill === undefined ||
+      yearDBContext.currentYear === undefined ||
+      monthDBContext.currentMonth === undefined
+    ) { return };
     const user = auth.user;
     const token = userDB.selectedConnection;
     const date = billDB.currentBill.name;
+    const year = yearDBContext.currentYear.name;
+    const month = monthDBContext.currentMonth.name;
     const ownerUid = isFirstPersonMode ? accountingDB.firstUid : accountingDB.secondUid;
     const shareUid = !isFirstPersonMode ? accountingDB.firstUid : accountingDB.secondUid;
 
@@ -43,7 +55,7 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
       const receipts = await DataParser.parseFileToReceipts(file, ownerUid, shareUid);
       for (let j = 0; j < receipts.length; j++) {
         const receipt = receipts[j];
-        await accountingDB.addReceipt(user, token, date, receipt);
+        await accountingDB.addReceipt(user, token, year, month, date, receipt);
         setProgress(((index + 1 + j + 1) / (files.length + receipts.length)) * 100);
       }
       const oldReceipts = isFirstPersonMode ? accountingDB.firstReceipts : accountingDB.secondReceipts;
@@ -55,27 +67,27 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
     setProgress(0);
   }
 
-  return <div className={[].join(' ')}>
-    <Card className={[styles.uploadSection].join(' ')}>
+  return (
+    <Card className={[styles.uploadSection, props.className].join(' ')}>
       <div className={[styles.uploadSectionHeader].join(' ')}>
         <div className={[styles.uploadSectionHeaderTitleWrapper].join(' ')}>
-          <h2 onChange={(e) => {
+          <h2>{isFirstPersonMode ? accountingDB.firstName : accountingDB.secondName}&apos;s Receipts 📃</h2>
+          <h4 onChange={(e) => {
             //TODO: make bill date editable
             // contentEditable={isInEditMode}
             // const currentBill = billDB.currentBill;
             // if (currentBill === undefined) { return; }
-          }}>{billDB.currentBill?.date.format('DD.MM.YYYY')}</h2>
-          <h2> | {isFirstPersonMode ? accountingDB.firstName : accountingDB.secondName}&apos;s Receipts</h2>
+          }}>{billDB.currentBill?.date.format('DD.MM.YYYY')}</h4>
         </div>
 
         <div className={[styles.uploadSectionHeaderControls].join(' ')}>
           <div className={[styles.uploadSectionHeaderModeWrapper].join(' ')}>
             <button disabled={isInEditMode} onClick={() => {
               setEditMode(true);
-            }}>Edit Mode</button>
+            }}>Edit Mode 🛠️</button>
             <button disabled={!isInEditMode} onClick={() => {
               setEditMode(false);
-            }}>Accounting</button>
+            }}>Accounting 🧾</button>
           </div>
           <hr />
           <button onClick={() => {
@@ -86,7 +98,9 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
             className={[].join(' ')}>Upload data</button>
           <button
             onClick={async () => {
-              if (billDB.currentBill === undefined) {
+              if (billDB.currentBill === undefined ||
+                yearDBContext.currentYear === undefined ||
+                monthDBContext.currentMonth === undefined) {
                 return;
               }
               setIsLoading(true);
@@ -94,6 +108,8 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
               const user = auth.user;
               const token = userDB.selectedConnection;
               const date = billDB.currentBill.name;
+              const year = yearDBContext.currentYear.name;
+              const month = monthDBContext.currentMonth.name;
               const outDatedReceipts = isFirstPersonMode ? accountingDB.firstReceipts : accountingDB.secondReceipts;
               const receipts = isFirstPersonMode ? accountingDB.firstReceipts : accountingDB.secondReceipts;
               accountingDB.saveReceipts([], isFirstPersonMode);
@@ -102,7 +118,7 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
 
               for (let index = 0; index < receipts.length; index++) {
                 const receipt = receipts[index];
-                isSuccessful = await accountingDB.deleteReceipt(user, token, date, receipt.receiptId);
+                isSuccessful = await accountingDB.deleteReceipt(user, token, year, month, date, receipt.receiptId);
                 setProgress(((index + 1) / receipts.length) * 100);
                 if (!isSuccessful) {
                   accountingDB.saveReceipts([...outDatedReceipts], isFirstPersonMode);
@@ -113,15 +129,19 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
               setIsLoading(false);
               setProgress(0);
             }}
-          >Clear data</button>
+          >❌ Data</button>
           <hr />
-          <button onClick={() => { setIsFirstPersonMode(!isFirstPersonMode) }}>{isFirstPersonMode ? 'Next person' : 'Prev. person'}</button>
-          <button onClick={() => { props.setResultReady(true) }}>Result</button>
+          <button onClick={() => { setIsFirstPersonMode(!isFirstPersonMode) }}>{isFirstPersonMode ? accountingDB.secondName + ' ⏭️' : '⏮️ ' + accountingDB.firstName}</button>
+          <button onClick={() => { props.setResultReady(true) }}>Result 🔬</button>
         </div>
       </div>
       {isInEditMode && !isLoading &&
         <AddReceipt addReceipt={async (receipt: IReceipt) => {
-          if (billDB.currentBill === undefined) { return; }
+          if (
+            billDB.currentBill === undefined ||
+            yearDBContext.currentYear === undefined ||
+            monthDBContext.currentMonth === undefined
+          ) { return; }
 
           const outDatedReceipts = accountingDB.firstReceipts;
           const updatedReceipts = accountingDB.firstReceipts;
@@ -129,7 +149,7 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
 
           accountingDB.saveReceipts([...updatedReceipts], isFirstPersonMode);
 
-          await accountingDB.addReceipt(auth.user, userDB.selectedConnection, billDB.currentBill.name, receipt).then(isSuccessful => {
+          await accountingDB.addReceipt(auth.user, userDB.selectedConnection, yearDBContext.currentYear.name, monthDBContext.currentMonth.name, billDB.currentBill.name, receipt).then(isSuccessful => {
             if (!isSuccessful) {
               accountingDB.saveReceipts([...outDatedReceipts], isFirstPersonMode);
             }
@@ -150,14 +170,16 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
                 receipt={receipt}
                 isInEditMode={false}
                 deleteReceipt={async (receipt: IReceipt) => {
-                  if (billDB.currentBill === undefined) { return; }
+                  if (billDB.currentBill === undefined ||
+                    yearDBContext.currentYear === undefined ||
+                    monthDBContext.currentMonth === undefined) { return; }
 
                   const outDatedReceipts = accountingDB.firstReceipts;
                   const updatedReceipts = accountingDB.firstReceipts.filter(firstReceipt => firstReceipt.receiptId !== receipt.receiptId);
 
                   accountingDB.saveReceipts([...updatedReceipts], true);
 
-                  await accountingDB.deleteReceipt(auth.user, userDB.selectedConnection, billDB.currentBill.name, receipt.receiptId).then(isSuccessful => {
+                  await accountingDB.deleteReceipt(auth.user, userDB.selectedConnection, yearDBContext.currentYear.name, monthDBContext.currentMonth.name, billDB.currentBill.name, receipt.receiptId).then(isSuccessful => {
                     if (!isSuccessful) {
                       accountingDB.saveReceipts([...outDatedReceipts], true);
                     }
@@ -172,12 +194,14 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
                 receipt={receipt}
                 isInEditMode={false}
                 deleteReceipt={async (receipt: IReceipt) => {
-                  if (billDB.currentBill === undefined) { return; }
+                  if (billDB.currentBill === undefined ||
+                    yearDBContext.currentYear === undefined ||
+                    monthDBContext.currentMonth === undefined) { return; }
                   const outDatedReceipts = accountingDB.secondReceipts;
                   const updatedReceipts = accountingDB.secondReceipts.filter(secondReceipt => secondReceipt.receiptId !== receipt.receiptId);
                   accountingDB.saveReceipts([...updatedReceipts], false);
 
-                  await accountingDB.deleteReceipt(auth.user, userDB.selectedConnection, billDB.currentBill.name, receipt.receiptId).then(isSuccessful => {
+                  await accountingDB.deleteReceipt(auth.user, userDB.selectedConnection, yearDBContext.currentYear.name, monthDBContext.currentMonth.name, billDB.currentBill.name, receipt.receiptId).then(isSuccessful => {
                     if (!isSuccessful) {
                       accountingDB.saveReceipts([...outDatedReceipts], false);
                     }
@@ -193,14 +217,16 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
                 receipt={receipt}
                 isInEditMode={true}
                 deleteReceipt={async (receipt: IReceipt) => {
-                  if (billDB.currentBill === undefined) { return; }
+                  if (billDB.currentBill === undefined ||
+                    yearDBContext.currentYear === undefined ||
+                    monthDBContext.currentMonth === undefined) { return; }
 
                   const outDatedReceipts = accountingDB.firstReceipts;
                   const updatedReceipts = accountingDB.firstReceipts.filter(firstReceipt => firstReceipt.receiptId !== receipt.receiptId);
 
                   accountingDB.saveReceipts([...updatedReceipts], true);
 
-                  await accountingDB.deleteReceipt(auth.user, userDB.selectedConnection, billDB.currentBill.name, receipt.receiptId).then(isSuccessful => {
+                  await accountingDB.deleteReceipt(auth.user, userDB.selectedConnection, yearDBContext.currentYear.name, monthDBContext.currentMonth.name, billDB.currentBill.name, receipt.receiptId).then(isSuccessful => {
                     if (!isSuccessful) {
                       accountingDB.saveReceipts([...outDatedReceipts], true);
                     }
@@ -215,12 +241,14 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
                 receipt={receipt}
                 isInEditMode={true}
                 deleteReceipt={async (receipt: IReceipt) => {
-                  if (billDB.currentBill === undefined) { return; }
+                  if (billDB.currentBill === undefined ||
+                    yearDBContext.currentYear === undefined ||
+                    monthDBContext.currentMonth === undefined) { return; }
                   const outDatedReceipts = accountingDB.secondReceipts;
                   const updatedReceipts = accountingDB.secondReceipts.filter(secondReceipt => secondReceipt.receiptId !== receipt.receiptId);
                   accountingDB.saveReceipts([...updatedReceipts], false);
 
-                  await accountingDB.deleteReceipt(auth.user, userDB.selectedConnection, billDB.currentBill.name, receipt.receiptId).then(isSuccessful => {
+                  await accountingDB.deleteReceipt(auth.user, userDB.selectedConnection, yearDBContext.currentYear.name, monthDBContext.currentMonth.name, billDB.currentBill.name, receipt.receiptId).then(isSuccessful => {
                     if (!isSuccessful) {
                       accountingDB.saveReceipts([...outDatedReceipts], false);
                     }
@@ -232,7 +260,7 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
           <div id={'add-point'} />
         </div>
       }
+      <input type='file' id={isFirstPersonMode ? 'firstUpload' : 'secondUpload'} accept='.csv' multiple={true} onChange={handleFileUpload} style={{ display: 'none' }} />
     </Card>
-    <input type='file' id={isFirstPersonMode ? 'firstUpload' : 'secondUpload'} accept='.csv' multiple={true} onChange={handleFileUpload} style={{ display: 'none' }} />
-  </div>;
+  );
 }

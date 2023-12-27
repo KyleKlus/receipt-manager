@@ -22,7 +22,9 @@ export default function AddReceipt(props: React.PropsWithChildren<IAddReceiptPro
         totalPrice: 0,
         mostCommonCategory: DataParser.DEFAULT_CATEGORY,
         amount: 0,
-        items: []
+        items: [],
+        categoryMetaData: [],
+        mostExpensiveItem: undefined
     });
 
     return (
@@ -51,10 +53,12 @@ export default function AddReceipt(props: React.PropsWithChildren<IAddReceiptPro
                                 totalPrice: 0,
                                 mostCommonCategory: DataParser.DEFAULT_CATEGORY,
                                 amount: 0,
-                                items: []
+                                items: [],
+                                categoryMetaData: [],
+                                mostExpensiveItem: undefined
                             });
                         });
-                    }}>Add</button>
+                    }}>➕</button>
                 </div>
             </div>
         </div>

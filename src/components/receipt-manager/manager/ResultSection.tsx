@@ -9,23 +9,68 @@ import { IResult } from '@/interfaces/data/IResult';
 import moment from 'moment';
 import { IAccountingDataBaseContext, useAccountingDB } from '@/context/AccountingDatabaseContext';
 import { useRouter } from 'next/router';
-import { RedirectPathOptions, redirectPaths } from '@/context/AuthContext';
+import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
+import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
+import { useEffect, useState } from 'react';
+import { IMonthDataBaseContext, useMonthDB } from '@/context/MonthDatabaseContext';
+import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
+import { IYearDataBaseContext, useYearDB } from '@/context/YearDatabaseContext';
 
 
 interface IResultSectionProps {
+  className?: string;
+  isResultReady: boolean;
   setResultReady: (state: boolean) => void;
 }
 
 export default function ResultSection(props: React.PropsWithChildren<IResultSectionProps>) {
+
+  const authContext: IAuthContext = useAuth();
+  const userDBContext: IUserDataBaseContext = useUserDB();
+  const yearDBContext: IYearDataBaseContext = useYearDB();
+  const monthDBContext: IMonthDataBaseContext = useMonthDB();
   const accountingDB: IAccountingDataBaseContext = useAccountingDB();
+
+  const [isResultReady, setIsResultReady] = useState(props.isResultReady);
+  const [isLoadingStats, setIsLoadingStats] = useState(false);
+  const billDB: IBillDataBaseContext = useBillDB();
+
   const router = useRouter();
 
-  return <div className={[].join(' ')}>
-    <Card className={[styles.resultSection].join(' ')}>
+  useEffect(() => {
+    setIsResultReady(props.isResultReady)
+    if (props.isResultReady) {
+      setIsLoadingStats(true);
+      fetchCurrentBillStats();
+    }
+  }, [props.isResultReady])
+
+  async function fetchCurrentBillStats() {
+    if (yearDBContext.currentYear === undefined || monthDBContext.currentMonth === undefined || billDB.currentBill === undefined) {
+      setIsLoadingStats(false);
+      return;
+    }
+    const updatedBill = await billDB.updateBillStats(authContext.user, userDBContext.selectedConnection, yearDBContext.currentYear.name, monthDBContext.currentMonth.name, billDB.currentBill, false);
+
+    if (updatedBill !== undefined) {
+      billDB.saveCurrentBill(updatedBill);
+    }
+
+    setIsLoadingStats(false);
+  }
+
+  if (billDB.currentBill === undefined) {
+    return <div></div>
+  }
+
+  return (
+    <Card className={[styles.resultSection, props.className].join(' ')}>
       <div className={[styles.resultSectionHeader].join(' ')}>
-        <h2>Result</h2>
+        <div className={[styles.resultSectionHeaderTitleWrapper].join(' ')}>
+          <h2>Result 🔬</h2>
+          <h4 >{billDB.currentBill?.date.format('DD.MM.YYYY')}</h4>
+        </div>
         <div className={[styles.resultSectionHeaderControls].join(' ')}>
-          <button onClick={() => { props.setResultReady(false) }}>Back</button>
           <button onClick={() => {
             // TODO: Fix caveman implementation
             const myName: string = accountingDB.firstName;
@@ -71,13 +116,55 @@ export default function ResultSection(props: React.PropsWithChildren<IResultSect
 
             DataParser.downloadEXCEL('Expenses_' + moment().format('DD_MM_YYYY'), myName, otherName, myUid, otherUid, myReceipts, otherReceipts, resultData);
           }}>Export data</button>
+          <hr />
+          <button onClick={() => { props.setResultReady(false) }}>Back</button>
           <button onClick={() => { router.push(redirectPaths[RedirectPathOptions.DashBoardPage]) }}>Close</button>
         </div>
       </div>
       <div className={[styles.resultSectionContent].join(' ')}>
+        <div className={[styles.resultSectionContentSplit].join(' ')}>
           <ResultCard isFirstPerson={true} />
-        <ResultCard isFirstPerson={false} />
+          <ResultCard isFirstPerson={false} />
+        </div>
+        {!isLoadingStats &&
+          <Card className={[styles.resultSectionContentCard, styles.resultFunFacts].join(' ')}>
+            <div>
+              Most common category:
+              <div>
+                {DataParser.getNameOfCategory(billDB.currentBill?.mostCommonCategory)}
+              </div>
+            </div>
+            <div>
+              Most expensive item:
+              <div>
+                {billDB.currentBill.mostExpensiveItem?.name} | {billDB.currentBill.mostExpensiveItem?.price} €
+              </div>
+            </div>
+
+            <div>
+              Most expensive receipt:
+              <div>
+                {billDB.currentBill.mostExpensiveReceipt?.store} | {billDB.currentBill.mostExpensiveReceipt?.totalPrice} €
+              </div>
+            </div>
+          </Card>
+        }
+        {!isLoadingStats &&
+          <Card className={[styles.resultSectionContentCard, styles.resultStats].join(' ')}>
+            {billDB.currentBill?.categoryMetaData.map((category, index) => {
+              return (<Card key={index}>
+                <h4>
+                  {DataParser.getNameOfCategory(category.category)}
+                </h4>
+                <br />
+                <p>Item amount: {category.itemAmount}</p>
+                <p>Item entries: {category.itemEntriesCount}</p>
+                <p>Total price: {category.totalPrice.toFixed(2)} €</p>
+              </Card>);
+            })}
+          </Card>
+        }
       </div>
     </Card>
-  </div>;
+  );
 }

@@ -29,13 +29,18 @@
 
 .uploadSectionHeaderTitleWrapper {
     display: flex;
-    gap: 1.5ch;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .uploadSectionHeaderModeWrapper {
     border-radius: var(--border-radius);
     border: 1px solid var(--bg-color-60);
+    display: flex;
+    flex-wrap: nowrap;
 }
+
+
 
 .uploadSectionHeaderModeWrapper > button:first-child {
     border-top-right-radius: 0;
@@ -61,6 +66,11 @@
     display: flex;
     gap: 16px;
 }
+
+.uploadSectionHeaderControls * {
+    font-size: 0.8rem;
+}
+
 
 .uploadSectionContent {
     height: 100%;

@@ -30,15 +30,18 @@ export enum Category {
 export const DEFAULT_CATEGORY: Category = Category.Food;
 
 export function getNameOfCategory(category: Category): string {
-    return (Object.keys(Category) as Array<keyof typeof Category>)
+    const categoryName=  (Object.keys(Category) as Array<keyof typeof Category>)
         .slice((Object.keys(Category).length / 2))[category];
+    return categoryName;
 }
 
 export function getCategoryByName(name: string): Category {
-    return (Object.keys(Category) as Array<keyof typeof Category>)
+    const category = (Object.keys(Category) as Array<keyof typeof Category>)
         .slice((Object.keys(Category).length / 2))
         .map((key) => { return key.toString() })
         .indexOf(name);
+
+    return category;
 }
 
 export function getDateNameByMoment(date: Moment): string {
@@ -125,6 +128,10 @@ export function parseFileToReceipts(file: File, payedByUid: string, sharedByUid:
                     const receiptItems: string[][] = _listToMatrix(receipt.slice(receiptColumnsCount).join('').replaceAll('"', '').split('|'), itemColumnsCount).filter((item) => { return item.length > 1 });
 
                     let totalPrice = 0;
+                    let mostExpensiveItem: IReceiptItem | undefined = undefined;
+                    const categoryMetaData = Object.values(Category).slice((Object.keys(Category).length / 2)).map((category) => {
+                        return { category: category as Category, itemAmount: 0, itemEntriesCount: 0, totalPrice: 0 };
+                    })
 
                     let parsedReceiptItems: IReceiptItem[] = receiptItems.map(list => {
                         let itemName = _firstCharToUppercase(list[0]);
@@ -132,16 +139,29 @@ export function parseFileToReceipts(file: File, payedByUid: string, sharedByUid:
                         const itemAmount: number = list[5] === '' ? 1 : Math.floor(parseFloat(list[5]) * 100) / 100;
                         // NOTE: * -100 because all parsed prices have a - sign
                         const price: number = Math.floor(parseFloat(list[2]) * -100) / 100;
-                        totalPrice += price;
 
-                        return {
+                        const parsedItem: IReceiptItem = {
                             itemId: _generateNewId(),
                             ownerUids: [payedByUid, sharedByUid],
                             name: itemName,
-                            price: Math.round(price * 100) / 100,
-                            amount: itemAmount,
-                            category: price < 0 ? Category.Discount : DEFAULT_CATEGORY
+                            price: itemName === 'Unrecognized Item' ? 0 : Math.round(price * 100) / 100,
+                            amount: itemName === 'Unrecognized Item' ? 0 : itemAmount,
+                            category: itemName === 'Unrecognized Item' ? Category.None : price < 0 ? Category.Discount : DEFAULT_CATEGORY
+                        };
+
+                        if (
+                            mostExpensiveItem === undefined ||
+                            (mostExpensiveItem !== undefined && mostExpensiveItem.price < parsedItem.price)
+                        ) {
+                            mostExpensiveItem = parsedItem;
                         }
+
+                        totalPrice += parsedItem.price;
+                        categoryMetaData.filter(category=>category.category === parsedItem.category)[0].itemAmount += parsedItem.amount;
+                        categoryMetaData.filter(category=>category.category === parsedItem.category)[0].itemEntriesCount += 1;
+                        categoryMetaData.filter(category=>category.category === parsedItem.category)[0].totalPrice += parsedItem.price;
+
+                        return parsedItem;
                     })
 
                     // Add store name to receipt
@@ -152,10 +172,12 @@ export function parseFileToReceipts(file: File, payedByUid: string, sharedByUid:
                         receiptId: _generateNewId(),
                         payedByUid: payedByUid,
                         store: storeName,
-                        totalPrice: Math.round(totalPrice * 100) / 100,
-                        items: parsedReceiptItems,
-                        amount: parsedReceiptItems.length,
-                        mostCommonCategory: DEFAULT_CATEGORY
+                        totalPrice: storeName === 'Unrecognized Store' ? 0 : Math.round(totalPrice * 100) / 100,
+                        items: storeName === 'Unrecognized Store' ? [] : parsedReceiptItems,
+                        amount: storeName === 'Unrecognized Store' ? 0 : parsedReceiptItems.length,
+                        mostCommonCategory: storeName === 'Unrecognized Store' ? Category.None : DEFAULT_CATEGORY,
+                        mostExpensiveItem: storeName === 'Unrecognized Store' ? undefined : mostExpensiveItem,
+                        categoryMetaData: storeName === 'Unrecognized Store' ? [] : categoryMetaData
                     }
 
                     receipts = receipts.concat(parsedReceipt)

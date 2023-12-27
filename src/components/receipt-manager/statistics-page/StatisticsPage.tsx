@@ -21,7 +21,7 @@ export default function StatisticsPage(props: React.PropsWithChildren<IStatistic
         <>
             <Card className={[styles.statisticsPage].join(' ')}>
                 <div className={[styles.statisticsPageHeader].join(' ')}>
-                    <h2>Items</h2>
+                    <h2>Statistics</h2>
                     <div className={[styles.statisticsPageHeaderControls].join(' ')}>
                         <Select
                             className={[styles.select].join(' ')}

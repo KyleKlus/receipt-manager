@@ -9,11 +9,15 @@ import IBill from '@/interfaces/data/IBill';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import StatisticsPage from '@/components/receipt-manager/statistics-page/StatisticsPage';
+import { IMonthDataBaseContext, useMonthDB } from '@/context/MonthDatabaseContext';
+import { IYearDataBaseContext, useYearDB } from '@/context/YearDatabaseContext';
+import moment from 'moment';
 
 function Home() {
   const authContext: IAuthContext = useAuth();
   const userDBContext: IUserDataBaseContext = useUserDB();
-  const billDBContext: IBillDataBaseContext = useBillDB();
+  const yearDBContext: IYearDataBaseContext = useYearDB();
+  const monthDBContext: IMonthDataBaseContext = useMonthDB();
 
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
@@ -39,19 +43,39 @@ function Home() {
 
         userDBContext.saveActiveConnections(activeConnections);
       }
+    }
 
-      setIsLoading(false);
+    async function setCurrentYear() {
+      const years = await yearDBContext.getYears(authContext.user, userDBContext.selectedConnection);
+      if (years.length > 0) {
+        yearDBContext.saveCurrentYear(years[0]);
+        yearDBContext.saveYears(years);
+      }
+    }
+
+    async function setCurrentMonth() {
+      const months = await monthDBContext.getMonths(authContext.user, userDBContext.selectedConnection, moment().startOf('year').format('YYYY'));
+      if (months.length > 0) {
+        monthDBContext.saveCurrentMonth(months[0]);
+        monthDBContext.saveMonths(months);
+      }
     }
 
     if (isLoading === true) {
-      fetchActiveConnections();
+      fetchActiveConnections().then(_ => {
+        setCurrentYear().then(_ => {
+          setCurrentMonth().then(_ => {
+            setIsLoading(false);
+          })
+        });
+      });
     }
   }, [isLoading])
 
   return (
     <Layout>
       <Content className={['applyHeaderOffset', 'dotted'].join(' ')}>
-        {isLoading &&
+        {!isLoading &&
           <StatisticsPage isLoading={isLoading} selectConnectionsOptions={selectConnectionsOptions} />
         }
       </Content>

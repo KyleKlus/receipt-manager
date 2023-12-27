@@ -21,11 +21,16 @@
     padding: 16px 32px;
     justify-content: space-between;
     align-items: center;
+    text-align: center;
 }
 
 .dashboardHeaderControls {
     display: flex;
-    gap: 8px;
+    gap: 16px;
+}
+
+.isHidden{
+    display: none;
 }
 
 .select input {
@@ -69,11 +74,13 @@
 
 .select * {
     caret-color: transparent;
+    font-size: 0.8rem;
+
 }
 
 .dashboardHeader .addConnectionButton {
     width: fit-content;
-    font-size: 1rem;
+    font-size: 0.8rem;
 }
 
 .dashboardContent {

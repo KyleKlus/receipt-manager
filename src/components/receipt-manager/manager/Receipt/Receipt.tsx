@@ -11,6 +11,8 @@ import React, { useEffect, useState } from 'react';
 import { IReceiptItem } from '@/interfaces/data/IReceiptItem';
 import AddItemRow from './AddItemRow';
 import ItemRow from './ItemRow';
+import { IMonthDataBaseContext, useMonthDB } from '@/context/MonthDatabaseContext';
+import { IYearDataBaseContext, useYearDB } from '@/context/YearDatabaseContext';
 
 interface IReceiptProps {
     receipt: IReceipt;
@@ -23,6 +25,8 @@ export default function Receipt(props: React.PropsWithChildren<IReceiptProps>) {
     const accountingDB: IAccountingDataBaseContext = useAccountingDB();
     const billDB: IBillDataBaseContext = useBillDB();
     const userDB: IUserDataBaseContext = useUserDB();
+    const yearDBContext: IYearDataBaseContext = useYearDB();
+    const monthDBContext: IMonthDataBaseContext = useMonthDB();
     const auth: IAuthContext = useAuth();
 
     // TODO: Implement
@@ -40,11 +44,16 @@ export default function Receipt(props: React.PropsWithChildren<IReceiptProps>) {
     }, [props]);
 
     async function _updateItemInReceipt(updatedItem: IReceiptItem, index: number, isBigUpdate: boolean) {
-        if (auth.user === null || billDB.currentBill === undefined) { return; }
+        if (auth.user === null || billDB.currentBill === undefined ||
+            yearDBContext.currentYear === undefined ||
+            monthDBContext.currentMonth === undefined
+        ) { return; }
 
         await accountingDB.updateItem(
             auth.user,
             userDB.selectedConnection,
+            yearDBContext.currentYear.name,
+            monthDBContext.currentMonth.name,
             billDB.currentBill.name,
             receipt.receiptId,
             updatedItem
@@ -52,9 +61,11 @@ export default function Receipt(props: React.PropsWithChildren<IReceiptProps>) {
             let updatedReceipt: IReceipt | undefined = receipt;
 
             if (isBigUpdate) {
-                if (auth.user === null || billDB.currentBill === undefined) { return; }
+                if (auth.user === null || billDB.currentBill === undefined || yearDBContext.currentYear === undefined ||
+                    monthDBContext.currentMonth === undefined) { return; }
 
-                updatedReceipt = await accountingDB.updateReceiptStats(auth.user, userDB.selectedConnection, billDB.currentBill.name, receipt);
+                updatedReceipt = await accountingDB.updateReceiptStats(auth.user, userDB.selectedConnection, yearDBContext.currentYear.name,
+                    monthDBContext.currentMonth.name, billDB.currentBill.name, receipt);
                 if (updatedReceipt === undefined) { return; }
             } else {
                 updatedReceipt.items[index] = updatedItem;
@@ -66,17 +77,22 @@ export default function Receipt(props: React.PropsWithChildren<IReceiptProps>) {
     }
 
     async function _addItemInReceipt(updatedItem: IReceiptItem) {
-        if (auth.user === null || billDB.currentBill === undefined) { return; }
+        if (auth.user === null || billDB.currentBill === undefined || yearDBContext.currentYear === undefined ||
+            monthDBContext.currentMonth === undefined) { return; }
         await accountingDB.addItemToReceipt(
             auth.user,
             userDB.selectedConnection,
+            yearDBContext.currentYear.name,
+            monthDBContext.currentMonth.name,
             billDB.currentBill.name,
             receipt.receiptId,
             updatedItem
         ).then(async _ => {
-            if (auth.user === null || billDB.currentBill === undefined) { return; }
+            if (auth.user === null || billDB.currentBill === undefined || yearDBContext.currentYear === undefined ||
+                monthDBContext.currentMonth === undefined) { return; }
 
-            const updatedReceipt = await accountingDB.updateReceiptStats(auth.user, userDB.selectedConnection, billDB.currentBill.name, receipt);
+            const updatedReceipt = await accountingDB.updateReceiptStats(auth.user, userDB.selectedConnection, yearDBContext.currentYear.name,
+                monthDBContext.currentMonth.name, billDB.currentBill.name, receipt);
 
             if (updatedReceipt === undefined) { return; }
 
@@ -86,19 +102,24 @@ export default function Receipt(props: React.PropsWithChildren<IReceiptProps>) {
     }
 
     async function _deleteItemInReceipt(index: number) {
-        if (auth.user === null || billDB.currentBill === undefined) { return; }
+        if (auth.user === null || billDB.currentBill === undefined || yearDBContext.currentYear === undefined ||
+            monthDBContext.currentMonth === undefined) { return; }
         const itemId = receipt.items[index].itemId;
 
         await accountingDB.deleteItem(
             auth.user,
             userDB.selectedConnection,
+            yearDBContext.currentYear.name,
+            monthDBContext.currentMonth.name,
             billDB.currentBill.name,
             receipt.receiptId,
             itemId
         ).then(async _ => {
-            if (auth.user === null || billDB.currentBill === undefined) { return; }
+            if (auth.user === null || billDB.currentBill === undefined || yearDBContext.currentYear === undefined ||
+                monthDBContext.currentMonth === undefined) { return; }
 
-            const updatedReceipt = await accountingDB.updateReceiptStats(auth.user, userDB.selectedConnection, billDB.currentBill.name, receipt);
+            const updatedReceipt = await accountingDB.updateReceiptStats(auth.user, userDB.selectedConnection, yearDBContext.currentYear.name,
+                monthDBContext.currentMonth.name, billDB.currentBill.name, receipt);
 
             if (updatedReceipt === undefined) { return; }
 
@@ -121,17 +142,19 @@ export default function Receipt(props: React.PropsWithChildren<IReceiptProps>) {
                     />
                     <div className={[itemStyles.itemEditButtonsWrapper].join(' ')}>
                         <button className={[itemStyles.itemEditButton].join(' ')} onClick={async () => {
-                            if (billDB.currentBill === undefined) { return; }
+                            if (billDB.currentBill === undefined || yearDBContext.currentYear === undefined ||
+                                monthDBContext.currentMonth === undefined) { return; }
                             const updatedReceipt = receipt;
                             updatedReceipt.store = unsavedStore;
-                            await accountingDB.updateReceipt(auth.user, userDB.selectedConnection, billDB.currentBill.name, receipt).then(_ => {
-                                setReceipt(updatedReceipt);
-                            });
-                        }}>Save</button>
+                            await accountingDB.updateReceipt(auth.user, userDB.selectedConnection, yearDBContext.currentYear.name,
+                                monthDBContext.currentMonth.name, billDB.currentBill.name, receipt).then(_ => {
+                                    setReceipt(updatedReceipt);
+                                });
+                        }}>💾</button>
                         <button className={[itemStyles.itemEditButton].join(' ')} onClick={async () => {
                             await props.deleteReceipt(receipt);
                         }}
-                        >Delete</button>
+                        >❌</button>
                     </div>
                 </div>
                 : <div className={[styles.receiptTitle].join(' ')}>{receipt.store} | {receipt.totalPrice.toFixed(2)}€</div>
@@ -145,7 +168,9 @@ export default function Receipt(props: React.PropsWithChildren<IReceiptProps>) {
                                 item.amount === 0 ||
                                 item.price === 0 ||
                                 item.name === '' ||
-                                billDB.currentBill === undefined
+                                billDB.currentBill === undefined ||
+                                yearDBContext.currentYear === undefined ||
+                                monthDBContext.currentMonth === undefined
                             ) {
                                 return new Promise(() => { });
                             }
@@ -167,7 +192,9 @@ export default function Receipt(props: React.PropsWithChildren<IReceiptProps>) {
                                     updatedItem.amount === 0 ||
                                     updatedItem.price === 0 ||
                                     updatedItem.name === '' ||
-                                    billDB.currentBill === undefined
+                                    billDB.currentBill === undefined ||
+                                    yearDBContext.currentYear === undefined ||
+                                    monthDBContext.currentMonth === undefined
                                 ) {
                                     return new Promise(() => { });
                                 }

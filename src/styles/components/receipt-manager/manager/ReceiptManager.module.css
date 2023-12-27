@@ -6,6 +6,10 @@
     height: 100%;
 }
 
+.isHidden {
+    display: none !important;
+}
+
 .center {
     justify-content: center;
 }

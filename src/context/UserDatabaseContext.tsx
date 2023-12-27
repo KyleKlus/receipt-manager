@@ -8,8 +8,10 @@ import { IUser } from '@/interfaces/app/IUser';
 
 export interface IUserDataBaseContext {
     selectedConnection: string,
+    prevSelectedConnection: string,
     activeConnections: IConnection[],
     saveSelectedConnection: (connection: string) => void,
+    savePrevSelectedConnection: (connection: string) => void,
     saveActiveConnections: (connections: IConnection[]) => void,
     addUserToDB: (user: User | null) => Promise<void>,
     addPendingSyncToken: (user: User | null, token: string) => Promise<void>,
@@ -24,8 +26,10 @@ export interface IUserDataBaseContext {
 
 const defaultValue: IUserDataBaseContext = {
     selectedConnection: '',
+    prevSelectedConnection: '',
     activeConnections: [],
     saveSelectedConnection: (connection: string) => { },
+    savePrevSelectedConnection: (connection: string) => { },
     saveActiveConnections: (connections: IConnection[]) => [],
     addUserToDB: (user: User | null) => { return new Promise<void>(() => { }); },
     addPendingSyncToken: (user: User | null, token: string) => { return new Promise<void>(() => { }); },
@@ -43,10 +47,16 @@ const UserDataBaseContext: React.Context<IUserDataBaseContext> = createContext<I
 
 const UserDataBaseProvider: React.FC<{ children: React.ReactNode }> = (props) => {
     const [selectedConnection, setSelectedConnection] = useState('');
+    const [prevSelectedConnection, setPrevSelectedConnection] = useState('');
     const [activeConnections, setActiveConnections] = useState<IConnection[]>([]);
 
     function saveSelectedConnection(connection: string) {
+        savePrevSelectedConnection(selectedConnection);
         setSelectedConnection(connection);
+    }
+
+    function savePrevSelectedConnection(connection: string) {
+        setPrevSelectedConnection(connection);
     }
 
     function saveActiveConnections(connections: IConnection[]) {
@@ -91,8 +101,10 @@ const UserDataBaseProvider: React.FC<{ children: React.ReactNode }> = (props) =>
 
     return <UserDataBaseContext.Provider value={{
         selectedConnection,
+        prevSelectedConnection,
         activeConnections,
         saveSelectedConnection,
+        savePrevSelectedConnection,
         moveActivePendingTokensToActiveTokens,
         saveActiveConnections,
         addUserToDB,

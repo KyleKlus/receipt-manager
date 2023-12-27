@@ -78,7 +78,7 @@ export default function AddItemRow(props: React.PropsWithChildren<IAddItemRowPro
                             ownerUids: [accountingDB.firstUid, accountingDB.secondUid]
                         })
                     });
-                }}>Save</button>
+                }}>➕</button>
                 <button className={[styles.itemEditButton].join(' ')} onClick={async () => {
                     setUnsavedItem({
                         itemId: unsavedItem.itemId,
@@ -89,7 +89,7 @@ export default function AddItemRow(props: React.PropsWithChildren<IAddItemRowPro
                         ownerUids: unsavedItem.ownerUids
                     })
                 }}
-                >Clear</button>
+                >🗑️</button>
             </div>
         </div>
     );

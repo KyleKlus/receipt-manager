@@ -213,7 +213,7 @@ export async function getUserUidByToken(user: User | null, token: string): Promi
     userDocsSnap.forEach(doc => {
         const userData = doc.data();
 
-        if (isTokenInTokenArray(token, userData.activeSyncTokens) && userData.uid !== user.uid) {
+        if ((isTokenInTokenArray(token, userData.activeSyncTokens) || isTokenInTokenArray(token, userData.pendingSyncTokens)) && userData.uid !== user.uid) {
             uid = userData.uid;
             return uid
         }

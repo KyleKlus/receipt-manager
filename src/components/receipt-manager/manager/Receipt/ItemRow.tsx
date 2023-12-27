@@ -73,11 +73,12 @@ export default function ItemRow(props: React.PropsWithChildren<IItemRowProps>) {
             <div className={[styles.itemEditButtonsWrapper].join(' ')}>
                 <button className={[styles.itemEditButton].join(' ')} onClick={async () => {
                     await props.updateItemInReceipt(unsavedItem, true);
-                }}>Save</button>
+                }}>
+                💾</button>
                 <button className={[styles.itemEditButton].join(' ')} onClick={async () => {
                     await props.updateItemInReceipt(undefined, true);
                 }}
-                >Delete</button>
+                >❌</button>
             </div>
         </div>
         : <div key={item.itemId} className={[styles.itemRow].join(' ')}>
@@ -96,7 +97,10 @@ export default function ItemRow(props: React.PropsWithChildren<IItemRowProps>) {
                         if (!(item.ownerUids.length === 1 &&
                             item.ownerUids[0] === accountingDB.firstUid) && auth.user !== null) {
                             const updatedItem = item;
+
                             updatedItem.ownerUids = [accountingDB.firstUid];
+                            setItem(updatedItem);
+
                             await props.updateItemInReceipt(updatedItem, false);
                         }
                     }} />
@@ -109,7 +113,10 @@ export default function ItemRow(props: React.PropsWithChildren<IItemRowProps>) {
                     onClick={async (e) => {
                         if (!(item.ownerUids.length > 1 || item.ownerUids.length === 0) && auth.user !== null) {
                             const updatedItem = item;
+
                             updatedItem.ownerUids = [accountingDB.firstUid, accountingDB.secondUid];
+                            setItem(updatedItem);
+
                             await props.updateItemInReceipt(updatedItem, false);
                         }
                     }} />
@@ -124,7 +131,10 @@ export default function ItemRow(props: React.PropsWithChildren<IItemRowProps>) {
                         if (!(item.ownerUids.length === 1 &&
                             item.ownerUids[0] === accountingDB.secondUid) && auth.user !== null) {
                             const updatedItem = item;
+
                             updatedItem.ownerUids = [accountingDB.secondUid];
+                            setItem(updatedItem);
+
                             await props.updateItemInReceipt(updatedItem, false);
                         }
                     }} />
@@ -139,6 +149,7 @@ export default function ItemRow(props: React.PropsWithChildren<IItemRowProps>) {
                     const updatedItem = item;
 
                     updatedItem.category = DataParser.getCategoryByName(e.value);
+                    setItem(updatedItem);
 
                     await props.updateItemInReceipt(updatedItem, false);
                 }} />

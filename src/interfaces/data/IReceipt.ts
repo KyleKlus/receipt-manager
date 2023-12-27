@@ -1,14 +1,14 @@
 import { Category } from "@/handlers/DataParser";
 import { IReceiptItem } from "./IReceiptItem";
 
-// TODO: add more stats
-
 export interface IReceipt {
-    receiptId: string;
-    payedByUid: string;
-    store: string;
-    totalPrice: number;
-    mostCommonCategory: Category;
-    amount: number;
-    items: IReceiptItem[];
+    receiptId: string,
+    payedByUid: string,
+    store: string,
+    amount: number,
+    totalPrice: number,
+    items: IReceiptItem[],
+    mostCommonCategory: Category,
+    mostExpensiveItem?: IReceiptItem | undefined,
+    categoryMetaData: { category: Category, itemAmount: number, itemEntriesCount: number, totalPrice: number }[]
 }

@@ -2,19 +2,19 @@
 import styles from '@/styles/components/receipt-manager/manager/ReceiptManager.module.css';
 import { useEffect, useState } from 'react';
 import { IReceipt } from '@/interfaces/data/IReceipt';
-import * as DataParser from '@/handlers/DataParser';
-import { Category } from '@/handlers/DataParser';
-import { IReceiptItem } from '@/interfaces/data/IReceiptItem';
 import UploadSection from './UploadSection';
 import ResultSection from './ResultSection';
 import { IAuthContext, useAuth } from '@/context/AuthContext';
-import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import { IAccountingDataBaseContext, useAccountingDB } from '@/context/AccountingDatabaseContext';
+import { IMonthDataBaseContext, useMonthDB } from '@/context/MonthDatabaseContext';
+import { IYearDataBaseContext, useYearDB } from '@/context/YearDatabaseContext';
 
 interface IReceiptManagerProps {
     billDate: string;
-    token: string
+    token: string;
+    currentYearName: string;
+    currentMonthName: string;
 }
 
 export default function ReceiptManager(props: React.PropsWithChildren<IReceiptManagerProps>) {
@@ -23,8 +23,8 @@ export default function ReceiptManager(props: React.PropsWithChildren<IReceiptMa
     const accountingDBContext: IAccountingDataBaseContext = useAccountingDB();
 
     const [isResultReady, setIsResultReady] = useState(false);
+    const [isStatsReady, setIsStatsReady] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-
 
     useEffect(() => {
         if (isLoading) {
@@ -34,6 +34,7 @@ export default function ReceiptManager(props: React.PropsWithChildren<IReceiptMa
 
     async function setResultReady(state: boolean) {
         setIsResultReady(state);
+        setIsStatsReady(state);
         if (state) {
             accountingDBContext.saveReceipts(await updateReceiptStats(accountingDBContext.firstReceipts), true);
             accountingDBContext.saveReceipts(await updateReceiptStats(accountingDBContext.secondReceipts), false);
@@ -73,7 +74,8 @@ export default function ReceiptManager(props: React.PropsWithChildren<IReceiptMa
         if (authContext.user === null) { return; }
         if (authContext.user.displayName == null) { return; }
 
-        const receipts = await updateReceiptStats(await accountingDBContext.getReceipts(authContext.user, props.token, props.billDate));
+        const receipts = await updateReceiptStats(await accountingDBContext.getReceipts(authContext.user, props.token, props.currentYearName,
+            props.currentMonthName, props.billDate, true));
 
         const firstReceipts = receipts.filter(receipt => receipt.payedByUid === authContext.user?.uid);
         accountingDBContext.saveReceipts(firstReceipts, true);
@@ -88,7 +90,8 @@ export default function ReceiptManager(props: React.PropsWithChildren<IReceiptMa
 
         for (let index = 0; index < receipts.length; index++) {
             const receipt = receipts[index];
-            const updatedReceipt = await accountingDBContext.updateReceiptStats(authContext.user, props.token, props.billDate, receipt);
+            const updatedReceipt = await accountingDBContext.updateReceiptStats(authContext.user, props.token, props.currentYearName,
+                props.currentMonthName, props.billDate, receipt);
 
             if (updatedReceipt !== undefined) {
                 receipts[index] = updatedReceipt;
@@ -102,12 +105,18 @@ export default function ReceiptManager(props: React.PropsWithChildren<IReceiptMa
         <div className={[styles.receiptManager].join(' ')}>
             {!isLoading &&
                 <>
-                    {!isResultReady
-                        ? <UploadSection setResultReady={setResultReady} />
-                        : <ResultSection setResultReady={setResultReady} />
-                    }
+                    <UploadSection
+                        setResultReady={setResultReady}
+                        className={[isResultReady ? styles.isHidden : ''].join(' ')}
+                    />
+                    <ResultSection
+                        isResultReady={isResultReady}
+                        setResultReady={setResultReady}
+                        className={[!isResultReady ? styles.isHidden : ''].join(' ')}
+                    />
                 </>
             }
+            {/* TODO: add Loading spinner */}
         </div>
     );
 }

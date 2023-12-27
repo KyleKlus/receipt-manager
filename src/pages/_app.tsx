@@ -10,6 +10,8 @@ import type { AppProps } from 'next/app';
 import { Fira_Code } from "next/font/google";
 import type { ReactElement, ReactNode } from 'react'
 import type { NextPage } from 'next'
+import YearDataBaseProvider from '@/context/YearDatabaseContext';
+import MonthDataBaseProvider from '@/context/MonthDatabaseContext';
 
 const firaCode = Fira_Code({ weight: '400', subsets: ['latin'] });
 
@@ -37,12 +39,16 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       `}</style>
       <AuthProvider>
         <UserDataBaseProvider>
-          <BillDataBaseProvider>
-            <AccountingDataBaseProvider>
-              {/* <Component {...pageProps} /> */}
-              {getLayout(<Component {...pageProps} />)}
-            </AccountingDataBaseProvider>
-          </BillDataBaseProvider>
+          <YearDataBaseProvider>
+            <MonthDataBaseProvider>
+              <BillDataBaseProvider>
+                <AccountingDataBaseProvider>
+                  {/* <Component {...pageProps} /> */}
+                  {getLayout(<Component {...pageProps} />)}
+                </AccountingDataBaseProvider>
+              </BillDataBaseProvider>
+            </MonthDataBaseProvider>
+          </YearDataBaseProvider>
         </UserDataBaseProvider>
       </AuthProvider>
     </>

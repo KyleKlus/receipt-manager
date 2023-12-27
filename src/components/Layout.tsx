@@ -9,6 +9,8 @@ import { RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthConte
 import Content from './Content';
 import { useRouter } from 'next/router';
 import { useUserDB } from '@/context/UserDatabaseContext';
+import { IYearDataBaseContext, useYearDB } from '@/context/YearDatabaseContext';
+import { IMonthDataBaseContext, useMonthDB } from '@/context/MonthDatabaseContext';
 
 const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
     ssr: false,
@@ -21,6 +23,8 @@ interface ILayoutProps {
 export default function Layout(props: React.PropsWithChildren<ILayoutProps>) {
     const authContext = useAuth();
     const userDB = useUserDB();
+    const yearDBContext: IYearDataBaseContext = useYearDB();
+    const monthDBContext: IMonthDataBaseContext = useMonthDB();
     const router = useRouter();
 
     const handleLogout = () => {
@@ -76,29 +80,29 @@ export default function Layout(props: React.PropsWithChildren<ILayoutProps>) {
                                     !isCurrentWindow(router.pathname, '/dashboard')
                                         && router.push('/dashboard')
                                 }}
-                            >D</button>
+                            >📖</button>
                             <button
-                                disabled={userDB.activeConnections.length === 0 && isCurrentWindow(router.pathname, redirectPaths[RedirectPathOptions.DashBoardPage])}
+                                disabled={userDB.activeConnections.length === 0 && isCurrentWindow(router.pathname, redirectPaths[RedirectPathOptions.DashBoardPage]) || true}// TODO: remove after implementation
                                 className={[
                                     styles.functionButton,
                                     applyCurrentWindowStyle(router.pathname, '/items')
                                 ].join(' ')}
                                 onClick={() => {
-                                    !isCurrentWindow(router.pathname, '/items')
-                                        && router.push({ pathname: '/items', query: { token: userDB.selectedConnection } })
+                                    !isCurrentWindow(router.pathname, '/items') && yearDBContext.currentYear !== undefined && monthDBContext.currentMonth !== undefined
+                                        && router.push({ pathname: '/items', query: { token: userDB.selectedConnection, year: yearDBContext.currentYear.name, month: monthDBContext.currentMonth.name } })
                                 }}
-                            >I</button>
+                            >📜</button>
                             <button
-                                disabled={userDB.activeConnections.length === 0 && isCurrentWindow(router.pathname, redirectPaths[RedirectPathOptions.DashBoardPage])}
+                                disabled={userDB.activeConnections.length === 0 && isCurrentWindow(router.pathname, redirectPaths[RedirectPathOptions.DashBoardPage]) || true}// TODO: remove after implementation
                                 className={[
                                     styles.functionButton,
                                     applyCurrentWindowStyle(router.pathname, '/statistics')
                                 ].join(' ')}
                                 onClick={() => {
-                                    !isCurrentWindow(router.pathname, '/statistics')
-                                        && router.push({ pathname: '/statistics', query: { token: userDB.selectedConnection } })
+                                    !isCurrentWindow(router.pathname, '/statistics') && yearDBContext.currentYear !== undefined && monthDBContext.currentMonth !== undefined
+                                        && router.push({ pathname: '/statistics', query: { token: userDB.selectedConnection, year: yearDBContext.currentYear.name, month: monthDBContext.currentMonth.name } })
                                 }}
-                            >S</button>
+                            >📈</button>
                         </div>
                         <div className={[styles.sideBarBottom].join(' ')}>
                             <hr />
