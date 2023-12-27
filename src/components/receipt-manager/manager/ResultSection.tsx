@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react';
 import { IMonthDataBaseContext, useMonthDB } from '@/context/MonthDatabaseContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import { IYearDataBaseContext, useYearDB } from '@/context/YearDatabaseContext';
+import IBill from '@/interfaces/data/IBill';
 
 
 interface IResultSectionProps {
@@ -50,7 +51,8 @@ export default function ResultSection(props: React.PropsWithChildren<IResultSect
       setIsLoadingStats(false);
       return;
     }
-    const updatedBill = await billDB.updateBillStats(authContext.user, userDBContext.selectedConnection, yearDBContext.currentYear.name, monthDBContext.currentMonth.name, billDB.currentBill, false);
+    let updatedBill: IBill | undefined = billDB.currentBill;
+    updatedBill = await billDB.updateBillStats(authContext.user, userDBContext.selectedConnection, yearDBContext.currentYear.name, monthDBContext.currentMonth.name, billDB.currentBill, false);
 
     if (updatedBill !== undefined) {
       billDB.saveCurrentBill(updatedBill);

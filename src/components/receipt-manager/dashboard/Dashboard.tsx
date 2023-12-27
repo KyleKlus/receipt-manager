@@ -62,6 +62,12 @@ export default function Dashboard(props: React.PropsWithChildren<IDashboardProps
             : [])
     }, [monthDBContext.currentMonth])
 
+    useEffect(() => {
+        if (billDBContext.bills.length === 0 && isInDeleteMode) {
+            setIsInDeleteMode(false);
+        }
+    }, [billDBContext.bills]);
+
 
     return (
         <>
@@ -72,7 +78,7 @@ export default function Dashboard(props: React.PropsWithChildren<IDashboardProps
                         <div className={[styles.dashboardHeaderControls].join(' ')}>
                             <div className={[styles.dashboardHeaderControlsModeWrapper].join(' ')}>
                                 <button disabled={isInDeleteMode} onClick={() => {
-                                    setIsInDeleteMode(true);
+                                    setIsInDeleteMode(billDBContext.bills.length > 0);
                                 }}>Delete ❌</button>
                                 <button disabled={!isInDeleteMode} onClick={() => {
                                     setIsInDeleteMode(false);
@@ -127,7 +133,9 @@ export default function Dashboard(props: React.PropsWithChildren<IDashboardProps
                                         key={DataParser.getDateNameByMoment(bill.date)}
                                         bill={bill}
                                         isInDeleteMode={isInDeleteMode}
-                                        reloadBills={() => { props.fetchBills(dbContext.selectedConnection) }} />);
+                                        reloadBills={() => {
+                                            props.fetchBills(dbContext.selectedConnection)
+                                        }} />);
                                 })
                             }
                         </div>
