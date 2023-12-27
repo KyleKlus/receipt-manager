@@ -82,36 +82,51 @@ export default function ResultSection(props: React.PropsWithChildren<IResultSect
             const myReceipts: IReceipt[] = accountingDB.firstReceipts;
             const otherReceipts: IReceipt[] = accountingDB.secondReceipts;
 
-            const myReceiptsExpenses: number = Calculator.calcReceiptsExpenses(myReceipts);
-            const otherReceiptsExpenses: number = Calculator.calcReceiptsExpenses(otherReceipts);
+            const myPaidExpenses: number = Calculator.calcReceiptsExpenses(myReceipts);
+            const otherPaidExpenses: number = Calculator.calcReceiptsExpenses(otherReceipts);
 
-            const myItemsFromMe: number = Calculator.calcPersonalExpenses(myReceipts, myUid);
-            const otherItemsFromOther: number = Calculator.calcPersonalExpenses(otherReceipts, otherUid);
-            const sharedFromMe: number = Calculator.calcSharedExpenses(myReceipts, myUid, otherUid);
-            const myExpensesFromMe: number = Math.floor((myItemsFromMe + sharedFromMe) * 100) / 100;
+            const myPersonalExpensesFromMe: number = Calculator.calcPersonalExpensesFromMyReceipts(myReceipts, myUid);
+            const otherPersonalExpensesFromMe: number = Calculator.calcPersonalExpensesFromMyReceipts(myReceipts, otherUid);
 
-            const myItemsFromOther: number = Calculator.calcRejectedExpenses(otherReceipts, otherUid, myUid);
-            const otherItemsFromMe: number = Calculator.calcRejectedExpenses(myReceipts, myUid, otherUid);
-            const sharedFromOther: number = Calculator.calcSharedExpenses(otherReceipts, myUid, otherUid);
-            const myExpensesFromOther: number = Math.floor((myItemsFromOther + sharedFromOther) * 100) / 100;
+            const myPersonalExpensesFromOther: number = Calculator.calcPersonalExpensesFromOtherReceipts(otherReceipts, myUid);
+            const otherPersonalExpensesFromOther: number = Calculator.calcPersonalExpensesFromOtherReceipts(otherReceipts, otherUid);
 
-            const myTotalExpenses: number = Math.floor((myExpensesFromOther + myExpensesFromMe) * 100) / 100;
+            const mySharedExpensesFromMe: number = Calculator.calcSharedExpensesFromMyReceipts(myReceipts, myUid);
+            const otherSharedExpensesFromMe: number = mySharedExpensesFromMe;
 
-            const rejectedFromMe: number = Calculator.calcRejectedExpenses(myReceipts, otherUid, myUid);
-            const result: number = Math.floor((myTotalExpenses - myReceiptsExpenses) * 100) / 100;
+            const mySharedExpensesFromOther: number = Calculator.calcSharedExpensesFromOtherReceipts(otherReceipts, myUid);
+            const otherSharedExpensesFromOther: number = mySharedExpensesFromOther;
+
+            const myExpensesFromMe = myPersonalExpensesFromMe + mySharedExpensesFromMe;
+            const otherExpensesFromMe = otherPersonalExpensesFromMe + otherSharedExpensesFromMe;
+
+            const myExpensesFromOther = myPersonalExpensesFromOther + mySharedExpensesFromOther;
+            const otherExpensesFromOther = otherPersonalExpensesFromOther + otherSharedExpensesFromOther;
+
+            const myTotalExpenses = myExpensesFromMe + myExpensesFromOther;
+            const otherTotalExpenses = otherExpensesFromMe + otherExpensesFromOther;
+
+            const myOverhang = Math.floor((myPaidExpenses - myTotalExpenses) * 100) / 100;
+            const otherOverhang = Math.floor((otherPaidExpenses - otherTotalExpenses) * 100) / 100;
+
+            const result: number = Math.floor((myTotalExpenses - myPaidExpenses) * 100) / 100;
+
+            const isPayerMe = () => {
+              return myOverhang < 0;
+            }
 
             const resultData: IResult = {
-              payerName: result <= 0 ? otherName : myName,
-              receiverName: result <= 0 ? myName : otherName,
-              payerExpenses: result <= 0 ? otherReceiptsExpenses : myReceiptsExpenses,
-              receiverExpenses: result <= 0 ? myReceiptsExpenses : otherReceiptsExpenses,
-              sharedFromPayer: result <= 0 ? sharedFromOther : sharedFromMe,
-              sharedFromReceiver: result <= 0 ? sharedFromMe : sharedFromOther,
-              payerItemsFromPayer: result <= 0 ? otherItemsFromOther : myItemsFromMe,
-              receiverItemsFromReceiver: result <= 0 ? myItemsFromMe : otherItemsFromOther,
-              receiverItemsFromPayer: result <= 0 ? myItemsFromOther : otherItemsFromMe,
-              payerItemsFromReceiver: result <= 0 ? otherItemsFromMe : myItemsFromOther,
-              result: result
+              payerName: isPayerMe() ? myName : otherName,
+              receiverName: !isPayerMe() ? myName : otherName,
+              payerPaidExpenses: !isPayerMe() ? otherPaidExpenses : myPaidExpenses,
+              receiverPaidExpenses: isPayerMe() ? otherPaidExpenses : myPaidExpenses,
+              sharedFromPayer: isPayerMe() ? mySharedExpensesFromMe : otherSharedExpensesFromOther,
+              sharedFromReceiver: !isPayerMe() ? mySharedExpensesFromMe : otherSharedExpensesFromOther,
+              payerItemsFromPayer: isPayerMe() ? myPersonalExpensesFromMe : otherPersonalExpensesFromOther,
+              receiverItemsFromReceiver: !isPayerMe() ? myPersonalExpensesFromMe : otherPersonalExpensesFromOther,
+              receiverItemsFromPayer: !isPayerMe() ? myPersonalExpensesFromOther : otherPersonalExpensesFromMe,
+              payerItemsFromReceiver: isPayerMe() ? myPersonalExpensesFromOther : otherPersonalExpensesFromMe,
+              receiverOverhang: isPayerMe() ? otherOverhang : myOverhang
             };
 
             DataParser.downloadEXCEL('Expenses_' + moment().format('DD_MM_YYYY'), myName, otherName, myUid, otherUid, myReceipts, otherReceipts, resultData);

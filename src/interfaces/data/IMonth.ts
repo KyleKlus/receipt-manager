@@ -31,5 +31,6 @@ export default interface IMonth {
         receiptEntriesCount: number,
         billEntriesCount: number,
         totalPrice: number
-    }[]
+    }[],
+    needsRefresh: boolean
 }

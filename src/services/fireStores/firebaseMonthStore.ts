@@ -12,6 +12,7 @@ import { itemConverter } from "./firebaseItemStore";
 import { IReceiptItem } from "@/interfaces/data/IReceiptItem";
 import { billConverter, deleteBill, getBills, updateBillStats } from "./firebaseBillStore";
 import IBill from "@/interfaces/data/IBill";
+import { getYear, updateYear } from "./firebaseYearStore";
 
 export const monthConverter = {
     toFirestore: (month: IMonth) => {
@@ -30,8 +31,9 @@ export const monthConverter = {
             : undefined;
 
         const categoryMetaData = month.categoryMetaData.map(metadata => {
+            const categoryName = DataParser.getNameOfCategory(metadata.category)
             return {
-                category: DataParser.getNameOfCategory(metadata.category),
+                category: categoryName === undefined ? metadata.category : categoryName,
                 receiptEntriesCount: metadata.receiptEntriesCount,
                 billEntriesCount: metadata.billEntriesCount,
                 itemAmount: metadata.itemAmount,
@@ -63,21 +65,22 @@ export const monthConverter = {
             mostExpensiveItemReceiptId: month.mostExpensiveItemReceiptId,
             mostExpensiveItem: mostExpensiveItem,
 
-            categoryMetaData: categoryMetaData
+            categoryMetaData: categoryMetaData,
+            needsRefresh: month.needsRefresh
         };
 
         if (updatedMonth.mostExpensiveBill === undefined) {
             delete updatedMonth.mostExpensiveBill;
-        } else if(updatedMonth.mostExpensiveBill.mostExpensiveReceipt === undefined){
+        } else if (updatedMonth.mostExpensiveBill.mostExpensiveReceipt === undefined) {
             delete updatedMonth.mostExpensiveBill.mostExpensiveReceipt;
-        }else if(updatedMonth.mostExpensiveBill.mostExpensiveReceipt.mostExpensiveItem === undefined){
+        } else if (updatedMonth.mostExpensiveBill.mostExpensiveReceipt.mostExpensiveItem === undefined) {
             delete updatedMonth.mostExpensiveBill.mostExpensiveReceipt.mostExpensiveItem;
         }
 
 
         if (updatedMonth.mostExpensiveReceipt === undefined) {
             delete updatedMonth.mostExpensiveReceipt;
-        }else if(updatedMonth.mostExpensiveReceipt.mostExpensiveItem === undefined){
+        } else if (updatedMonth.mostExpensiveReceipt.mostExpensiveItem === undefined) {
             delete updatedMonth.mostExpensiveReceipt.mostExpensiveItem;
         }
 
@@ -135,6 +138,7 @@ export const monthConverter = {
             mostExpensiveItem: mostExpensiveItem,
 
             categoryMetaData: categoryMetaData,
+            needsRefresh: data.needsRefresh
         }
         return month;
     }
@@ -176,6 +180,7 @@ export async function addMonth(user: User | null, token: string, year: string): 
         mostExpensiveItemReceiptId: '',
 
         categoryMetaData: [],
+        needsRefresh: true
     }
 
 
@@ -204,22 +209,22 @@ export async function deleteMonth(user: User | null, token: string, year: string
     return await deleteDocument(monthCollection, month);
 }
 
-export async function updateMonth(user: User | null, token: string, year: string, updatedMonth: IMonth): Promise<boolean> {
-    if (user === null || user.displayName === null) { return false; } // TODO: add error
+export async function updateMonth(user: User | null, token: string, year: string, updatedMonth: IMonth): Promise<IMonth | undefined> {
+    if (user === null) { return undefined; } // TODO: add error
     const monthCollection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.YEARS_DB_NAME, year, DB_ACCESS_NAMES.MONTHS_DB_NAME].join('/');
 
     if (updatedMonth.mostExpensiveBill === undefined) {
         delete updatedMonth.mostExpensiveBill;
-    } else if(updatedMonth.mostExpensiveBill.mostExpensiveReceipt === undefined){
+    } else if (updatedMonth.mostExpensiveBill.mostExpensiveReceipt === undefined) {
         delete updatedMonth.mostExpensiveBill.mostExpensiveReceipt;
-    }else if(updatedMonth.mostExpensiveBill.mostExpensiveReceipt.mostExpensiveItem === undefined){
+    } else if (updatedMonth.mostExpensiveBill.mostExpensiveReceipt.mostExpensiveItem === undefined) {
         delete updatedMonth.mostExpensiveBill.mostExpensiveReceipt.mostExpensiveItem;
     }
 
 
     if (updatedMonth.mostExpensiveReceipt === undefined) {
         delete updatedMonth.mostExpensiveReceipt;
-    }else if(updatedMonth.mostExpensiveReceipt.mostExpensiveItem === undefined){
+    } else if (updatedMonth.mostExpensiveReceipt.mostExpensiveItem === undefined) {
         delete updatedMonth.mostExpensiveReceipt.mostExpensiveItem;
     }
 
@@ -227,11 +232,22 @@ export async function updateMonth(user: User | null, token: string, year: string
         delete updatedMonth.mostExpensiveItem;
     }
 
-    return await updateDocumentData(monthCollection, updatedMonth.name, monthConverter, updatedMonth);
+    return await updateDocumentData(monthCollection, updatedMonth.name, monthConverter, updatedMonth).then(isSuccessful => {
+        return isSuccessful ? updatedMonth : undefined;
+    });
 }
 
 export async function updateMonthStats(user: User | null, token: string, year: string, month: IMonth, isFullUpdate: boolean): Promise<IMonth | undefined> {
-    if (user === null || user.displayName === null) { return undefined; } // TODO: add error
+    if (user === null) { return undefined; } // TODO: add error
+    if (!month.needsRefresh) { return month; } else {
+        month.needsRefresh = false;
+
+        const currentYear = await getYear(user, token, year);
+        if (currentYear !== undefined) {
+            currentYear.needsRefresh = true;
+            await updateYear(user, token, currentYear);
+        }
+    }
     const monthCollection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.YEARS_DB_NAME, year, DB_ACCESS_NAMES.MONTHS_DB_NAME].join('/');
 
     const updatedMonth = month;
@@ -291,13 +307,13 @@ export async function updateMonthStats(user: User | null, token: string, year: s
         numberOfItems += bill.numberOfItems;
         numberOfReceipts += bill.numberOfReceipts;
 
-        categoryMetaData.filter(category=>category.category===bill.mostCommonCategory)[0].billEntriesCount += 1;
+        categoryMetaData.filter(category => category.category === bill.mostCommonCategory)[0].billEntriesCount += 1;
 
         categoryMetaData.forEach((metaData, index) => {
-            metaData.itemAmount += bill.categoryMetaData.filter(category=>category.category===metaData.category)[0].itemAmount;
-            metaData.itemEntriesCount += bill.categoryMetaData.filter(category=>category.category===metaData.category)[0].itemEntriesCount;
-            metaData.receiptEntriesCount += bill.categoryMetaData.filter(category=>category.category===metaData.category)[0].receiptEntriesCount;
-            metaData.totalPrice += bill.categoryMetaData.filter(category=>category.category===metaData.category)[0].totalPrice;
+            metaData.itemAmount += bill.categoryMetaData.filter(category => category.category === metaData.category)[0].itemAmount;
+            metaData.itemEntriesCount += bill.categoryMetaData.filter(category => category.category === metaData.category)[0].itemEntriesCount;
+            metaData.receiptEntriesCount += bill.categoryMetaData.filter(category => category.category === metaData.category)[0].receiptEntriesCount;
+            metaData.totalPrice += bill.categoryMetaData.filter(category => category.category === metaData.category)[0].totalPrice;
         });
     }
 
@@ -321,16 +337,16 @@ export async function updateMonthStats(user: User | null, token: string, year: s
 
     if (updatedMonth.mostExpensiveBill === undefined) {
         delete updatedMonth.mostExpensiveBill;
-    } else if(updatedMonth.mostExpensiveBill.mostExpensiveReceipt === undefined){
+    } else if (updatedMonth.mostExpensiveBill.mostExpensiveReceipt === undefined) {
         delete updatedMonth.mostExpensiveBill.mostExpensiveReceipt;
-    }else if(updatedMonth.mostExpensiveBill.mostExpensiveReceipt.mostExpensiveItem === undefined){
+    } else if (updatedMonth.mostExpensiveBill.mostExpensiveReceipt.mostExpensiveItem === undefined) {
         delete updatedMonth.mostExpensiveBill.mostExpensiveReceipt.mostExpensiveItem;
     }
 
 
     if (updatedMonth.mostExpensiveReceipt === undefined) {
         delete updatedMonth.mostExpensiveReceipt;
-    }else if(updatedMonth.mostExpensiveReceipt.mostExpensiveItem === undefined){
+    } else if (updatedMonth.mostExpensiveReceipt.mostExpensiveItem === undefined) {
         delete updatedMonth.mostExpensiveReceipt.mostExpensiveItem;
     }
 

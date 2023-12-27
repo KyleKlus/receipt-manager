@@ -36,8 +36,9 @@ export const yearConverter = {
             : undefined;
 
         const categoryMetaData = year.categoryMetaData.map(metadata => {
+            const categoryName = DataParser.getNameOfCategory(metadata.category)
             return {
-                category: DataParser.getNameOfCategory(metadata.category),
+                category: categoryName === undefined ? metadata.category : categoryName,
                 itemAmount: metadata.itemAmount,
                 billEntriesCount: metadata.billEntriesCount,
                 receiptEntriesCount: metadata.receiptEntriesCount,
@@ -75,7 +76,8 @@ export const yearConverter = {
             mostExpensiveItemReceiptId: year.mostExpensiveItemReceiptId,
             mostExpensiveItem: mostExpensiveItem,
 
-            categoryMetaData: categoryMetaData
+            categoryMetaData: categoryMetaData,
+            needsRefresh: year.needsRefresh
         }
 
         if (updatedYear.mostExpensiveMonth === undefined) {
@@ -166,6 +168,7 @@ export const yearConverter = {
             mostExpensiveItem: mostExpensiveItem,
 
             categoryMetaData: categoryMetaData,
+            needsRefresh: data.needsRefresh
         };
         return year;
     }
@@ -209,7 +212,8 @@ export async function addYear(user: User | null, token: string): Promise<IYear |
         categoryMetaData: [],
         mostExpensiveBillMonth: "",
         mostExpensiveReceiptMonth: "",
-        mostExpensiveItemMonth: ""
+        mostExpensiveItemMonth: "",
+        needsRefresh: true
     }
 
 
@@ -238,8 +242,9 @@ export async function deleteYear(user: User | null, token: string, year: string)
     return await deleteDocument(yearCollection, year);
 }
 
-export async function updateYear(user: User | null, token: string, updatedYear: IYear): Promise<boolean> {
-    if (user === null || user.displayName === null) { return false; } // TODO: add error
+export async function updateYear(user: User | null, token: string, updatedYear: IYear): Promise<IYear | undefined> {
+    if (user === null) { return undefined; } // TODO: add error
+
     const yearCollection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.YEARS_DB_NAME].join('/');
 
     if (updatedYear.mostExpensiveMonth === undefined) {
@@ -270,11 +275,17 @@ export async function updateYear(user: User | null, token: string, updatedYear: 
         delete updatedYear.mostExpensiveItem;
     }
 
-    return await updateDocumentData(yearCollection, updatedYear.name, yearConverter, updatedYear);
+    return await updateDocumentData(yearCollection, updatedYear.name, yearConverter, updatedYear).then(isSuccessful => {
+        return isSuccessful ? updatedYear : undefined;
+    });
 }
 
 export async function updateYearStats(user: User | null, token: string, year: IYear, isFullUpdate: boolean): Promise<IYear | undefined> {
-    if (user === null || user.displayName === null) { return undefined; } // TODO: add error
+    if (user === null) { return undefined; } // TODO: add error
+
+    if (!year.needsRefresh) { return year } else {
+        year.needsRefresh = false;
+    }
     const yearCollection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.YEARS_DB_NAME, year, DB_ACCESS_NAMES.MONTHS_DB_NAME].join('/');
 
     const updatedYear = year;
@@ -351,14 +362,14 @@ export async function updateYearStats(user: User | null, token: string, year: IY
         numberOfReceipts += month.numberOfReceipts;
         numberOfBills += month.numberOfBills;
 
-        categoryMetaData.filter(category=>category.category===month.mostCommonCategory)[0].monthEntriesCount += 1;
+        categoryMetaData.filter(category => category.category === month.mostCommonCategory)[0].monthEntriesCount += 1;
 
         categoryMetaData.forEach((metaData, index) => {
-            metaData.itemAmount += month.categoryMetaData.filter(category=>category.category===metaData.category)[0].itemAmount;
-            metaData.itemEntriesCount += month.categoryMetaData.filter(category=>category.category===metaData.category)[0].itemEntriesCount;
-            metaData.receiptEntriesCount += month.categoryMetaData.filter(category=>category.category===metaData.category)[0].receiptEntriesCount;
-            metaData.billEntriesCount += month.categoryMetaData.filter(category=>category.category===metaData.category)[0].billEntriesCount;
-            metaData.totalPrice += month.categoryMetaData.filter(category=>category.category===metaData.category)[0].totalPrice;
+            metaData.itemAmount += month.categoryMetaData.filter(category => category.category === metaData.category)[0].itemAmount;
+            metaData.itemEntriesCount += month.categoryMetaData.filter(category => category.category === metaData.category)[0].itemEntriesCount;
+            metaData.receiptEntriesCount += month.categoryMetaData.filter(category => category.category === metaData.category)[0].receiptEntriesCount;
+            metaData.billEntriesCount += month.categoryMetaData.filter(category => category.category === metaData.category)[0].billEntriesCount;
+            metaData.totalPrice += month.categoryMetaData.filter(category => category.category === metaData.category)[0].totalPrice;
         });
     }
 

@@ -10,5 +10,6 @@ export interface IReceipt {
     items: IReceiptItem[],
     mostCommonCategory: Category,
     mostExpensiveItem?: IReceiptItem | undefined,
-    categoryMetaData: { category: Category, itemAmount: number, itemEntriesCount: number, totalPrice: number }[]
+    categoryMetaData: { category: Category, itemAmount: number, itemEntriesCount: number, totalPrice: number }[],
+    needsRefresh: boolean
 }

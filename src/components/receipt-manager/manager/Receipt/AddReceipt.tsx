@@ -24,7 +24,8 @@ export default function AddReceipt(props: React.PropsWithChildren<IAddReceiptPro
         amount: 0,
         items: [],
         categoryMetaData: [],
-        mostExpensiveItem: undefined
+        mostExpensiveItem: undefined,
+        needsRefresh: true
     });
 
     return (
@@ -55,7 +56,8 @@ export default function AddReceipt(props: React.PropsWithChildren<IAddReceiptPro
                                 amount: 0,
                                 items: [],
                                 categoryMetaData: [],
-                                mostExpensiveItem: undefined
+                                mostExpensiveItem: undefined,
+                                needsRefresh: true
                             });
                         });
                     }}>➕</button>

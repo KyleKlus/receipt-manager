@@ -7,6 +7,7 @@ import { IReceipt } from "@/interfaces/data/IReceipt";
 import { addReceiptItem, deleteReceiptItem, getItems, itemConverter } from "./firebaseItemStore";
 import { IReceiptItem } from "@/interfaces/data/IReceiptItem";
 import { Category } from "../../handlers/DataParser";
+import { getBill, updateBill } from "./firebaseBillStore";
 
 export const receiptConverter = {
     toFirestore: (receipt: IReceipt) => {
@@ -15,8 +16,9 @@ export const receiptConverter = {
             : undefined;
 
         const categoryMetaData = receipt.categoryMetaData.map(metadata => {
+            const categoryName = DataParser.getNameOfCategory(metadata.category)
             return {
-                category: DataParser.getNameOfCategory(metadata.category),
+                category: categoryName === undefined ? metadata.category : categoryName,
                 itemAmount: metadata.itemAmount,
                 itemEntriesCount: metadata.itemEntriesCount,
                 totalPrice: metadata.totalPrice
@@ -28,11 +30,12 @@ export const receiptConverter = {
             receiptId: receipt.receiptId,
             payedByUid: receipt.payedByUid,
             store: receipt.store,
-            amount: receipt.items.length,
+            amount: receipt.items === undefined ? 0 : receipt.items.length,
             totalPrice: Math.round(receipt.totalPrice * 100) / 100,
             mostCommonCategory: categoryName === undefined ? receipt.mostCommonCategory : categoryName,
             mostExpensiveItem: mostExpensiveItem,
-            categoryMetaData: categoryMetaData
+            categoryMetaData: categoryMetaData,
+            needsRefresh: receipt.needsRefresh
         }
 
         if (dataObj.mostExpensiveItem === undefined) {
@@ -66,6 +69,7 @@ export const receiptConverter = {
             mostCommonCategory: DataParser.getCategoryByName(data.mostCommonCategory),
             mostExpensiveItem: mostExpensiveItem,
             categoryMetaData: categoryMetaData,
+            needsRefresh: data.needsRefresh
         }
         return receipt;
     }
@@ -75,6 +79,21 @@ export async function getReceipts(user: User | null, token: string, year: string
     if (user === null || token.length < 36 || date.length < 19) { return []; } // TODO: add error
     const receiptCollection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.YEARS_DB_NAME, year, DB_ACCESS_NAMES.MONTHS_DB_NAME, month, DB_ACCESS_NAMES.BILLS_DB_NAME, date, DB_ACCESS_NAMES.RECEIPTS_DB_NAME].join('/');
     const receipts = await getDocumentCollectionData(receiptCollection, receiptConverter) as IReceipt[];
+
+    for (let index = 0; index < receipts.length && shouldPreLoadItems; index++) {
+        const receipt = receipts[index];
+        if (receipt.amount === 0) { continue; }
+
+        receipt.items = await getItems(user, token, year, month, date, receipt.receiptId);
+    }
+
+    return receipts;
+}
+
+export async function getReceiptsByUid(user: User | null, token: string, year: string, month: string, date: string, uid: string, shouldPreLoadItems: boolean): Promise<IReceipt[]> {
+    if (user === null || token.length < 36 || date.length < 19) { return []; } // TODO: add error
+    const receiptCollection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.YEARS_DB_NAME, year, DB_ACCESS_NAMES.MONTHS_DB_NAME, month, DB_ACCESS_NAMES.BILLS_DB_NAME, date, DB_ACCESS_NAMES.RECEIPTS_DB_NAME].join('/');
+    const receipts = await getDocumentCollectionData(receiptCollection, receiptConverter, 'payedByUid', '==', uid) as IReceipt[];
 
     for (let index = 0; index < receipts.length && shouldPreLoadItems; index++) {
         const receipt = receipts[index];
@@ -132,6 +151,14 @@ export async function updateReceipt(user: User | null, token: string, year: stri
 
 export async function updateReceiptStats(user: User | null, token: string, year: string, month: string, date: string, receipt: IReceipt): Promise<IReceipt | undefined> {
     if (user === null || token.length < 36 || date.length < 19) { return undefined; } // TODO: add error
+    if (!receipt.needsRefresh) { return receipt } else {
+        receipt.needsRefresh = false;
+        const currentBill = await getBill(user, token, year, month, date);
+        if (currentBill !== undefined) {
+            currentBill.needsRefresh = true;
+            await updateBill(user, token, year, month, currentBill);
+        }
+    }
     const updatedReceipt = receipt;
 
     const items = await getItems(user, token, year, month, date, updatedReceipt.receiptId);
@@ -153,9 +180,9 @@ export async function updateReceiptStats(user: User | null, token: string, year:
         }
 
         totalCost += item.price;
-        categoryMetaData.filter(category=>category.category===item.category)[0].itemAmount += item.amount;
-        categoryMetaData.filter(category=>category.category===item.category)[0].itemEntriesCount += 1;
-        categoryMetaData.filter(category=>category.category===item.category)[0].totalPrice += item.price;
+        categoryMetaData.filter(category => category.category === item.category)[0].itemAmount += item.amount;
+        categoryMetaData.filter(category => category.category === item.category)[0].itemEntriesCount += 1;
+        categoryMetaData.filter(category => category.category === item.category)[0].totalPrice += item.price;
     })
 
     updatedReceipt.totalPrice = Math.round(totalCost * 100) / 100;

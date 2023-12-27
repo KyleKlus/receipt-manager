@@ -59,6 +59,7 @@ export default function Receipt(props: React.PropsWithChildren<IReceiptProps>) {
             updatedItem
         ).then(async _ => {
             let updatedReceipt: IReceipt | undefined = receipt;
+            updatedReceipt.needsRefresh = true;
 
             if (isBigUpdate) {
                 if (auth.user === null || billDB.currentBill === undefined || yearDBContext.currentYear === undefined ||
@@ -66,7 +67,9 @@ export default function Receipt(props: React.PropsWithChildren<IReceiptProps>) {
 
                 updatedReceipt = await accountingDB.updateReceiptStats(auth.user, userDB.selectedConnection, yearDBContext.currentYear.name,
                     monthDBContext.currentMonth.name, billDB.currentBill.name, receipt);
+
                 if (updatedReceipt === undefined) { return; }
+
             } else {
                 updatedReceipt.items[index] = updatedItem;
             }
@@ -91,8 +94,11 @@ export default function Receipt(props: React.PropsWithChildren<IReceiptProps>) {
             if (auth.user === null || billDB.currentBill === undefined || yearDBContext.currentYear === undefined ||
                 monthDBContext.currentMonth === undefined) { return; }
 
-            const updatedReceipt = await accountingDB.updateReceiptStats(auth.user, userDB.selectedConnection, yearDBContext.currentYear.name,
-                monthDBContext.currentMonth.name, billDB.currentBill.name, receipt);
+            let updatedReceipt: IReceipt | undefined = receipt
+            updatedReceipt.needsRefresh = true;
+
+            updatedReceipt = await accountingDB.updateReceiptStats(auth.user, userDB.selectedConnection, yearDBContext.currentYear.name,
+                monthDBContext.currentMonth.name, billDB.currentBill.name, updatedReceipt);
 
             if (updatedReceipt === undefined) { return; }
 
@@ -105,7 +111,7 @@ export default function Receipt(props: React.PropsWithChildren<IReceiptProps>) {
         if (auth.user === null || billDB.currentBill === undefined || yearDBContext.currentYear === undefined ||
             monthDBContext.currentMonth === undefined) { return; }
         const itemId = receipt.items[index].itemId;
-
+        
         await accountingDB.deleteItem(
             auth.user,
             userDB.selectedConnection,
@@ -118,8 +124,11 @@ export default function Receipt(props: React.PropsWithChildren<IReceiptProps>) {
             if (auth.user === null || billDB.currentBill === undefined || yearDBContext.currentYear === undefined ||
                 monthDBContext.currentMonth === undefined) { return; }
 
-            const updatedReceipt = await accountingDB.updateReceiptStats(auth.user, userDB.selectedConnection, yearDBContext.currentYear.name,
-                monthDBContext.currentMonth.name, billDB.currentBill.name, receipt);
+            let updatedReceipt: IReceipt | undefined = receipt
+            updatedReceipt.needsRefresh = true;
+
+            updatedReceipt = await accountingDB.updateReceiptStats(auth.user, userDB.selectedConnection, yearDBContext.currentYear.name,
+                monthDBContext.currentMonth.name, billDB.currentBill.name, updatedReceipt);
 
             if (updatedReceipt === undefined) { return; }
 
@@ -146,10 +155,12 @@ export default function Receipt(props: React.PropsWithChildren<IReceiptProps>) {
                                 monthDBContext.currentMonth === undefined) { return; }
                             const updatedReceipt = receipt;
                             updatedReceipt.store = unsavedStore;
+
                             await accountingDB.updateReceipt(auth.user, userDB.selectedConnection, yearDBContext.currentYear.name,
                                 monthDBContext.currentMonth.name, billDB.currentBill.name, receipt).then(_ => {
                                     setReceipt(updatedReceipt);
                                 });
+
                         }}>💾</button>
                         <button className={[itemStyles.itemEditButton].join(' ')} onClick={async () => {
                             await props.deleteReceipt(receipt);

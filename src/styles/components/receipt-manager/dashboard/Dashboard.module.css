@@ -29,6 +29,35 @@
     gap: 16px;
 }
 
+.dashboardHeaderControlsModeWrapper {
+    border-radius: var(--border-radius);
+    border: 1px solid var(--bg-color-60);
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+
+
+.dashboardHeaderControlsModeWrapper > button:first-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.dashboardHeaderControlsModeWrapper > button:last-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.dashboardHeaderControlsModeWrapper > button:disabled {
+    background: var(--bg-color-10);
+    box-shadow: inset var(--shadowElevation_1);
+    cursor: default;
+}
+
+.dashboardHeaderControlsModeWrapper > button:disabled:hover {
+    outline-color: var(--bg-color-30);
+}
+
 .isHidden{
     display: none;
 }

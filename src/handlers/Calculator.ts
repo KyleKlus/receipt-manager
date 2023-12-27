@@ -5,16 +5,18 @@ export function calcReceiptsExpenses(receipts: IReceipt[]): number {
     let expenses: number = 0;
 
     receipts.forEach((receipt) => {
-        expenses += receipt.totalPrice;
+        receipt.items.forEach((item) => {
+                expenses += item.price;
+        })
     })
 
     return Math.floor((expenses) * 100) / 100;
 }
 
-export function calcPersonalExpenses(receipts: IReceipt[], myUid: string): number {
+export function calcPersonalExpensesFromMyReceipts(myReceipts: IReceipt[], myUid: string): number {
     let expenses: number = 0;
 
-    receipts.forEach((receipt) => {
+    myReceipts.forEach((receipt) => {
         receipt.items.forEach((item) => {
             if (isMine(item, myUid)) {
                 expenses += item.price;
@@ -25,12 +27,16 @@ export function calcPersonalExpenses(receipts: IReceipt[], myUid: string): numbe
     return Math.floor((expenses) * 100) / 100;
 }
 
-export function calcSharedExpenses(receipts: IReceipt[], myUid: string, otherUid: string): number {
+export function calcPersonalExpensesFromOtherReceipts(otherReceipts: IReceipt[], myUid: string): number {
+    return calcPersonalExpensesFromMyReceipts(otherReceipts, myUid);
+}
+
+export function calcSharedExpensesFromMyReceipts(myReceipts: IReceipt[], myUid: string): number {
     let expenses: number = 0;
 
-    receipts.forEach((receipt) => {
+    myReceipts.forEach((receipt) => {
         receipt.items.forEach((item) => {
-            if (isShared(item)) {
+            if (isShared(item, myUid)) {
                 expenses += item.price / 2;
             }
         })
@@ -39,13 +45,13 @@ export function calcSharedExpenses(receipts: IReceipt[], myUid: string, otherUid
     return Math.floor((expenses) * 100) / 100;
 }
 
-export function calcRejectedExpenses(receipts: IReceipt[], myUid: string, otherUid: string): number {
+export function calcSharedExpensesFromOtherReceipts(otherReceipts: IReceipt[], myUid: string): number {
     let expenses: number = 0;
 
-    receipts.forEach((receipt) => {
+    otherReceipts.forEach((receipt) => {
         receipt.items.forEach((item) => {
-            if (isOthers(item, otherUid)) {
-                expenses += item.price;
+            if (isShared(item, myUid)) {
+                expenses += item.price / 2;
             }
         })
     })

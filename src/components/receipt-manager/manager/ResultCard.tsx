@@ -6,6 +6,7 @@ import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import * as Calculator from '@/handlers/Calculator';
 import { IReceipt } from '@/interfaces/data/IReceipt';
+import { IResult } from '@/interfaces/data/IResult';
 import styles from '@/styles/components/receipt-manager/manager/ResultCard.module.css';
 
 export default function ResultCard(props: {
@@ -16,33 +17,47 @@ export default function ResultCard(props: {
     const userDB: IUserDataBaseContext = useUserDB();
     const auth: IAuthContext = useAuth();
 
-    const myName: string = props.isFirstPerson ? accountingDB.firstName : accountingDB.secondName;
-    const otherName: string = !props.isFirstPerson ? accountingDB.firstName : accountingDB.secondName;
+    const myName: string = props.isFirstPerson?accountingDB.firstName: accountingDB.secondName;
+    const otherName: string = !props.isFirstPerson?accountingDB.firstName: accountingDB.secondName;
 
-    const myUid: string = props.isFirstPerson ? accountingDB.firstUid : accountingDB.secondUid;
-    const otherUid: string = !props.isFirstPerson ? accountingDB.firstUid : accountingDB.secondUid;
+    const myUid: string = props.isFirstPerson?accountingDB.firstUid:accountingDB.secondUid;
+    const otherUid: string = !props.isFirstPerson?accountingDB.firstUid:accountingDB.secondUid;
 
-    const myReceipts: IReceipt[] = props.isFirstPerson ? accountingDB.firstReceipts : accountingDB.secondReceipts;
-    const otherReceipts: IReceipt[] = !props.isFirstPerson ? accountingDB.firstReceipts : accountingDB.secondReceipts;
+    const myReceipts: IReceipt[] = props.isFirstPerson?accountingDB.firstReceipts:accountingDB.secondReceipts;
+    const otherReceipts: IReceipt[] = !props.isFirstPerson?accountingDB.firstReceipts:accountingDB.secondReceipts;
 
-    const myReceiptsExpenses: number = Calculator.calcReceiptsExpenses(myReceipts);
-    const otherReceiptsExpenses: number = Calculator.calcReceiptsExpenses(otherReceipts);
+    const myPaidExpenses: number = Calculator.calcReceiptsExpenses(myReceipts);
+    const otherPaidExpenses: number = Calculator.calcReceiptsExpenses(otherReceipts);
 
-    const myItemsFromMe: number = Calculator.calcPersonalExpenses(myReceipts, myUid);
-    const otherItemsFromOther: number = Calculator.calcPersonalExpenses(otherReceipts, otherUid);
-    const sharedFromMe: number = Calculator.calcSharedExpenses(myReceipts, myUid, otherUid);
-    const myExpensesFromMe: number = Math.floor((myItemsFromMe + sharedFromMe) * 100) / 100;
+    const myPersonalExpensesFromMe: number = Calculator.calcPersonalExpensesFromMyReceipts(myReceipts, myUid);
+    const otherPersonalExpensesFromMe: number = Calculator.calcPersonalExpensesFromMyReceipts(myReceipts, otherUid);
 
-    const myItemsFromOther: number = Calculator.calcRejectedExpenses(otherReceipts, otherUid, myUid);
-    const otherItemsFromMe: number = Calculator.calcRejectedExpenses(myReceipts, myUid, otherUid);
-    const sharedFromOther: number = Calculator.calcSharedExpenses(otherReceipts, myUid, otherUid);
-    const myExpensesFromOther: number = Math.floor((myItemsFromOther + sharedFromOther) * 100) / 100;
+    const myPersonalExpensesFromOther: number = Calculator.calcPersonalExpensesFromOtherReceipts(otherReceipts, myUid);
+    const otherPersonalExpensesFromOther: number = Calculator.calcPersonalExpensesFromOtherReceipts(otherReceipts, otherUid);
 
-    const myTotalExpenses: number = Math.floor((myExpensesFromOther + myExpensesFromMe) * 100) / 100;
+    const mySharedExpensesFromMe: number = Calculator.calcSharedExpensesFromMyReceipts(myReceipts, myUid);
+    const otherSharedExpensesFromMe: number = mySharedExpensesFromMe;
 
+    const mySharedExpensesFromOther: number = Calculator.calcSharedExpensesFromOtherReceipts(otherReceipts, myUid);
+    const otherSharedExpensesFromOther: number = mySharedExpensesFromOther;
 
-    const rejectedFromMe: number = Calculator.calcRejectedExpenses(myReceipts, otherUid, myUid);
-    const result: number = Math.floor((myTotalExpenses - myReceiptsExpenses) * 100) / 100;
+    const myExpensesFromMe = myPersonalExpensesFromMe + mySharedExpensesFromMe;
+    const otherExpensesFromMe = otherPersonalExpensesFromMe + otherSharedExpensesFromMe;
+
+    const myExpensesFromOther = myPersonalExpensesFromOther + mySharedExpensesFromOther;
+    const otherExpensesFromOther = otherPersonalExpensesFromOther + otherSharedExpensesFromOther;
+
+    const myTotalExpenses = myExpensesFromMe + myExpensesFromOther;
+    const otherTotalExpenses = otherExpensesFromMe + otherExpensesFromOther;
+
+    const myOverhang = Math.floor((myPaidExpenses - myTotalExpenses) * 100) / 100;
+    const otherOverhang = Math.floor((otherPaidExpenses - otherTotalExpenses) * 100) / 100;
+
+    const result: number = Math.floor((myTotalExpenses - myPaidExpenses) * 100) / 100;
+
+    const isPayerMe = () => {
+        return myOverhang < 0;
+    }
 
     return (
         <Card className={[styles.receiptsOverviewCard].join(' ')}>
@@ -54,11 +69,11 @@ export default function ResultCard(props: {
                         <hr />
                         <div className={[styles.personTableSum].join(' ')}>
                             <div>Personal items: </div>
-                            <div>{myItemsFromMe.toFixed(2)} €</div>
+                            <div>{myPersonalExpensesFromMe.toFixed(2)} €</div>
                         </div>
                         <div className={[styles.personTableSum].join(' ')}>
                             <div>Shared items: </div>
-                            <div>{sharedFromMe.toFixed(2)} €</div>
+                            <div>{mySharedExpensesFromMe.toFixed(2)} €</div>
                         </div>
                         <hr />
                         <hr />
@@ -72,11 +87,11 @@ export default function ResultCard(props: {
                         <hr />
                         <div className={[styles.personTableSum].join(' ')}>
                             <div>Personal items: </div>
-                            <div>{myItemsFromOther.toFixed(2)} €</div>
+                            <div>{myPersonalExpensesFromOther.toFixed(2)} €</div>
                         </div>
                         <div className={[styles.personTableSum].join(' ')}>
                             <div>Shared items: </div>
-                            <div>{sharedFromOther.toFixed(2)} €</div>
+                            <div>{mySharedExpensesFromOther.toFixed(2)} €</div>
                         </div>
                         <hr />
                         <hr />
@@ -90,23 +105,23 @@ export default function ResultCard(props: {
                 <hr />
                 <div className={[styles.personTableSum].join(' ')}>
                     <div>{myName}&#39;s total expenses: </div>
-                    <div>{myTotalExpenses} €</div>
+                    <div>{myTotalExpenses.toFixed(2)} €</div>
                 </div>
                 <div className={[styles.personTableSum].join(' ')}>
                     <div>{myName} paid: </div>
-                    <div>{-myReceiptsExpenses.toFixed(2)} €</div>
+                    <div>{-myPaidExpenses.toFixed(2)} €</div>
                 </div>
                 <hr />
                 <div className={[styles.personTableSum].join(' ')}>
                     <div>Total result: </div>
-                    <div>{result.toFixed(2)} €</div>
+                    <div>{myOverhang.toFixed(2)} €</div>
                 </div>
                 <hr />
                 <hr />
                 <div className={[styles.personTableSum].join(' ')}>
-                    {result <= 0
-                        ? <div>{myName} has paid too much: </div>
-                        : <div>{myName} needs to pay: </div>
+                    {isPayerMe()
+                        ? <div>{myName} needs to pay: </div>
+                        : <div>{myName} has paid too much: </div>
                     }
                     <div>{Math.abs(result).toFixed(2)} €</div>
                 </div>

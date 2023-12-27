@@ -16,10 +16,14 @@ export interface IAccountingDataBaseContext {
     secondUid: string,
     firstReceipts: IReceipt[],
     secondReceipts: IReceipt[],
+    firstDataState: dbService.DataState;
+    secondDataState: dbService.DataState;
+    saveDataState: (state: dbService.DataState, isFirst: boolean) => void
     saveName: (name: string, isFirst: boolean) => void
     saveUid: (uid: string, isFirst: boolean) => void
     saveReceipts: (receipts: IReceipt[], isFirst: boolean) => void,
-    getReceipts: (user: User | null, token: string, year: string, month: string, date: string, shouldPreloadItems: boolean) => Promise<IReceipt[]>
+    getReceipts: (user: User | null, token: string, year: string, month: string, date: string, shouldPreloadItems: boolean) => Promise<IReceipt[]>,
+    getReceiptsByUid: (user: User | null, token: string, year: string, month: string, date: string, uid: string, shouldPreloadItems: boolean) => Promise<IReceipt[]>,
     generateNewId: () => string,
     addReceipt: (user: User | null, token: string, year: string, month: string, date: string, receipt: IReceipt) => Promise<boolean>,
     updateReceipt: (user: User | null, token: string, year: string, month: string, date: string, receipt: IReceipt) => Promise<boolean>,
@@ -38,10 +42,14 @@ const defaultValue: IAccountingDataBaseContext = {
     secondUid: '',
     firstReceipts: [],
     secondReceipts: [],
+    firstDataState: dbService.DataState.NEEDS_FIRST_LOAD,
+    secondDataState: dbService.DataState.NEEDS_FIRST_LOAD,
+    saveDataState: (state: dbService.DataState, isFirst: boolean) => { return; },
     saveName: (name: string, isFirst: boolean) => { return; },
     saveUid: (uid: string, isFirst: boolean) => { return; },
     saveReceipts: (receipts: IReceipt[], isFirst: boolean) => { return new Promise<void>(() => { }); },
     getReceipts: (user: User | null, token: string, year: string, month: string, date: string, shouldPreloadItems: boolean) => { return new Promise<IReceipt[]>(() => { }); },
+    getReceiptsByUid: (user: User | null, token: string, year: string, month: string, date: string, uid: string, shouldPreloadItems: boolean) => { return new Promise<IReceipt[]>(() => { }); },
     generateNewId: () => { return ''; },
     addReceipt: (user: User | null, token: string, year: string, month: string, date: string, receipt: IReceipt) => { return new Promise<boolean>(() => { }); },
     updateReceipt: (user: User | null, token: string, year: string, month: string, date: string, receipt: IReceipt) => { return new Promise<boolean>(() => { }); },
@@ -58,10 +66,12 @@ const AccountingDataBaseContext: React.Context<IAccountingDataBaseContext> = cre
 const AccountingDataBaseProvider: React.FC<{ children: React.ReactNode }> = (props) => {
     const [firstName, setFirstName] = useState<string>('');
     const [firstUid, setFirstUid] = useState<string>('');
+    const [firstDataState, setFirstDataState] = useState<dbService.DataState>(dbService.DataState.NEEDS_FIRST_LOAD);
     const [firstReceipts, setFirstReceipts] = useState<IReceipt[]>([]);
 
     const [secondName, setSecondName] = useState<string>('');
     const [secondUid, setSecondUid] = useState<string>('');
+    const [secondDataState, setSecondDataState] = useState<dbService.DataState>(dbService.DataState.NEEDS_FIRST_LOAD);
     const [secondReceipts, setSecondReceipts] = useState<IReceipt[]>([]);
 
     function saveName(name: string, isFirst: boolean) {
@@ -69,6 +79,14 @@ const AccountingDataBaseProvider: React.FC<{ children: React.ReactNode }> = (pro
             setFirstName(name);
         } else {
             setSecondName(name);
+        }
+    }
+
+    function saveDataState(state: dbService.DataState, isFirst: boolean) {
+        if (isFirst) {
+            setFirstDataState(state);
+        } else {
+            setSecondDataState(state);
         }
     }
 
@@ -94,6 +112,10 @@ const AccountingDataBaseProvider: React.FC<{ children: React.ReactNode }> = (pro
 
     async function getReceipts(user: User | null, token: string, year: string, month: string, date: string, shouldPreloadItems: boolean): Promise<IReceipt[]> {
         return await receiptDBService.getReceipts(user, token, year, month, date, shouldPreloadItems);
+    }
+
+    async function getReceiptsByUid(user: User | null, token: string, year: string, month: string, date: string, uid: string, shouldPreloadItems: boolean): Promise<IReceipt[]> {
+        return await receiptDBService.getReceiptsByUid(user, token, year, month, date, uid, shouldPreloadItems);
     }
 
     async function addReceipt(user: User | null, token: string, year: string, month: string, date: string, receipt: IReceipt): Promise<boolean> {
@@ -135,11 +157,15 @@ const AccountingDataBaseProvider: React.FC<{ children: React.ReactNode }> = (pro
         secondUid,
         firstReceipts,
         secondReceipts,
+        firstDataState,
+        secondDataState,
+        saveDataState,
         saveName,
         saveUid,
         saveReceipts,
         generateNewId,
         getReceipts,
+        getReceiptsByUid,
         addReceipt,
         deleteReceipt,
         updateReceipt,
