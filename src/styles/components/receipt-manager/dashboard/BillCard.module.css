@@ -1,0 +1,63 @@
+.billCard {
+    width: 180px;
+    height: 190px;
+    box-shadow: var(--shadowElevation_2);
+    padding: 0;
+}
+
+.isEditable {
+    cursor: pointer;
+}
+
+.isEditable:hover,
+.isEditable:focus-within {
+    border-color: var(--color-accent-00);
+}
+
+.billCardWrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.billCardHeader {
+    width: 100%;
+    height: 42px;
+    border-bottom: 1px solid var(--bg-color-40);
+    padding: 4px 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 0;
+}
+
+.billCardContent {
+    width: 100%;
+    flex-grow: 1;
+    padding: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.isEditable .billCardContent {
+    justify-content: flex-start;
+}
+
+.addBillButton {
+    margin-top: -32px;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.billInfos li {
+    font-size: small;
+    list-style: none;
+}

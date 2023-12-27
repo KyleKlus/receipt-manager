@@ -1,15 +1,32 @@
 /** @format */
 // Info: uncomment if you want to use firebase
-// 'use client';
-// import AuthProvider from 'templates/context/AuthContext';
-// import DataBaseProvider from 'templates/context/DatabaseContext';
+'use client';
+import AuthProvider from '@/context/AuthContext';
+import UserDataBaseProvider from '@/context/UserDatabaseContext';
+import BillDataBaseProvider from '@/context/BillDatabaseContext';
+import AccountingDataBaseProvider from '@/context/AccountingDatabaseContext';
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
 import { Fira_Code } from "next/font/google";
+import type { ReactElement, ReactNode } from 'react'
+import type { NextPage } from 'next'
+import YearDataBaseProvider from '@/context/YearDatabaseContext';
+import MonthDataBaseProvider from '@/context/MonthDatabaseContext';
 
 const firaCode = Fira_Code({ weight: '400', subsets: ['latin'] });
 
-export default function App({ Component, pageProps }: AppProps) {
+export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+  getLayout?: (page: ReactElement) => ReactNode
+}
+
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout
+}
+
+export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+  // Use the layout defined at the page level, if available
+  const getLayout = Component.getLayout ?? ((page) => page)
+
   return (
     <>
       <style
@@ -20,11 +37,42 @@ export default function App({ Component, pageProps }: AppProps) {
           font-family: ${firaCode.style.fontFamily};
         }
       `}</style>
-      {/* <AuthProvider>
-        <DataBaseProvider> */}
-          <Component {...pageProps} />
-        {/* </DataBaseProvider>
-      </AuthProvider> */}
+      <AuthProvider>
+        <UserDataBaseProvider>
+          <YearDataBaseProvider>
+            <MonthDataBaseProvider>
+              <BillDataBaseProvider>
+                <AccountingDataBaseProvider>
+                  {/* <Component {...pageProps} /> */}
+                  {getLayout(<Component {...pageProps} />)}
+                </AccountingDataBaseProvider>
+              </BillDataBaseProvider>
+            </MonthDataBaseProvider>
+          </YearDataBaseProvider>
+        </UserDataBaseProvider>
+      </AuthProvider>
     </>
+
   );
 }
+
+
+// export default function App({ Component, pageProps }: AppProps) {
+//   return (
+//     <>
+//       <style
+//         jsx
+//         global
+//       >{`
+//         html {
+//           font-family: ${firaCode.style.fontFamily};
+//         }
+//       `}</style>
+//       <AuthProvider>
+//         <DataBaseProvider>
+//           <Component {...pageProps} />
+//         </DataBaseProvider>
+//       </AuthProvider>
+//     </>
+//   );
+// }

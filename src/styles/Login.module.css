@@ -1,5 +1,5 @@
 .loginPageCard {
-    margin-top: calc(50vh - 350px);
+    margin-top: calc(50vh - 325px);
     width: 500px;
     padding: 42px 64px ;
     align-items: center;
@@ -19,6 +19,12 @@
     color: #ff4b4b;
     margin-top: 2px;
     font-size: xx-small;
+}
+
+.smallInfoLabel,
+.smallInfoLabel > *{
+    margin-top: 2px;
+    font-size: x-small;
 }
 
 .loginButton{

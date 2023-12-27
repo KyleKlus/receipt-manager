@@ -14,30 +14,18 @@ import styles from '@/styles/LockedPage.module.css'
 import ScrollNavLink from '@/components/links/ScrollNavLink';
 import dynamic from 'next/dynamic';
 
-import NavLink from '@/components/links/NavLink';
 import Card from '@/components/Card';
-import { IAuthContext, useAuth } from 'templates/context/AuthContext';
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { IDataBaseContext, useDB } from 'templates/context/DatabaseContext';
+import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
+import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
+import withAuth from '@/components/withAuth';
 
 const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
   ssr: false,
 });
 
-export default function Home() {
+function Home() {
   const authContext: IAuthContext = useAuth();
-  const dbContext: IDataBaseContext = useDB();
-  const router = useRouter();
-
-  console.log(authContext);
-  console.log(dbContext);
-
-
-
-  useEffect(() => {
-    if (authContext.user === null) router.push(process.env.basePath + "/auth/login");
-  }, [authContext.user, router]);
+  const dbContext: IUserDataBaseContext = useUserDB();
 
   const handleLogout = () => {
     authContext.logOut();
@@ -101,25 +89,29 @@ export default function Home() {
       <Main>
         <div id={'top'}></div>
         <Content className={['applyHeaderOffset'].join(' ')}>
-          <button onClick={() => {
-            if (authContext.user === null) { return; }
-            dbContext.addUserDocument(authContext.user, authContext.user?.displayName + '_secrets', { secret: '42', uid: authContext.user?.uid });
-          }}>Add a document</button>
-          <button onClick={() => {
-            if (authContext.user === null) { return; }
-            dbContext.updateUserDocument(authContext.user, authContext.user?.displayName + '_secrets', { secret: '84', uid: authContext.user?.uid });
-          }}>Update a document</button>
-          <button onClick={() => {
-            if (authContext.user === null) { return; }
-            dbContext.deleteUserDocument(authContext.user, authContext.user?.displayName + '_secrets');
-          }}>Delete a document</button>
-          <button onClick={() => {
-            if (authContext.user === null) { return; }
-            dbContext.readUserDocument(authContext.user, authContext.user?.displayName + '_secrets');
-          }}>Read a document</button>
+          <Card>
+            <button onClick={() => {
+              if (authContext.user === null) { return; }
+              dbContext.addUserDocument(authContext.user, authContext.user?.displayName + '_secrets', { secret: '42', uid: authContext.user?.uid });
+            }}>Add a document</button>
+            <button onClick={() => {
+              if (authContext.user === null) { return; }
+              dbContext.updateUserDocument(authContext.user, authContext.user?.displayName + '_secrets', { secret: '84', uid: authContext.user?.uid });
+            }}>Update a document</button>
+            <button onClick={() => {
+              if (authContext.user === null) { return; }
+              dbContext.deleteUserDocument(authContext.user, authContext.user?.displayName + '_secrets');
+            }}>Delete a document</button>
+            <button onClick={() => {
+              if (authContext.user === null) { return; }
+              dbContext.readUserDocument(authContext.user, authContext.user?.displayName + '_secrets');
+            }}>Read a document</button>
+          </Card>
         </Content>
         <Footer />
       </Main>
     </>
   );
 }
+
+export default withAuth(Home);

@@ -1,4 +1,5 @@
 /** @format */
+
 import Head from 'next/head';
 import Footer from '@/components/footer/Footer';
 import Header from '@/components/header/Header';
@@ -14,75 +15,55 @@ import dynamic from 'next/dynamic';
 import Image from 'next/image';
 
 import Card from '@/components/Card';
-import { getRedirectResult, GoogleAuthProvider, UserCredential } from 'firebase/auth';
+import { UserCredential } from 'firebase/auth';
 import { useRouter } from 'next/router';
-import { IAuthContext, useAuth } from 'templates/context/AuthContext';
-import { initFirebase } from 'templates/services/firebase';
-import firebase_auth from 'templates/services/firebaseAuth';
+import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
 
 import googleLogo from '../../../public/google.png';
 import { useState } from 'react';
+import Link from 'next/link';
 
 const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
   ssr: false,
 });
 
-initFirebase();
 
 export default function Home() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const { user, loading } = useAuth();
 
   const authContext: IAuthContext = useAuth();
   const router = useRouter();
 
-  getRedirectResult(firebase_auth).then((result) => {
-    // This gives you a Google Access Token. You can use it to access Google APIs.
-    if (result === null) { return; }
-    const credential = GoogleAuthProvider.credentialFromResult(result);
-    const token = credential?.accessToken;
-
-    // The signed-in user info.
-    const user = result?.user;
-    // IdP data available using getAdditionalUserInfo(result)
-    // ...
-    router.push(process.env.basePath + "/auth/locked-page");
-  }).catch((error) => {
-    // Handle Errors here.
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    // The email of the user's account used.
-    const email = error.customData.email;
-    // The AuthCredential type that was used.
-    const credential = GoogleAuthProvider.credentialFromError(error);
-    // ...
-  });
-
   const handleGoogleSignIn = async () => {
-    setIsLoading(true);
     try {
-      router.push(process.env.basePath + "/auth/loading-page");
-      sessionStorage.setItem('startSignIn', 'true');
+      setErrorMsg('');
+      authContext.googleSignIn();
     }
     catch (error) {
-      console.error(error);
-      setIsLoading(false);
+      setErrorMsg('Something went wrong');
     }
   };
 
   const handleSignIn = async () => {
-    setIsLoading(true);
     try {
       const userCredentials: UserCredential = await authContext.emailLogin(email, password);
       if (userCredentials.user !== null) {
         setErrorMsg('');
-        router.push(process.env.basePath + "/auth/locked-page");
+        router.push(redirectPaths[RedirectPathOptions.LockedPage]);
       }
     }
-    catch (error) { setErrorMsg('Wrong credentials'); setIsLoading(false); }
+    catch (error) {
+      setErrorMsg('Wrong credentials');
+    }
   };
+
+  if (user) {
+    router.push(redirectPaths[RedirectPathOptions.LockedPage]);
+  }
+
   return (
     <>
       <Head>
@@ -139,48 +120,52 @@ export default function Home() {
       </Header >
       <Main>
         <div id={'top'}></div>
-        <Content className={['applyHeaderOffset'].join(' ')}>
-          <Card className={[styles.loginPageCard].join(' ')}>
-            <h1>Login</h1>
-            <br />
-            <br />
-            <label className={[styles.textboxLabel].join(' ')}>E-Mail</label>
-            <input disabled={isLoading} className={[styles.textbox].join(' ')} type="text" placeholder='example@mail.com' value={email} onKeyDown={(e) => {
-              if (e.key === 'Enter') { handleSignIn() }
-            }} onChange={(e) => {
-              setEmail(e.currentTarget.value);
-            }} />
-            <br />
-            <label className={[styles.textboxLabel].join(' ')}>Password</label>
-            <input disabled={isLoading} className={[styles.textbox].join(' ')} type="password" placeholder='Password' value={password} onKeyDown={(e) => {
-              if (e.key === 'Enter') { handleSignIn() }
-            }} onChange={(e) => {
-              setPassword(e.currentTarget.value);
-            }} />
-            <label className={[styles.textboxLabel, styles.errorLabel].join(' ')}>{errorMsg}</label>
-            <br />
-            <br />
-            <button disabled={isLoading} className={[styles.loginButton].join(' ')} onClick={handleSignIn}>
-              <h2>Login</h2>
-            </button>
-            <br />
-            <br />
-            <br />
-            <h3>Or</h3>
-            <br />
-            <br />
-            <button disabled={isLoading} className={[styles.googleButton].join(' ')} onClick={handleGoogleSignIn}>
-              <Image
-                src={googleLogo}
-                alt={'Google Logo'}
-                quality={100}
-                width={32}
-                height={32}
-              />
-              <h2>Sign in</h2>
-            </button>
-          </Card>
+        <Content className={['applyHeaderOffset', 'dotted'].join(' ')}>
+          {!loading && !user &&
+            <Card className={[styles.loginPageCard].join(' ')}>
+              <h1>Login</h1>
+              <br />
+              <br />
+              <label className={[styles.textboxLabel].join(' ')}>E-Mail</label>
+              <input className={[styles.textbox].join(' ')} type="text" placeholder='example@mail.com' value={email} onKeyDown={(e) => {
+                if (e.key === 'Enter') { handleSignIn() }
+              }} onChange={(e) => {
+                setEmail(e.currentTarget.value);
+              }} />
+              <br />
+              <label className={[styles.textboxLabel].join(' ')}>Password</label>
+              <input className={[styles.textbox].join(' ')} type="password" placeholder='Password' value={password} onKeyDown={(e) => {
+                if (e.key === 'Enter') { handleSignIn() }
+              }} onChange={(e) => {
+                setPassword(e.currentTarget.value);
+              }} />
+              <label className={[styles.textboxLabel, styles.errorLabel].join(' ')}>{errorMsg}</label>
+              <br />
+              <br />
+              <button className={[styles.loginButton].join(' ')} onClick={handleSignIn}>
+                <h2>Login</h2>
+              </button>
+              <label className={[styles.textboxLabel, styles.smallInfoLabel].join(' ')}>Don&apos;t have an account yet? {<Link href={'/auth/register'}>Register</Link>}</label>
+              <br />
+              <br />
+              <br />
+              <h3>Or</h3>
+              <br />
+              <br />
+              <button className={[styles.googleButton].join(' ')} onClick={handleGoogleSignIn}>
+                <Image
+                  src={googleLogo}
+                  alt={'Google Logo'}
+                  quality={100}
+                  width={32}
+                  height={32}
+                />
+                <h2>Sign in</h2>
+              </button>
+            </Card>
+          }
         </Content>
+        {/* } */}
         <Footer />
       </Main>
     </>

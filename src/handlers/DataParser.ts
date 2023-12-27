@@ -1,6 +1,7 @@
-import { IReceipt } from "@/interfaces/IReceipt";
-import { IReceiptItem } from "@/interfaces/IReceiptItem";
-import { IResult } from "@/interfaces/IResult";
+import { IReceipt } from "@/interfaces/data/IReceipt";
+import { IReceiptItem } from "@/interfaces/data/IReceiptItem";
+import { IResult } from "@/interfaces/data/IResult";
+import moment, { Moment } from "moment";
 import * as XLSX from 'xlsx';
 
 export enum Category {
@@ -18,25 +19,62 @@ export enum Category {
     Stationery,
     Travel,
     Misc,
+    Rent,
+    Formalities,
+    Leisure,
+    Discount,
     None
 }
 
+
 export const DEFAULT_CATEGORY: Category = Category.Food;
 
-export function downloadCSV(name: string, myReceipts: IReceipt[], otherReceipts: IReceipt[]) {
-    const data: string[] = [_prepCSVDataReceipts(myReceipts, otherReceipts)];
-    if (name === undefined || data === undefined || name === '' || data.length === 0 || data[0] === '') { return; }
-    const link = document.createElement('a');
-    const fileBlob = new Blob(data, { type: 'text/csv' });
-    link.href = URL.createObjectURL(fileBlob);
-    link.download = name + '.csv';
-    document.body.appendChild(link);
-    link.click();
+export function getNameOfCategory(category: Category): string {
+    const categoryName=  (Object.keys(Category) as Array<keyof typeof Category>)
+        .slice((Object.keys(Category).length / 2))[category];
+    return categoryName;
 }
 
-export function downloadEXCEL(name: string, myName: string, otherName: string, myReceipts: IReceipt[], otherReceipts: IReceipt[], result: IResult) {
-    const myData: string = _prepCSVDataReceipts(myReceipts, otherReceipts);
-    const otherData: string = _prepCSVDataReceipts(otherReceipts, myReceipts);
+export function getCategoryByName(name: string): Category {
+    const category = (Object.keys(Category) as Array<keyof typeof Category>)
+        .slice((Object.keys(Category).length / 2))
+        .map((key) => { return key.toString() })
+        .indexOf(name);
+
+    return category;
+}
+
+export function getDateNameByMoment(date: Moment): string {
+    return date.format('DD-MM-YYYY_HH-mm-ss');
+}
+
+export function getDateNameByDateString(dateString: string): string {
+    return getDateNameByMoment(moment(dateString));
+}
+
+// export function downloadCSV(name: string, myReceipts: IReceipt[], otherReceipts: IReceipt[]) {
+//     const data: string[] = [_prepCSVDataReceipts(myReceipts, otherReceipts, )];
+//     if (name === undefined || data === undefined || name === '' || data.length === 0 || data[0] === '') { return; }
+//     const link = document.createElement('a');
+//     const fileBlob = new Blob(data, { type: 'text/csv' });
+//     link.href = URL.createObjectURL(fileBlob);
+//     link.download = name + '.csv';
+//     document.body.appendChild(link);
+//     link.click();
+// }
+
+export function downloadEXCEL(
+    name: string,
+    myName: string,
+    otherName: string,
+    myUid: string,
+    otherUid: string,
+    myReceipts: IReceipt[],
+    otherReceipts: IReceipt[],
+    result: IResult
+) {
+    const myData: string = _prepCSVDataReceipts(myReceipts, otherReceipts, myUid, otherUid);
+    const otherData: string = _prepCSVDataReceipts(otherReceipts, myReceipts, otherUid, myUid);
     const resultData: string = _prepCSVDataTotal(result);
 
     if (name === undefined || myData === undefined || name === '' || myData.length === 0 || myData[0] === '') { return; }
@@ -64,7 +102,7 @@ export function downloadEXCEL(name: string, myName: string, otherName: string, m
     XLSX.writeFileXLSX(wb, name + '.xlsx', { type: 'file' });
 }
 
-export function parseFileToReceipts(file: File, ownerName: string): Promise<IReceipt[]> {
+export function parseFileToReceipts(file: File, payedByUid: string, sharedByUid: string): Promise<IReceipt[]> {
     let receipts: IReceipt[] = []
 
     let reader = new FileReader();
@@ -79,17 +117,21 @@ export function parseFileToReceipts(file: File, ownerName: string): Promise<IRec
             const result = reader.result;
 
             if (result !== null && result !== undefined) {
-                const receiptsHeader: string[] = result.toString().split('\n')[0].split(',');
-                const receiptHeaderCount: number = receiptsHeader.length;
-                const itemHeader: string[] = receiptsHeader.reverse()[0].split('|');
-                const itemHeaderCount: number = itemHeader.length;
+                const receiptsColumns: string[] = result.toString().split('\n')[0].split(',');
+                const receiptColumnsCount: number = receiptsColumns.length;
+                const itemColumns: string[] = receiptsColumns.reverse()[0].split('|');
+                const itemColumnsCount: number = itemColumns.length;
                 const receiptsAsText: string[] = result.toString().split('\n').slice(1).filter((item) => { return item.length > 1 });
 
                 for (let i: number = 0; i < receiptsAsText.length; i++) {
                     const receipt: string[] = receiptsAsText[i].split(',');
-                    const receiptItems: string[][] = _listToMatrix(receipt.slice(receiptHeaderCount).join('').replaceAll('"', '').split('|'), itemHeaderCount).filter((item) => { return item.length > 1 });
+                    const receiptItems: string[][] = _listToMatrix(receipt.slice(receiptColumnsCount).join('').replaceAll('"', '').split('|'), itemColumnsCount).filter((item) => { return item.length > 1 });
 
                     let totalPrice = 0;
+                    let mostExpensiveItem: IReceiptItem | undefined = undefined;
+                    const categoryMetaData = Object.values(Category).slice((Object.keys(Category).length / 2)).map((category) => {
+                        return { category: category as Category, itemAmount: 0, itemEntriesCount: 0, totalPrice: 0 };
+                    })
 
                     let parsedReceiptItems: IReceiptItem[] = receiptItems.map(list => {
                         let itemName = _firstCharToUppercase(list[0]);
@@ -97,17 +139,29 @@ export function parseFileToReceipts(file: File, ownerName: string): Promise<IRec
                         const itemAmount: number = list[5] === '' ? 1 : Math.floor(parseFloat(list[5]) * 100) / 100;
                         // NOTE: * -100 because all parsed prices have a - sign
                         const price: number = Math.floor(parseFloat(list[2]) * -100) / 100;
-                        totalPrice += price;
 
-                        return {
+                        const parsedItem: IReceiptItem = {
+                            itemId: _generateNewId(),
+                            ownerUids: [payedByUid, sharedByUid],
                             name: itemName,
-                            price: price,
-                            amount: itemAmount,
-                            isMine: false,
-                            isShared: true,
-                            isRejected: false,
-                            category: DEFAULT_CATEGORY
+                            price: itemName === 'Unrecognized Item' ? 0 : Math.round(price * 100) / 100,
+                            amount: itemName === 'Unrecognized Item' ? 0 : itemAmount,
+                            category: itemName === 'Unrecognized Item' ? Category.None : price < 0 ? Category.Discount : DEFAULT_CATEGORY
+                        };
+
+                        if (
+                            mostExpensiveItem === undefined ||
+                            (mostExpensiveItem !== undefined && mostExpensiveItem.price < parsedItem.price)
+                        ) {
+                            mostExpensiveItem = parsedItem;
                         }
+
+                        totalPrice += parsedItem.price;
+                        categoryMetaData.filter(category=>category.category === parsedItem.category)[0].itemAmount += parsedItem.amount;
+                        categoryMetaData.filter(category=>category.category === parsedItem.category)[0].itemEntriesCount += 1;
+                        categoryMetaData.filter(category=>category.category === parsedItem.category)[0].totalPrice += parsedItem.price;
+
+                        return parsedItem;
                     })
 
                     // Add store name to receipt
@@ -115,14 +169,15 @@ export function parseFileToReceipts(file: File, ownerName: string): Promise<IRec
                     storeName = storeName !== '' ? storeName : 'Unrecognized Store';
 
                     const parsedReceipt: IReceipt = {
+                        receiptId: _generateNewId(),
+                        payedByUid: payedByUid,
                         store: storeName,
-                        owner: ownerName,
-                        totalPrice: Math.floor(totalPrice * 100) / 100,
-                        items: parsedReceiptItems,
-                        categoryForAllItems: Category.None,
-                        isAllShared: false,
-                        isAllRejected: false,
-                        isAllMine: false,
+                        totalPrice: storeName === 'Unrecognized Store' ? 0 : Math.round(totalPrice * 100) / 100,
+                        items: storeName === 'Unrecognized Store' ? [] : parsedReceiptItems,
+                        amount: storeName === 'Unrecognized Store' ? 0 : parsedReceiptItems.length,
+                        mostCommonCategory: storeName === 'Unrecognized Store' ? Category.None : DEFAULT_CATEGORY,
+                        mostExpensiveItem: storeName === 'Unrecognized Store' ? undefined : mostExpensiveItem,
+                        categoryMetaData: storeName === 'Unrecognized Store' ? [] : categoryMetaData
                     }
 
                     receipts = receipts.concat(parsedReceipt)
@@ -162,46 +217,47 @@ function _firstCharToUppercase(text: string): string {
     return '';
 }
 
-function _prepCSVDataReceipts(myReceipts: IReceipt[], otherReceipts: IReceipt[]): string {
+function _generateNewId(): string {
+    return crypto.randomUUID().split('-').slice(0, -1).join('-');
+}
+
+function _prepCSVDataReceipts(myReceipts: IReceipt[], otherReceipts: IReceipt[], myUid: string, otherUid: string): string {
     let dataString: string = '';
 
     if (myReceipts === undefined || otherReceipts === undefined) { return dataString; }
     if (myReceipts.length === 0 && otherReceipts.length === 0) { return dataString; }
 
-    let filteredList: IReceiptItem[] = []
-    let otherFilteredList: IReceiptItem[] = [];
+    let myFilteredList: IReceiptItem[] = []
 
-    myReceipts.slice(0).forEach((itemArray) => {
-        for (let index = 0; index < itemArray.items.length; index++) {
-            const item = itemArray.items[index];
-            if (item.isRejected) { continue; }
-            if (item.isShared) {
-                item.price = item.price / 2;
+    const addMyItemsFromReceiptsToList = (receipts: IReceipt[]) => {
+        receipts.slice(0).forEach((receipt) => {
+            for (let index = 0; index < receipt.items.length; index++) {
+                const item = receipt.items[index];
+
+                if (isOthers(item, otherUid)) {
+                    continue;
+                }
+
+                if (isShared(item)) {
+                    item.price = item.price / 2;
+                }
+                myFilteredList.push(item);
             }
-            filteredList.push(item);
-        }
-    });
+        });
+    }
 
-    otherReceipts.slice(0).forEach((itemArray) => {
-        for (let index = 0; index < itemArray.items.length; index++) {
-            const item = itemArray.items[index];
-            if (item.isMine) { continue; }
-            if (item.isShared) {
-                item.price = item.price / 2;
-            }
-            otherFilteredList.push(item);
-        }
-    });
+    addMyItemsFromReceiptsToList(myReceipts);
+    addMyItemsFromReceiptsToList(otherReceipts);
 
-    const data = filteredList.concat(otherFilteredList).slice(0).map((e) => {
+    const data = myFilteredList.slice(0).map((e) => {
         return {
             name: e.name,
-            price: e.price.toString().replace('.', ','),
+            price: e.price.toFixed(2).replace('.', ','),
             amount: e.amount.toString().replace('.', ','),
             category: Category[e.category],
-            mine: e.isMine,
-            shared: e.isShared,
-            rejected: e.isRejected,
+            mine: isMine(e, myUid),
+            shared: isShared(e),
+            rejected: isOthers(e, otherUid),
         }
     }).slice(0);
 
@@ -251,4 +307,16 @@ function _prepCSVDataTotal(resultData: IResult): string {
     const csvData: string = csvDataArray.join('\n');
 
     return csvData;
+}
+
+export function isMine(item: IReceiptItem, myUid: string): boolean {
+    return item.ownerUids.length === 1 && item.ownerUids.indexOf(myUid) !== -1;
+}
+
+export function isShared(item: IReceiptItem): boolean {
+    return item.ownerUids.length === 0 || item.ownerUids.length === 2;
+}
+
+export function isOthers(item: IReceiptItem, otherUid: string): boolean {
+    return isMine(item, otherUid);
 }

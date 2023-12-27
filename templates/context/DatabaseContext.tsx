@@ -1,6 +1,6 @@
 import { createContext, useContext, useRef } from 'react';
 import React from 'react';
-import firebase_db from 'templates/services/firebase_store';
+import firebase_db from '@/services/fireStores/firebaseStore';
 import { collection, setDoc, doc, addDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { User } from 'firebase/auth';
 

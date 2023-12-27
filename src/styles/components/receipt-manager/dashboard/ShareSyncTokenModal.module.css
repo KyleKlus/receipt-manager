@@ -1,0 +1,31 @@
+.addConnectionModal {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.addConnectionModalRoot {
+    --height: 400px;
+    --width: 600px;
+}
+
+.addConnectionModal > p {
+    text-align: center;
+    font-size: large;
+    margin-top: 16px;
+}
+
+
+.tokenContainerWrapper {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.tokenContainer {
+    width: 42ch;
+    text-align: center;
+    resize: none;
+}

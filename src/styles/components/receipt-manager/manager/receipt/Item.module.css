@@ -1,0 +1,158 @@
+/** @format */
+
+.itemRow,
+.itemEditRow {
+    padding: 4px 0;
+    margin: 0 4px;
+    width: calc(100% - 8px);
+
+    /* width: 100%; */
+    display: flex;
+    border-bottom: 1px solid var(--bg-color-40);
+}
+
+.itemRow > *,
+.itemEditRow > * {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.itemAmount {
+    width: 50px;
+    border-right: 1px solid var(--bg-color-40);
+    text-align: center;
+}
+
+.itemName {
+    flex-grow: 1;
+    border-right: 1px solid var(--bg-color-40);
+    justify-content: flex-start;
+    padding: 0 16px;
+}
+
+.itemPrice {
+    width: 150px;
+    border-right: 1px solid var(--bg-color-40);
+    text-align: center;
+}
+
+.itemEditButtonsWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin: 2px 32px;
+}
+
+.itemEditButton {
+    width: 65px;
+}
+
+.itemPayerButtons {
+    padding: 0 16px;
+    border-right: 1px solid var(--bg-color-40);
+}
+
+.itemPayerButtons > * {
+    margin: 0px 8px;
+    background-color: var(--bg-color-10);
+    border-radius: 10px;
+    outline: 1px solid var(--bg-color-80);
+    box-shadow: var(--shadowElevation_4);
+    cursor: pointer;
+    display: inline-block;
+    height: 15px;
+    position: relative;
+    width: 15px;
+    appearance: none;
+    transition: background-color 200ms ease, outline-color 200ms ease, box-shadow 200ms ease;
+}
+
+.itemPayerButtons > *.isChecked {
+    cursor: default;
+}
+
+
+.itemPayerButtons > *:not(.isChecked):hover {
+    background-color: var(--bg-color-30);
+    outline-color: var(--bg-color-90);
+    box-shadow: var(--shadowElevation_4);
+}
+
+.itemPayerButtons > *:disabled {
+    display: none;
+}
+
+.itemPayerButtons > *:after {
+    background-color: var(--bg-color-10);
+    border-radius: 25px;
+    content: '';
+    display: block;
+    height: 11px;
+    left: 2px;
+    position: relative;
+    top: 2px;
+    width: 11px;
+    transition: background-color 200ms ease;
+}
+
+.itemPayerButtons > *.isShared.isChecked:after {
+    background-color: #7cb271;
+}
+
+.itemPayerButtons > *.isMine.isChecked:after {
+    background-color: var(--color-accent-10);
+}
+
+.itemPayerButtons > *.isOther.isChecked:after {
+    background-color: #dcd66e;
+}
+
+.itemSelect {
+    padding: 0 16px;
+}
+
+.itemSelect input {
+    padding: unset;
+    border-radius: unset;
+    border: unset;
+    background: unset;
+    box-shadow: unset;
+    outline: unset;
+}
+
+.itemSelect > div[class$='control'] {
+    border-radius: 5px;
+    border: 1px solid var(--bg-color-30);
+    background: var(--bg-color-00);
+    box-shadow: var(--shadowElevation_3);
+    outline: none;
+    min-width: 250px;
+}
+
+.itemSelect div[class$='menu'] {
+    background-color: var(--bg-color-00);
+}
+
+.itemSelect div[class$='menu'] div[class$='option'] {
+    background-color: var(--bg-color-00);
+}
+
+.itemSelect div[class$='menu'] div[class$='option'][aria-itemSelected="true"] {
+    background-color: var(--color-accent-00);
+}
+
+.itemSelect div[class$='menu'] div[class$='option']:not([aria-itemSelected="true"]):hover,
+.itemSelect div[class$='menu'] div[class$='option']:not([aria-itemSelected="true"]):focus-within,
+.itemSelect div[class$='menu'] div[class$='option']:not([aria-itemSelected="true"]):focus-visible {
+    background-color: var(--bg-color-20);
+}
+
+.itemSelect div[class$='singleValue'] {
+    color: var(--bg-color-90);
+}
+
+.itemSelect * {
+    caret-color: transparent;
+}

@@ -1,0 +1,98 @@
+/** @format */
+
+
+.resultSection {
+    margin: calc(5vh - 64px) auto 5vh auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    box-shadow: var(--shadowElevation_4);
+
+    width: 90%;
+    height: 90vh;
+    padding: 0px !important;
+}
+
+.resultSectionHeader {
+    width: 100%;
+    background-color: var(--bg-color-20);
+    display: flex;
+    border-top-right-radius: var(--border-radius);
+    border-top-left-radius: var(--border-radius);
+    border-bottom: 1px solid var(--bg-color-40);
+    padding: 16px 32px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.resultSectionHeaderTitleWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.resultSectionHeaderControls {
+    display: flex;
+    gap: 16px;
+}
+
+.resultSectionContent,
+.resultSectionContentSplit {
+    width: 100%;
+    padding: 32px;
+    /* justify-content: center; */
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    overflow: auto;
+    border-bottom-left-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+}
+
+.resultSectionContent >*{
+    overflow: visible;
+}
+
+.resultSectionContentSplit {
+    flex-direction: row;
+    padding: 0;
+    height: fit-content;
+    overflow: visible;
+}
+
+.resultSectionContentSplit > * {
+    flex-grow: 1;
+}
+
+.resultSectionContentCard {
+    width: 100%;
+    padding: 32px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    gap: 32px;
+    border-bottom-left-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+    background-color: var(--bg-color-00);
+    box-shadow: var(--shadowElevation_3);
+}
+
+.resultFunFacts {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.resultStats {
+    display: grid;
+    height: unset;
+    /* min-height: fit-content; */
+
+    grid-template-columns: repeat(auto-fit, 250px);
+    grid-template-rows: repeat(auto-fit, 1fr);
+}

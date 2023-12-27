@@ -7,15 +7,16 @@ const nextConfig = {
   reactStrictMode: true,
   basePath: '/receipt-manager',
   output: 'export',
+  images: { unoptimized: true },
   env: {
     basePath: '/receipt-manager',
-    // NEXT_PUBLIC_FIREBASE_API_KEY: 'AIzaSyAYytnWLc4vB2glt1X8tWz27gpgclDvrls',
-    // NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: 'protected-page-login.firebaseapp.com',
-    // NEXT_PUBLIC_FIREBASE_PROJECT_ID: 'protected-page-login',
-    // NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: 'protected-page-login.appspot.com',
-    // NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: '1006126548565',
-    // NEXT_PUBLIC_FIREBASE_APP_ID: '1:1006126548565:web:3968fb892dec003f15b6dc',
-    // NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: 'G-G3GNEWJKK7',
+    NEXT_PUBLIC_FIREBASE_API_KEY: 'AIzaSyChYZbQkmc4s9csPwyeeadexqhbJeXJKN4',
+    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: 'receipt-manager-25bc4.firebaseapp.com',
+    NEXT_PUBLIC_FIREBASE_PROJECT_ID: 'receipt-manager-25bc4',
+    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: 'receipt-manager-25bc4.appspot.com',
+    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: '531877776041',
+    NEXT_PUBLIC_FIREBASE_APP_ID: '1:531877776041:web:5229281461b26e7cfef7b8',
+    NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: 'G-M4R39LKG7B',
   },
 };
 

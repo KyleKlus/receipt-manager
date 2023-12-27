@@ -72,6 +72,7 @@ export default function Home() {
           elementName="https://kyleklus.github.io/#aboutPage"
           displayText="About"
         />
+        
         <ThemeButton />
       </Header >
       <Main>

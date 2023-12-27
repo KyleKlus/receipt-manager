@@ -212,6 +212,7 @@ button,
 input[type=text],
 textarea,
 input[type=password],
+input[type=number],
 .textboxClass {
   padding: 8px;
   border-radius: 5px;
@@ -224,6 +225,7 @@ input[type=password],
 input[type=text]:focus-within,
 textarea:focus-within,
 input[type=password]:focus-within,
+input[type=number]:focus-within,
 .textboxClass:focus-within {
   border-color: var(--bg-color-60);
   background: var(--bg-color-05);
@@ -423,6 +425,7 @@ ol li {
   input[type=text]:not(:focus-within):hover,
   textarea:not(:focus-within):hover,
   input[type=password]:not(:focus-within):hover,
+  input[type=number]:not(:focus-within):hover,
   .textboxClass:not(:focus-within):hover {
     border-color: var(--bg-color-50);
   }
