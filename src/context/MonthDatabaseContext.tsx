@@ -15,7 +15,7 @@ export interface IMonthDataBaseContext {
     getMonths: (user: User | null, token: string, year: string) => Promise<IMonth[]>,
     getMonth: (user: User | null, token: string, year: string, month: string) => Promise<IMonth | undefined>,
     addMonth: (user: User | null, token: string, year: string) => Promise<IMonth | undefined>,
-    updateMonth: (user: User | null, token: string, year: string, month: IMonth) => Promise<boolean>,
+    updateMonth: (user: User | null, token: string, year: string, month: IMonth) => Promise<IMonth|undefined>,
     updateMonthStats: (user: User | null, token: string, year: string, month: IMonth, isFullUpdate: boolean) => Promise<IMonth | undefined>
 }
 
@@ -27,7 +27,7 @@ const defaultValue: IMonthDataBaseContext = {
     getMonths: (user: User | null, token: string, year: string) => { return new Promise<IMonth[]>(() => { }); },
     getMonth: (user: User | null, token: string, year: string, month: string) => { return new Promise<IMonth | undefined>(() => { }); },
     addMonth: (user: User | null, token: string, year: string) => { return new Promise<IMonth | undefined>(() => { }); },
-    updateMonth: (user: User | null, token: string, year: string, month: IMonth) => { return new Promise<boolean>(() => { }); },
+    updateMonth: (user: User | null, token: string, year: string, month: IMonth) => { return new Promise<IMonth|undefined>(() => { }); },
     updateMonthStats: (user: User | null, token: string, year: string, month: IMonth, isFullUpdate: boolean) => { return new Promise<IMonth | undefined>(() => { }); }
 }
 
@@ -58,7 +58,7 @@ const MonthDataBaseProvider: React.FC<{ children: React.ReactNode }> = (props) =
     }
 
 
-    async function updateMonth(user: User | null, token: string, year: string, month: IMonth): Promise<boolean> {
+    async function updateMonth(user: User | null, token: string, year: string, month: IMonth): Promise<IMonth|undefined> {
         return await monthDBService.updateMonth(user, token, year, month);
     }
 

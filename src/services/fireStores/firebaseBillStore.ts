@@ -146,7 +146,7 @@ export async function addBill(user: User | null, token: string, year: string, mo
 }
 
 export async function deleteBill(user: User | null, token: string, year: string, month: string, date: string): Promise<boolean> {
-    if (user === null || token.length < 36 ) { return false; } // TODO: add error
+    if (user === null || token.length < 36) { return false; } // TODO: add error
     const billCollection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.YEARS_DB_NAME, year, DB_ACCESS_NAMES.MONTHS_DB_NAME, month, DB_ACCESS_NAMES.BILLS_DB_NAME].join('/');
     const receiptCollection = [billCollection, date, DB_ACCESS_NAMES.RECEIPTS_DB_NAME].join('/');
 
@@ -155,6 +155,12 @@ export async function deleteBill(user: User | null, token: string, year: string,
     for (let index = 0; index < receipts.length; index++) {
         const receipt = receipts[index];
         await deleteReceipt(user, token, year, month, date, receipt.receiptId);
+    }
+
+    const currentMonth = await getMonth(user, token, year, month);
+    if (currentMonth !== undefined) {
+        currentMonth.needsRefresh = true;
+        await updateMonth(user, token, year, currentMonth);
     }
 
     return await deleteDocument(billCollection, date);

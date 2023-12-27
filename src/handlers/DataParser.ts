@@ -96,23 +96,21 @@ export function downloadEXCEL(
     const resultWs = XLSX.utils.aoa_to_sheet(resultArrayOfArrayCsv);
     let firstSheetName = '_' + name;
     let secondSheetName = '_' + name;
+    const permittedLength = 31 - firstSheetName.length
 
-    const firstNameLength = firstSheetName.length + myName.length;
-    if (firstNameLength > 32) {
-        const cropAmount = firstNameLength - firstSheetName.length;
+    if (myName.length > permittedLength) {
+        const cropAmount = myName.length - permittedLength;
         firstSheetName = myName.slice(0, -cropAmount) + firstSheetName;
     } else {
         firstSheetName = myName + firstSheetName;
     }
 
-    const secondNameLength = secondSheetName.length + otherName.length;
-    if (secondNameLength > 32) {
-        const cropAmount = secondNameLength - secondSheetName.length;
+    if (otherName.length > permittedLength) {
+        const cropAmount = otherName.length - permittedLength;
         secondSheetName = otherName.slice(0, -cropAmount) + secondSheetName;
     } else {
         secondSheetName = otherName + secondSheetName;
     }
-
 
     XLSX.utils.book_append_sheet(wb, myWs, firstSheetName);
     XLSX.utils.book_append_sheet(wb, otherWs, secondSheetName);
@@ -253,7 +251,9 @@ function _prepCSVDataReceipts(myReceipts: IReceipt[], otherReceipts: IReceipt[],
         receipts.slice(0).forEach((receipt) => {
             for (let index = 0; index < receipt.items.length; index++) {
                 const item = receipt.items[index];
-
+                if (item.category == Category.Cleaning) {
+                    console.log(item)
+                }
                 if (isOthers(item, otherUid)) {
                     continue;
                 }

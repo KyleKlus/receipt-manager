@@ -13,6 +13,7 @@ import { IReceipt } from '@/interfaces/data/IReceipt';
 import AddReceipt from './Receipt/AddReceipt';
 import { IMonthDataBaseContext, useMonthDB } from '@/context/MonthDatabaseContext';
 import { IYearDataBaseContext, useYearDB } from '@/context/YearDatabaseContext';
+import { getBill, updateBill } from '@/services/fireStores/firebaseBillStore';
 
 interface IUploadSectionProps {
   className?: string
@@ -63,6 +64,12 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
       }
       const oldReceipts = isFirstPersonMode ? accountingDB.firstReceipts : accountingDB.secondReceipts;
       accountingDB.saveReceipts(oldReceipts.concat(receipts), isFirstPersonMode);
+    }
+
+    const currentBill = await getBill(user, token, year, month, date);
+    if (currentBill !== undefined) {
+      currentBill.needsRefresh = true;
+      await updateBill(user, token, year, month, currentBill);
     }
 
     e.target.value = '';
@@ -194,13 +201,13 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
             setIsFirstPersonMode(!isFirstPersonMode)
           }}>{isFirstPersonMode ? accountingDB.secondName + ' ⏭️' : '⏮️ ' + accountingDB.firstName}</button>
           <button onClick={() => {
-            if(isFirstPersonMode ? accountingDB.secondReceipts.length === 0 : accountingDB.firstReceipts.length === 0){
+            if (isFirstPersonMode ? accountingDB.secondReceipts.length === 0 : accountingDB.firstReceipts.length === 0) {
               setShouldLoadReceipts(isFirstPersonMode ? accountingDB.secondReceipts.length === 0 : accountingDB.firstReceipts.length === 0);
               setIsFirstPersonMode(!isFirstPersonMode)
               const waitForOtherReceiptsToLoad = () => {
-                if(isLoadingReceipts){
+                if (isLoadingReceipts) {
                   setTimeout(waitForOtherReceiptsToLoad, 300);
-                } else{
+                } else {
                   props.setResultReady(true)
                 }
               };

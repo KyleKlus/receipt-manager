@@ -15,7 +15,7 @@ export interface IYearDataBaseContext {
     getYears: (user: User | null, token: string) => Promise<IYear[]>,
     getYear: (user: User | null, token: string, year: string) => Promise<IYear | undefined>,
     addYear: (user: User | null, token: string) => Promise<IYear| undefined>,
-    updateYear: (user: User | null, token: string, year: IYear) => Promise<boolean>,
+    updateYear: (user: User | null, token: string, year: IYear) => Promise<IYear|undefined>,
     updateYearStats: (user: User | null, token: string, year: IYear, isFullUpdate: boolean) => Promise<IYear | undefined>
 }
 
@@ -27,7 +27,7 @@ const defaultValue: IYearDataBaseContext = {
     getYears: (user: User | null, token: string) => { return new Promise<IYear[]>(() => { }); },
     getYear: (user: User | null, token: string, year: string) => { return new Promise<IYear | undefined>(() => { }); },
     addYear: (user: User | null, token: string) => { return new Promise<IYear| undefined>(() => { }); },
-    updateYear: (user: User | null, token: string,year: IYear) => { return new Promise<boolean>(() => { }); },
+    updateYear: (user: User | null, token: string,year: IYear) => { return new Promise<IYear|undefined>(() => { }); },
     updateYearStats: (user: User | null, token: string, year: IYear, isFullUpdate: boolean) => { return new Promise<IYear | undefined>(() => { }); }
 }
 
@@ -58,7 +58,7 @@ const YearDataBaseProvider: React.FC<{ children: React.ReactNode }> = (props) =>
     }
 
 
-    async function updateYear(user: User | null, token: string, year: IYear): Promise<boolean> {
+    async function updateYear(user: User | null, token: string, year: IYear): Promise<IYear|undefined> {
         return await yearDBService.updateYear(user, token, year);
     }
 

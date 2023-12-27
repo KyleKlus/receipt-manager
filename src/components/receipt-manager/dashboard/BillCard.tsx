@@ -83,7 +83,7 @@ export default function BillCard(props: React.PropsWithChildren<IShareSyncTokenM
                         }</>
                     }
                     {isInDeleteMode !== undefined && isInDeleteMode &&
-                        <button className={[styles.deleteBillButton].join(' ')} onClick={async () => {
+                        <button disabled={isDeleting} className={[styles.deleteBillButton].join(' ')} onClick={async () => {
                             if (yearDBContext.currentYear === undefined || monthDBContext.currentMonth === undefined || props.bill === undefined) {
                                 return;
                             }

@@ -36,12 +36,12 @@ export default function ReceiptManager(props: React.PropsWithChildren<IReceiptMa
     })
 
     async function setResultReady(state: boolean) {
+        if (state) {
+            accountingDBContext.saveReceipts(await updateReceiptStats(accountingDBContext.firstReceipts), true);
+            accountingDBContext.saveReceipts(await updateReceiptStats(accountingDBContext.secondReceipts), false);
+        }
         setIsResultReady(state);
         setIsStatsReady(state);
-        // if (state) {
-        //     accountingDBContext.saveReceipts(await updateReceiptStats(accountingDBContext.firstReceipts), true);
-        //     accountingDBContext.saveReceipts(await updateReceiptStats(accountingDBContext.secondReceipts), false);
-        // }
     }
 
     async function loadData() {
