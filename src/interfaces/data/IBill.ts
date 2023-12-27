@@ -19,5 +19,6 @@ export default interface IBill {
         itemEntriesCount: number,
         receiptEntriesCount: number,
         totalPrice: number
-    }[]
+    }[],
+    needsRefresh: boolean
 }

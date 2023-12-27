@@ -38,5 +38,6 @@ export default interface IYear {
         billEntriesCount: number,
         monthEntriesCount: number,
         totalPrice: number
-    }[]
+    }[],
+    needsRefresh: boolean
 }

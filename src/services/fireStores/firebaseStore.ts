@@ -1,5 +1,6 @@
+import { FirebaseError } from "firebase/app";
 import firebase_app from "../firebase";
-import { collection, connectFirestoreEmulator, deleteDoc, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
+import { WhereFilterOp, collection, connectFirestoreEmulator, deleteDoc, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc, query, where } from "firebase/firestore";
 
 const firebase_db = getFirestore(firebase_app);
 // connectFirestoreEmulator(firebase_db, '127.0.0.1', 8080); // TODO: remove in prod
@@ -34,13 +35,32 @@ const productionNames: IDBNames = {
     ITEMS_DB_NAME: 'items'
 }
 
+export enum DataState {
+    NEEDS_FIRST_LOAD,
+    NEEDS_REFRESH,
+    NEEDS_STATS_UPDATE,
+    IS_OK
+}
+
 export const DB_ACCESS_NAMES: IDBNames = productionNames;
 
 export async function getDocumentCollectionData(
     documentCollectionName: string,
-    dataConverter: any
+    dataConverter: any,
+    fieldName?: string,
+    operator?: WhereFilterOp,
+    valueName?: string
 ): Promise<any[]> {
-    const docsSnap = await getDocs(collection(firebase_db, documentCollectionName));
+    const collectionRef = collection(firebase_db, documentCollectionName)
+    let q = undefined;
+    if (
+        (fieldName !== undefined && fieldName !== '') &&
+        (operator !== undefined) &&
+        (valueName !== undefined)
+    ) {
+        q = query(collectionRef, where(fieldName, operator, valueName));
+    }
+    const docsSnap = await getDocs(q === undefined ? collectionRef : q);
     if (docsSnap.size === 0) { return [] }
 
     const dataArray: any[] = [];
@@ -99,8 +119,29 @@ export async function setDocumentData(
     data: any
 ): Promise<void> {
     const docRef = doc(firebase_db, documentCollectionName, documentName);
+    try {
+        await setDoc(docRef, dataConverter.toFirestore(data))
+    } catch (error) {
+        console.error((error as FirebaseError).message)
+        const findUndefinedProperties = (obj: any, path = '') => {
+            for (const key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    const newPath = path ? `${path}.${key}` : key;
+                    if (obj[key] === undefined) {
+                        console.error(`Undefined property found: ${newPath}`);
+                    } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+                        findUndefinedProperties(obj[key], newPath);
+                    }
+                }
+            }
+        }
 
-    await setDoc(docRef, dataConverter.toFirestore(data))
+        // Call the function with your data object
+        findUndefinedProperties(dataConverter.toFirestore(data));
+
+        console.error('Data:', dataConverter.toFirestore(data))
+
+    }
 }
 
 export async function updateDocumentData(
@@ -114,8 +155,29 @@ export async function updateDocumentData(
     if (!(await isDocumentExisting(documentCollectionName, documentName))) {
         return false
     }
+    try {
+        await updateDoc(docRef, dataConverter.toFirestore(data));
+    } catch (error) {
+        console.error((error as FirebaseError).message)
+        const findUndefinedProperties = (obj: any, path = '') => {
+            for (const key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    const newPath = path ? `${path}.${key}` : key;
+                    if (obj[key] === undefined) {
+                        console.error(`Undefined property found: ${newPath}`);
+                    } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+                        findUndefinedProperties(obj[key], newPath);
+                    }
+                }
+            }
+        }
 
-    await updateDoc(docRef, dataConverter.toFirestore(data));
+        // Call the function with your data object
+        findUndefinedProperties(dataConverter.toFirestore(data));
+
+        console.error('Data:', dataConverter.toFirestore(data))
+
+    }
     return true;
 }
 

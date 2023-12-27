@@ -10,6 +10,7 @@ import { IReceipt } from "@/interfaces/data/IReceipt";
 import { Category } from "../../handlers/DataParser";
 import { itemConverter } from "./firebaseItemStore";
 import { IReceiptItem } from "@/interfaces/data/IReceiptItem";
+import { getMonth, updateMonth } from "./firebaseMonthStore";
 
 export const billConverter = {
     toFirestore: (bill: IBill) => {
@@ -24,8 +25,9 @@ export const billConverter = {
             : undefined;
 
         const categoryMetaData = bill.categoryMetaData.map(metadata => {
+            const categoryName = DataParser.getNameOfCategory(metadata.category)
             return {
-                category: DataParser.getNameOfCategory(metadata.category),
+                category: categoryName === undefined ? metadata.category : categoryName,
                 receiptEntriesCount: metadata.receiptEntriesCount,
                 itemAmount: metadata.itemAmount,
                 itemEntriesCount: metadata.itemEntriesCount,
@@ -34,7 +36,6 @@ export const billConverter = {
         });
 
         const categoryName = DataParser.getNameOfCategory(bill.mostCommonCategory)
-
 
         let updatedBill = {
             date: timeStampDate,
@@ -46,9 +47,9 @@ export const billConverter = {
             mostExpensiveReceipt: mostExpensiveReceipt,
             mostExpensiveItemReceiptId: bill.mostExpensiveItemReceiptId,
             mostExpensiveItem: mostExpensiveItem,
-            categoryMetaData: categoryMetaData
+            categoryMetaData: categoryMetaData,
+            needsRefresh: bill.needsRefresh
         };
-
 
         if (updatedBill.mostExpensiveReceipt === undefined) {
             delete updatedBill.mostExpensiveReceipt;
@@ -94,7 +95,8 @@ export const billConverter = {
             mostExpensiveReceipt: mostExpensiveReceipt,
             mostExpensiveItemReceiptId: data.mostExpensiveItemReceiptId,
             mostExpensiveItem: mostExpensiveItem,
-            categoryMetaData: categoryMetaData
+            categoryMetaData: categoryMetaData,
+            needsRefresh: data.needsRefresh
         }
         return bill;
     }
@@ -129,7 +131,8 @@ export async function addBill(user: User | null, token: string, year: string, mo
         numberOfReceipts: 0,
         totalPrice: 0,
         mostExpensiveItemReceiptId: '',
-        categoryMetaData: []
+        categoryMetaData: [],
+        needsRefresh: true
     }
 
 
@@ -143,9 +146,8 @@ export async function addBill(user: User | null, token: string, year: string, mo
 }
 
 export async function deleteBill(user: User | null, token: string, year: string, month: string, date: string): Promise<boolean> {
-    if (user === null || token.length < 36 || date.length < 19) { return false; } // TODO: add error
-    const billCollection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.YEARS_DB_NAME, year, DB_ACCESS_NAMES.MONTHS_DB_NAME, month, DB_ACCESS_NAMES.BILLS_DB_NAME, date, DB_ACCESS_NAMES.RECEIPTS_DB_NAME].join('/');
-
+    if (user === null || token.length < 36 ) { return false; } // TODO: add error
+    const billCollection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.YEARS_DB_NAME, year, DB_ACCESS_NAMES.MONTHS_DB_NAME, month, DB_ACCESS_NAMES.BILLS_DB_NAME].join('/');
     const receiptCollection = [billCollection, date, DB_ACCESS_NAMES.RECEIPTS_DB_NAME].join('/');
 
     const receipts = (await getDocumentCollectionData(receiptCollection, receiptConverter)) as IReceipt[];
@@ -159,7 +161,7 @@ export async function deleteBill(user: User | null, token: string, year: string,
 }
 
 export async function updateBill(user: User | null, token: string, year: string, month: string, updatedBill: IBill): Promise<boolean> {
-    if (user === null || user.displayName === null) { return false; } // TODO: add error
+    if (user === null) { return false; } // TODO: add error
     const billCollection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.YEARS_DB_NAME, year, DB_ACCESS_NAMES.MONTHS_DB_NAME, month, DB_ACCESS_NAMES.BILLS_DB_NAME].join('/');
 
     if (updatedBill.mostExpensiveReceipt === undefined) {
@@ -172,12 +174,23 @@ export async function updateBill(user: User | null, token: string, year: string,
         delete updatedBill.mostExpensiveItem;
     }
 
-    return await updateDocumentData(billCollection, DataParser.getDateNameByMoment(updatedBill.date), billConverter, updatedBill);
+    return await updateDocumentData(billCollection, updatedBill.name, billConverter, updatedBill);
 }
 
 export async function updateBillStats(user: User | null, token: string, year: string, month: string, bill: IBill, isFullUpdate: boolean): Promise<IBill | undefined> {
-    if (user === null || user.displayName === null) { return undefined; } // TODO: add error
+    if (user === null) { return undefined; } // TODO: add error
+    if (!bill.needsRefresh) { return bill; } else {
+        bill.needsRefresh = false;
+
+        const currentMonth = await getMonth(user, token, year, month);
+        if (currentMonth !== undefined) {
+            currentMonth.needsRefresh = true;
+            await updateMonth(user, token, year, currentMonth);
+        }
+    }
+
     const billCollection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.YEARS_DB_NAME, year, DB_ACCESS_NAMES.MONTHS_DB_NAME, month, DB_ACCESS_NAMES.BILLS_DB_NAME].join('/');
+
 
     const updatedBill = bill;
     const receipts = await getReceipts(user, token, year, month, updatedBill.name, false);

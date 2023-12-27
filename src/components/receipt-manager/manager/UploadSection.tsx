@@ -26,8 +26,11 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
   const yearDBContext: IYearDataBaseContext = useYearDB();
   const monthDBContext: IMonthDataBaseContext = useMonthDB();
   const auth: IAuthContext = useAuth();
+
   const [isInEditMode, setEditMode] = useState(false);
   const [isFirstPersonMode, setIsFirstPersonMode] = useState(true);
+  const [shouldLoadReceipts, setShouldLoadReceipts] = useState(true);
+  const [isLoadingReceipts, setIsLoadingReceipts] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
 
@@ -65,6 +68,57 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
     e.target.value = '';
     setIsLoading(false);
     setProgress(0);
+  }
+
+  useEffect(() => {
+    if (shouldLoadReceipts && !isLoadingReceipts) {
+      loadReceipts(isFirstPersonMode);
+    }
+  })
+
+  async function loadReceipts(isFirst: boolean) {
+    setShouldLoadReceipts(false);
+    if (auth.user === null || billDB.currentBill === undefined ||
+      yearDBContext.currentYear === undefined ||
+      monthDBContext.currentMonth === undefined) { return; }
+    setIsLoadingReceipts(true);
+    setProgress(0);
+
+    const loadByUid = isFirst ? accountingDB.firstUid : accountingDB.secondUid;
+
+    const receipts = await accountingDB.getReceiptsByUid(auth.user, userDB.selectedConnection,
+      yearDBContext.currentYear.name,
+      monthDBContext.currentMonth.name,
+      billDB.currentBill.name, loadByUid, true)
+
+    setProgress(50);
+
+    const updatedReceipts = await updateReceiptStats(receipts);
+    setProgress(75);
+
+    accountingDB.saveReceipts(updatedReceipts, isFirst);
+    setProgress(100);
+    setIsLoadingReceipts(false);
+  }
+
+  async function updateReceiptStats(receipts: IReceipt[]): Promise<IReceipt[]> {
+    if (auth.user === null || billDB.currentBill === undefined ||
+      yearDBContext.currentYear === undefined ||
+      monthDBContext.currentMonth === undefined) { return []; }
+
+    for (let index = 0; index < receipts.length; index++) {
+      const receipt = receipts[index];
+      const updatedReceipt = await accountingDB.updateReceiptStats(auth.user, userDB.selectedConnection,
+        yearDBContext.currentYear.name,
+        monthDBContext.currentMonth.name,
+        billDB.currentBill.name, receipt);
+
+      if (updatedReceipt !== undefined) {
+        receipts[index] = updatedReceipt;
+      }
+    }
+
+    return receipts;
   }
 
   return (
@@ -126,16 +180,39 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
                 }
               }
 
+              const updatedBill = billDB.currentBill;
+              updatedBill.needsRefresh = true;
+              await billDB.updateBill(user, token, year, month, updatedBill);
+
               setIsLoading(false);
               setProgress(0);
             }}
           >❌ Data</button>
           <hr />
-          <button onClick={() => { setIsFirstPersonMode(!isFirstPersonMode) }}>{isFirstPersonMode ? accountingDB.secondName + ' ⏭️' : '⏮️ ' + accountingDB.firstName}</button>
-          <button onClick={() => { props.setResultReady(true) }}>Result 🔬</button>
+          <button onClick={() => {
+            setShouldLoadReceipts(isFirstPersonMode ? accountingDB.secondReceipts.length === 0 : accountingDB.firstReceipts.length === 0);
+            setIsFirstPersonMode(!isFirstPersonMode)
+          }}>{isFirstPersonMode ? accountingDB.secondName + ' ⏭️' : '⏮️ ' + accountingDB.firstName}</button>
+          <button onClick={() => {
+            if(isFirstPersonMode ? accountingDB.secondReceipts.length === 0 : accountingDB.firstReceipts.length === 0){
+              setShouldLoadReceipts(isFirstPersonMode ? accountingDB.secondReceipts.length === 0 : accountingDB.firstReceipts.length === 0);
+              setIsFirstPersonMode(!isFirstPersonMode)
+              const waitForOtherReceiptsToLoad = () => {
+                if(isLoadingReceipts){
+                  setTimeout(waitForOtherReceiptsToLoad, 300);
+                } else{
+                  props.setResultReady(true)
+                }
+              };
+
+              setTimeout(waitForOtherReceiptsToLoad, 300);
+            } else {
+              props.setResultReady(true)
+            }
+          }}>Result 🔬</button>
         </div>
       </div>
-      {isInEditMode && !isLoading &&
+      {isInEditMode && !isLoading && !isLoadingReceipts && !shouldLoadReceipts &&
         <AddReceipt addReceipt={async (receipt: IReceipt) => {
           if (
             billDB.currentBill === undefined ||
@@ -154,10 +231,16 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
               accountingDB.saveReceipts([...outDatedReceipts], isFirstPersonMode);
             }
           });
+
+          const updatedBill = billDB.currentBill;
+          updatedBill.needsRefresh = true;
+          await billDB.updateBill(auth.user, userDB.selectedConnection, yearDBContext.currentYear.name, monthDBContext.currentMonth.name, updatedBill);
+
+
           document.getElementById('add-point')?.scrollIntoView();
         }} />
       }
-      {isLoading
+      {isLoading || isLoadingReceipts || shouldLoadReceipts
         ? <div className={[styles.uploadSectionLoadingContent].join(' ')}>
           <progress value={progress} max={100}></progress>
         </div>
@@ -184,6 +267,10 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
                       accountingDB.saveReceipts([...outDatedReceipts], true);
                     }
                   });
+
+                  const updatedBill = billDB.currentBill;
+                  updatedBill.needsRefresh = true;
+                  await billDB.updateBill(auth.user, userDB.selectedConnection, yearDBContext.currentYear.name, monthDBContext.currentMonth.name, updatedBill);
                 }} />);
             })
           }
@@ -206,6 +293,9 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
                       accountingDB.saveReceipts([...outDatedReceipts], false);
                     }
                   });
+                  const updatedBill = billDB.currentBill;
+                  updatedBill.needsRefresh = true;
+                  await billDB.updateBill(auth.user, userDB.selectedConnection, yearDBContext.currentYear.name, monthDBContext.currentMonth.name, updatedBill);
                 }}
               />);
             })
@@ -231,6 +321,9 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
                       accountingDB.saveReceipts([...outDatedReceipts], true);
                     }
                   });
+                  const updatedBill = billDB.currentBill;
+                  updatedBill.needsRefresh = true;
+                  await billDB.updateBill(auth.user, userDB.selectedConnection, yearDBContext.currentYear.name, monthDBContext.currentMonth.name, updatedBill);
                 }} />);
             })
           }
@@ -253,6 +346,9 @@ export default function UploadSection(props: React.PropsWithChildren<IUploadSect
                       accountingDB.saveReceipts([...outDatedReceipts], false);
                     }
                   });
+                  const updatedBill = billDB.currentBill;
+                  updatedBill.needsRefresh = true;
+                  await billDB.updateBill(auth.user, userDB.selectedConnection, yearDBContext.currentYear.name, monthDBContext.currentMonth.name, updatedBill);
                 }}
               />);
             })

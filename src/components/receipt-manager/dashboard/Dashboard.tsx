@@ -28,6 +28,7 @@ export default function Dashboard(props: React.PropsWithChildren<IDashboardProps
     const monthDBContext: IMonthDataBaseContext = useMonthDB();
 
     const [isLoadingBills, setIsLoadingBills] = useState(props.isLoadingBills);
+    const [isInDeleteMode, setIsInDeleteMode] = useState(false);
     const [progress, setProgress] = useState(props.progress);
     const [selectYearOptions, setSelectYearOptions] = useState(yearDBContext.years.length > 0
         ? yearDBContext.years.map(year => {
@@ -69,6 +70,15 @@ export default function Dashboard(props: React.PropsWithChildren<IDashboardProps
                     <div className={[styles.dashboardHeader].join(' ')}>
                         <h2>Dashboard 📖</h2>
                         <div className={[styles.dashboardHeaderControls].join(' ')}>
+                            <div className={[styles.dashboardHeaderControlsModeWrapper].join(' ')}>
+                                <button disabled={isInDeleteMode} onClick={() => {
+                                    setIsInDeleteMode(true);
+                                }}>Delete ❌</button>
+                                <button disabled={!isInDeleteMode} onClick={() => {
+                                    setIsInDeleteMode(false);
+                                }}>View 🧾</button>
+                            </div>
+                            <hr />
                             <Select
                                 className={[styles.select].join(' ')}
                                 options={props.selectConnectionsOptions}
@@ -108,12 +118,15 @@ export default function Dashboard(props: React.PropsWithChildren<IDashboardProps
                             <progress value={progress} max={100}></progress>
                         </div>
                         : <div className={[styles.dashboardContent].join(' ')}>
-                            <BillCard reloadBills={() => { props.fetchBills(dbContext.selectedConnection) }} />
+                            {!isInDeleteMode &&
+                                <BillCard reloadBills={() => { props.fetchBills(dbContext.selectedConnection) }} />
+                            }
                             {
                                 billDBContext.bills.map(bill => {
                                     return (<BillCard
                                         key={DataParser.getDateNameByMoment(bill.date)}
                                         bill={bill}
+                                        isInDeleteMode={isInDeleteMode}
                                         reloadBills={() => { props.fetchBills(dbContext.selectedConnection) }} />);
                                 })
                             }

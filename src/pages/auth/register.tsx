@@ -44,8 +44,10 @@ export default function Home() {
   const handleSignIn = async () => {
     try {
       const userCredentials: UserCredential = await authContext.emailRegister(email, password);
+      console.log(userCredentials)
       if (userCredentials.user !== null) {
         setErrorMsg('');
+        userCredentials
         dbContext.addUserToDB(userCredentials.user).then(_ => {
           router.push(redirectPaths[RedirectPathOptions.DashBoardPage]);
         });

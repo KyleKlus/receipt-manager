@@ -30,7 +30,7 @@ export enum Category {
 export const DEFAULT_CATEGORY: Category = Category.Food;
 
 export function getNameOfCategory(category: Category): string {
-    const categoryName=  (Object.keys(Category) as Array<keyof typeof Category>)
+    const categoryName = (Object.keys(Category) as Array<keyof typeof Category>)
         .slice((Object.keys(Category).length / 2))[category];
     return categoryName;
 }
@@ -94,9 +94,28 @@ export function downloadEXCEL(
     const myWs = XLSX.utils.aoa_to_sheet(myArrayOfArrayCsv);
     const otherWs = XLSX.utils.aoa_to_sheet(otherArrayOfArrayCsv);
     const resultWs = XLSX.utils.aoa_to_sheet(resultArrayOfArrayCsv);
+    let firstSheetName = '_' + name;
+    let secondSheetName = '_' + name;
 
-    XLSX.utils.book_append_sheet(wb, myWs, myName + '_' + name);
-    XLSX.utils.book_append_sheet(wb, otherWs, otherName + '_' + name);
+    const firstNameLength = firstSheetName.length + myName.length;
+    if (firstNameLength > 32) {
+        const cropAmount = firstNameLength - firstSheetName.length;
+        firstSheetName = myName.slice(0, -cropAmount) + firstSheetName;
+    } else {
+        firstSheetName = myName + firstSheetName;
+    }
+
+    const secondNameLength = secondSheetName.length + otherName.length;
+    if (secondNameLength > 32) {
+        const cropAmount = secondNameLength - secondSheetName.length;
+        secondSheetName = otherName.slice(0, -cropAmount) + secondSheetName;
+    } else {
+        secondSheetName = otherName + secondSheetName;
+    }
+
+
+    XLSX.utils.book_append_sheet(wb, myWs, firstSheetName);
+    XLSX.utils.book_append_sheet(wb, otherWs, secondSheetName);
     XLSX.utils.book_append_sheet(wb, resultWs, 'Result_' + name);
 
     XLSX.writeFileXLSX(wb, name + '.xlsx', { type: 'file' });
@@ -157,9 +176,9 @@ export function parseFileToReceipts(file: File, payedByUid: string, sharedByUid:
                         }
 
                         totalPrice += parsedItem.price;
-                        categoryMetaData.filter(category=>category.category === parsedItem.category)[0].itemAmount += parsedItem.amount;
-                        categoryMetaData.filter(category=>category.category === parsedItem.category)[0].itemEntriesCount += 1;
-                        categoryMetaData.filter(category=>category.category === parsedItem.category)[0].totalPrice += parsedItem.price;
+                        categoryMetaData.filter(category => category.category === parsedItem.category)[0].itemAmount += parsedItem.amount;
+                        categoryMetaData.filter(category => category.category === parsedItem.category)[0].itemEntriesCount += 1;
+                        categoryMetaData.filter(category => category.category === parsedItem.category)[0].totalPrice += parsedItem.price;
 
                         return parsedItem;
                     })
@@ -177,7 +196,8 @@ export function parseFileToReceipts(file: File, payedByUid: string, sharedByUid:
                         amount: storeName === 'Unrecognized Store' ? 0 : parsedReceiptItems.length,
                         mostCommonCategory: storeName === 'Unrecognized Store' ? Category.None : DEFAULT_CATEGORY,
                         mostExpensiveItem: storeName === 'Unrecognized Store' ? undefined : mostExpensiveItem,
-                        categoryMetaData: storeName === 'Unrecognized Store' ? [] : categoryMetaData
+                        categoryMetaData: storeName === 'Unrecognized Store' ? [] : categoryMetaData,
+                        needsRefresh: true,
                     }
 
                     receipts = receipts.concat(parsedReceipt)
@@ -238,7 +258,7 @@ function _prepCSVDataReceipts(myReceipts: IReceipt[], otherReceipts: IReceipt[],
                     continue;
                 }
 
-                if (isShared(item)) {
+                if (isShared(item, myUid)) {
                     item.price = item.price / 2;
                 }
                 myFilteredList.push(item);
@@ -256,7 +276,7 @@ function _prepCSVDataReceipts(myReceipts: IReceipt[], otherReceipts: IReceipt[],
             amount: e.amount.toString().replace('.', ','),
             category: Category[e.category],
             mine: isMine(e, myUid),
-            shared: isShared(e),
+            shared: isShared(e, myUid),
             rejected: isOthers(e, otherUid),
         }
     }).slice(0);
@@ -297,11 +317,11 @@ function _prepCSVDataTotal(resultData: IResult): string {
         + (resultData.sharedFromReceiver).toString().replace('.', ',') + ';');
 
     csvDataArray.push('Money paid;'
-        + (-1 * resultData.payerExpenses).toString().replace('.', ',') + ';'
-        + (-1 * resultData.receiverExpenses).toString().replace('.', ',') + ';');
+        + (-1 * resultData.payerPaidExpenses).toString().replace('.', ',') + ';'
+        + (-1 * resultData.receiverPaidExpenses).toString().replace('.', ',') + ';');
 
-    csvDataArray.push('Result;' + (-1 * resultData.result).toString().replace('.', ',')
-        + ';' + (resultData.result).toString().replace('.', ',') + ';');
+    csvDataArray.push('Result;' + (-1 * resultData.receiverOverhang).toString().replace('.', ',')
+        + ';' + (resultData.receiverOverhang).toString().replace('.', ',') + ';');
 
 
     const csvData: string = csvDataArray.join('\n');
@@ -313,8 +333,8 @@ export function isMine(item: IReceiptItem, myUid: string): boolean {
     return item.ownerUids.length === 1 && item.ownerUids.indexOf(myUid) !== -1;
 }
 
-export function isShared(item: IReceiptItem): boolean {
-    return item.ownerUids.length === 0 || item.ownerUids.length === 2;
+export function isShared(item: IReceiptItem, myUid: string): boolean {
+    return item.ownerUids.length === 0 || (item.ownerUids.length === 2 && item.ownerUids.filter(id => id === myUid).length !== 0);
 }
 
 export function isOthers(item: IReceiptItem, otherUid: string): boolean {

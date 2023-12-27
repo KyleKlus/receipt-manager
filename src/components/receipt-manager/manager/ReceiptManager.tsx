@@ -1,6 +1,6 @@
 /** @format */
 import styles from '@/styles/components/receipt-manager/manager/ReceiptManager.module.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { IReceipt } from '@/interfaces/data/IReceipt';
 import UploadSection from './UploadSection';
 import ResultSection from './ResultSection';
@@ -24,10 +24,13 @@ export default function ReceiptManager(props: React.PropsWithChildren<IReceiptMa
 
     const [isResultReady, setIsResultReady] = useState(false);
     const [isStatsReady, setIsStatsReady] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
+    const [shouldLoad, setShouldLoad] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        if (isLoading) {
+        if (shouldLoad && !isLoading) {
+            setShouldLoad(false);
+            setIsLoading(true);
             loadData();
         }
     })
@@ -35,27 +38,28 @@ export default function ReceiptManager(props: React.PropsWithChildren<IReceiptMa
     async function setResultReady(state: boolean) {
         setIsResultReady(state);
         setIsStatsReady(state);
-        if (state) {
-            accountingDBContext.saveReceipts(await updateReceiptStats(accountingDBContext.firstReceipts), true);
-            accountingDBContext.saveReceipts(await updateReceiptStats(accountingDBContext.secondReceipts), false);
-        }
+        // if (state) {
+        //     accountingDBContext.saveReceipts(await updateReceiptStats(accountingDBContext.firstReceipts), true);
+        //     accountingDBContext.saveReceipts(await updateReceiptStats(accountingDBContext.secondReceipts), false);
+        // }
     }
 
     async function loadData() {
-        await loadNames();
-
         await loadUids();
 
-        await loadReceipts();
+        await loadNames();
 
         setIsLoading(false);
     }
 
     async function loadNames() {
         if (authContext.user === null) { return; }
-        if (authContext.user.displayName == null) { return; }
 
-        accountingDBContext.saveName(authContext.user.displayName.split(' ')[0], true);
+        const name = authContext.user.displayName === null
+            ? 'User-' + crypto.randomUUID().split('-')[0]
+            : authContext.user.displayName.split(' ')[0]
+
+        accountingDBContext.saveName(name, true);
         const secondPersonName: string = await userDBContext.getUserNameByToken(authContext.user, props.token);
 
         accountingDBContext.saveName(secondPersonName.split(' ')[0], false);
@@ -63,30 +67,25 @@ export default function ReceiptManager(props: React.PropsWithChildren<IReceiptMa
 
     async function loadUids() {
         if (authContext.user === null) { return; }
-        if (authContext.user.displayName == null) { return; }
 
         accountingDBContext.saveUid(authContext.user.uid, true);
         const secondPersonUid: string = await userDBContext.getUserUidByToken(authContext.user, props.token);
         accountingDBContext.saveUid(secondPersonUid, false);
     }
 
-    async function loadReceipts() {
+    async function loadReceipts(isFirst: boolean) {
         if (authContext.user === null) { return; }
-        if (authContext.user.displayName == null) { return; }
 
-        const receipts = await updateReceiptStats(await accountingDBContext.getReceipts(authContext.user, props.token, props.currentYearName,
-            props.currentMonthName, props.billDate, true));
+        const loadByUid = isFirst ? accountingDBContext.firstUid : accountingDBContext.secondUid;
 
-        const firstReceipts = receipts.filter(receipt => receipt.payedByUid === authContext.user?.uid);
-        accountingDBContext.saveReceipts(firstReceipts, true);
+        const receipts = await updateReceiptStats(await accountingDBContext.getReceiptsByUid(authContext.user, props.token, props.currentYearName,
+            props.currentMonthName, props.billDate, loadByUid, true));
 
-        const secondReceipts = receipts.filter(receipt => receipt.payedByUid !== authContext.user?.uid);
-        accountingDBContext.saveReceipts(secondReceipts, false);
+        accountingDBContext.saveReceipts(receipts, isFirst);
     }
 
     async function updateReceiptStats(receipts: IReceipt[]): Promise<IReceipt[]> {
         if (authContext.user === null) { return []; }
-        if (authContext.user.displayName == null) { return []; }
 
         for (let index = 0; index < receipts.length; index++) {
             const receipt = receipts[index];
@@ -103,7 +102,7 @@ export default function ReceiptManager(props: React.PropsWithChildren<IReceiptMa
 
     return (
         <div className={[styles.receiptManager].join(' ')}>
-            {!isLoading &&
+            {!isLoading && !shouldLoad &&
                 <>
                     <UploadSection
                         setResultReady={setResultReady}

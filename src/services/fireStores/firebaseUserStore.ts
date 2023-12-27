@@ -47,11 +47,11 @@ export const connectionConverter = {
 };
 
 export async function addUserToDB(user: User | null): Promise<void> {
-    if (user === null || user.displayName === null) { return; } // TODO: add error
+    if (user === null) { return; } // TODO: add error
     if (await isDocumentExisting(DB_ACCESS_NAMES.USERS_DB_NAME, user.uid)) { return; }
 
     const newUser: IUser = {
-        name: user.displayName,
+        name: user.displayName === null ? 'User-' + crypto.randomUUID().split('-')[0] : user.displayName,
         pendingSyncTokens: [],
         activeSyncTokens: [],
         uid: user.uid
@@ -61,7 +61,7 @@ export async function addUserToDB(user: User | null): Promise<void> {
 }
 
 export async function addPendingSyncToken(user: User | null, token: string): Promise<void> {
-    if (user === null || user.displayName === null || token.length < 1) { return; } // TODO: add error
+    if (user === null|| token.length < 1) { return; } // TODO: add error
 
     const userData = await getUserDBDataByUid(user.uid);
     if (userData === undefined) { return } // TODO: add error
@@ -73,7 +73,7 @@ export async function addPendingSyncToken(user: User | null, token: string): Pro
 }
 
 export async function addActiveSyncToken(user: User | null, token: string): Promise<boolean> {
-    if (user === null || user.displayName === null || token.length !== 36) { return false; } // TODO: add error
+    if (user === null || token.length !== 36) { return false; } // TODO: add error
     const userData = await getUserDBDataByUid(user.uid);
     if (userData === undefined) { return false; } // TODO: add error
 
@@ -100,7 +100,7 @@ export async function addActiveSyncToken(user: User | null, token: string): Prom
 }
 
 export async function getActiveConnections(user: User | null): Promise<IConnection[]> {
-    if (user === null || user.displayName === null) { return []; } // TODO: add error
+    if (user === null) { return []; } // TODO: add error
 
     const userData = await getUserDBDataByUid(user.uid);
     if (userData === undefined) { return []; }
@@ -131,7 +131,7 @@ function isTokenInTokenArray(token: string, tokenArray: string[]): boolean {
 export async function moveActivePendingTokensToActiveTokens(
     user: User | null
 ): Promise<IConnection[]> {
-    if (user === null || user.displayName === null) { return []; } // TODO: add error
+    if (user === null) { return []; } // TODO: add error
     const userData = await getUserDBDataByUid(user.uid);
     if (userData === undefined) { return []; }
     let myPendingSyncTokens: string[] = userData.pendingSyncTokens;
@@ -224,7 +224,7 @@ export async function getUserUidByToken(user: User | null, token: string): Promi
 
 
 async function getUserDBData(user: User | null): Promise<IUser | undefined> {
-    if (user === null || user.displayName === null) { return undefined; } // TODO: add error
+    if (user === null) { return undefined; } // TODO: add error
     return await getUserDBDataByUid(user.uid);
 }
 
