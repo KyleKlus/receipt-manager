@@ -91,7 +91,7 @@ function Home() {
   async function setCurrentYear() {
     const years = await yearDBContext.getYears(authContext.user, userDBContext.selectedConnection);
 
-    if (years.filter(year => year.name === moment().startOf('year').format('YYYY')).length === 0) {
+    if (years.length === 0 || years.filter(year => year.name === moment().startOf('year').format('YYYY')).length === 0) {
       const newYear = await yearDBContext.addYear(authContext.user, userDBContext.selectedConnection);
       if (newYear !== undefined) {
         yearDBContext.saveCurrentYear(newYear);
@@ -108,7 +108,7 @@ function Home() {
     if (yearDBContext.currentYear === undefined) { return; }
     const months = await monthDBContext.getMonths(authContext.user, userDBContext.selectedConnection, yearDBContext.currentYear.name);
 
-    if (months.filter(month => month.name === moment().startOf('month').format('MM-YYYY')).length === 0) {
+    if (months.length === 0 || months.filter(month => month.name === moment().startOf('month').format('MM-YYYY')).length === 0) {
       const newMonth = await monthDBContext.addMonth(authContext.user, userDBContext.selectedConnection, yearDBContext.currentYear.name);
       if (newMonth !== undefined) {
         monthDBContext.saveCurrentMonth(newMonth);
