@@ -90,31 +90,34 @@ function Home() {
 
   async function setCurrentYear() {
     const years = await yearDBContext.getYears(authContext.user, userDBContext.selectedConnection);
-    if (years.length > 0) {
-      yearDBContext.saveCurrentYear(years[0]);
-      yearDBContext.saveYears(years);
-    } else {
+
+    if (years.filter(year => year.name === moment().startOf('year').format('YYYY')).length === 0) {
       const newYear = await yearDBContext.addYear(authContext.user, userDBContext.selectedConnection);
       if (newYear !== undefined) {
         yearDBContext.saveCurrentYear(newYear);
-        yearDBContext.saveYears([newYear]);
+        years.push(newYear);
+      } else {
+        yearDBContext.saveCurrentYear(years[0]);
       }
+
+      yearDBContext.saveYears(years);
     }
   }
 
   async function setCurrentMonth() {
     if (yearDBContext.currentYear === undefined) { return; }
     const months = await monthDBContext.getMonths(authContext.user, userDBContext.selectedConnection, yearDBContext.currentYear.name);
-    if (months.length > 0) {
-      monthDBContext.saveCurrentMonth(months[0]);
-      monthDBContext.saveMonths(months);
 
-    } else {
+    if (months.filter(month => month.name === moment().startOf('month').format('MM-YYYY')).length === 0) {
       const newMonth = await monthDBContext.addMonth(authContext.user, userDBContext.selectedConnection, yearDBContext.currentYear.name);
       if (newMonth !== undefined) {
         monthDBContext.saveCurrentMonth(newMonth);
-        monthDBContext.saveMonths([newMonth]);
+        months.push(newMonth);
+      } else {
+        monthDBContext.saveCurrentMonth(months[0]);
       }
+
+      monthDBContext.saveMonths(months);
     }
   }
 

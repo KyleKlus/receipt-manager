@@ -30,11 +30,13 @@ export default function Dashboard(props: React.PropsWithChildren<IDashboardProps
     const [isLoadingBills, setIsLoadingBills] = useState(props.isLoadingBills);
     const [isInDeleteMode, setIsInDeleteMode] = useState(false);
     const [progress, setProgress] = useState(props.progress);
+
     const [selectYearOptions, setSelectYearOptions] = useState(yearDBContext.years.length > 0
         ? yearDBContext.years.map(year => {
             return { value: year.name, label: year.name }
         })
         : []);
+        
     const [selectMonthOptions, setSelectMonthOptions] = useState(monthDBContext.months.length > 0
         ? monthDBContext.months.map(month => {
             return { value: month.name, label: month.date.format('MMM') }
