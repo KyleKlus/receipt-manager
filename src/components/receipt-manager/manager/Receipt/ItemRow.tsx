@@ -38,7 +38,7 @@ export default function ItemRow(props: React.PropsWithChildren<IItemRowProps>) {
                 type='number'
                 placeholder='Amount'
                 className={[styles.itemAmount].join(' ')}
-                value={item.amount}
+                value={unsavedItem.amount}
                 onChange={async (e) => {
                     if (e === null) { return; }
                     const amount = parseInt(e.currentTarget.value);
@@ -50,7 +50,7 @@ export default function ItemRow(props: React.PropsWithChildren<IItemRowProps>) {
                 type='text'
                 placeholder='Name'
                 className={[styles.itemName].join(' ')}
-                value={item.name}
+                value={unsavedItem.name}
                 onChange={async (e) => {
                     if (e === null) { return; }
                     const name = e.currentTarget.value;
@@ -62,7 +62,7 @@ export default function ItemRow(props: React.PropsWithChildren<IItemRowProps>) {
                 type='number'
                 placeholder='Price'
                 className={[styles.itemPrice].join(' ')}
-                value={item.price.toFixed(2)}
+                value={unsavedItem.price.toFixed(2)}
                 onChange={async (e) => {
                     if (e === null) { return; }
                     const price = parseFloat(e.currentTarget.value);
