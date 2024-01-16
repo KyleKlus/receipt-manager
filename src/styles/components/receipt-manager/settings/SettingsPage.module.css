@@ -1,0 +1,11 @@
+.settings {
+    margin: calc(10vh - 64px) auto 10vh auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    box-shadow: var(--shadowElevation_4);
+    gap: 16px;
+    width: 80%;
+    height: 80vh;
+}

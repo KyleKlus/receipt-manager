@@ -21,7 +21,6 @@ interface IDashboardProps {
 }
 
 export default function Dashboard(props: React.PropsWithChildren<IDashboardProps>) {
-    const authContext: IAuthContext = useAuth();
     const dbContext: IUserDataBaseContext = useUserDB();
     const billDBContext: IBillDataBaseContext = useBillDB();
     const yearDBContext: IYearDataBaseContext = useYearDB();
@@ -36,7 +35,7 @@ export default function Dashboard(props: React.PropsWithChildren<IDashboardProps
             return { value: year.name, label: year.name }
         })
         : []);
-        
+
     const [selectMonthOptions, setSelectMonthOptions] = useState(monthDBContext.months.length > 0
         ? monthDBContext.months.map(month => {
             return { value: month.name, label: month.date.format('MMM') }
@@ -54,6 +53,7 @@ export default function Dashboard(props: React.PropsWithChildren<IDashboardProps
                 return { value: year.name, label: year.name }
             })
             : [])
+
     }, [yearDBContext.currentYear])
 
     useEffect(() => {

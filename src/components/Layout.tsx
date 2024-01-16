@@ -34,7 +34,7 @@ export default function Layout(props: React.PropsWithChildren<ILayoutProps>) {
     return (
         <>
             <Head>
-                <title>Kyle Klus | Receipt Manager 🧾 - Dashboard</title>
+                <title>Kyle Klus | Receipt Manager 🧾</title>
                 <meta
                     name="description"
                     content="Receipt Manager web app"
@@ -107,11 +107,13 @@ export default function Layout(props: React.PropsWithChildren<ILayoutProps>) {
                         <div className={[styles.sideBarBottom].join(' ')}>
                             <hr />
                             <ThemeButton />
+                            <button className={[styles.sideBarUserButton].join(' ')} onClick={() => {
+                                router.push(redirectPaths[RedirectPathOptions.SettingsPage]);
+                            }}>
+                                ⚙️
+                            </button>
                             <button className={[styles.sideBarUserButton].join(' ')} onClick={handleLogout}>
-                                {authContext.user && authContext.user.displayName
-                                    ? authContext.user.displayName[0]
-                                    : 'U'
-                                }
+                                🏃
                             </button>
                         </div>
 

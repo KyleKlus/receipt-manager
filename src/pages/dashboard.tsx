@@ -23,10 +23,9 @@ function Home() {
   const monthDBContext: IMonthDataBaseContext = useMonthDB();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingBills, setIsLoadingBills] = useState(true);
+  const [isLoadingSite, setIsLoadingSite] = useState(true);
+  const [isLoadingBills, setIsLoadingBills] = useState(false);
   const [progress, setProgress] = useState(0);
-
 
   const selectConnectionsOptions = userDBContext.activeConnections.length > 0
     ? userDBContext.activeConnections.map(connection => {
@@ -34,45 +33,25 @@ function Home() {
     })
     : [];
 
-
   useEffect(() => {
     // Only fetches data on refresh page and when loading is set to true
-    if (!isLoading) { return; }
+    if (!isLoadingSite) { return; }
 
-    fetchActiveConnections().then(_ => {
-      setCurrentYear().then(_ => {
-        setCurrentMonth().then(_ => {
-          setIsLoading(false);
-          fetchBills(userDBContext.selectedConnection);
-        })
-      });
-    });
-  }, [isLoading])
+    fetchActiveConnections();
+  }, [isLoadingSite])
 
   useEffect(() => {
-    // The selected connection has changed
-    if (isLoading) { return }
-
-    setCurrentYear().then(_ => {
-      setCurrentMonth().then(_ => {
-        fetchBills(userDBContext.selectedConnection, userDBContext.prevSelectedConnection);
-      })
-    });
+    setCurrentYear();
   }, [userDBContext.selectedConnection])
 
   useEffect(() => {
-    // The selected connection has changed
-    if (isLoading) { return }
-
-    setCurrentMonth().then(_ => {
-      fetchBills(userDBContext.selectedConnection, userDBContext.prevSelectedConnection);
-    })
+    setCurrentMonth();
   }, [yearDBContext.currentYear])
 
   useEffect(() => {
-    // The selected connection has changed
-    if (isLoading) { return }
-
+    if (isLoadingSite) {
+      setIsLoadingSite(false);
+    }
     fetchBills(userDBContext.selectedConnection, userDBContext.prevSelectedConnection);
   }, [monthDBContext.currentMonth])
 
@@ -91,7 +70,8 @@ function Home() {
   async function setCurrentYear() {
     const years = await yearDBContext.getYears(authContext.user, userDBContext.selectedConnection);
 
-    if (years.length === 0 || years.filter(year => year.name === moment().startOf('year').format('YYYY')).length === 0) {
+    // Create year if no one was created or if current one isnt there
+    if (years.filter(year => year.name === moment().startOf('year').format('YYYY')).length === 0) {
       const newYear = await yearDBContext.addYear(authContext.user, userDBContext.selectedConnection);
       if (newYear !== undefined) {
         yearDBContext.saveCurrentYear(newYear);
@@ -99,17 +79,25 @@ function Home() {
       } else {
         yearDBContext.saveCurrentYear(years[0]);
       }
-
-      yearDBContext.saveYears(years);
+    } else {
+      yearDBContext.saveCurrentYear(years.filter(year => year.name === moment().startOf('year').format('YYYY'))[0]);
     }
+
+    yearDBContext.saveYears(years);
   }
 
   async function setCurrentMonth() {
     if (yearDBContext.currentYear === undefined) { return; }
+
     const months = await monthDBContext.getMonths(authContext.user, userDBContext.selectedConnection, yearDBContext.currentYear.name);
 
-    if (months.length === 0 || months.filter(month => month.name === moment().startOf('month').format('MM-YYYY')).length === 0) {
+    if ( // Create new month if there are no months in this year or if the year is the current one and it doesnt have the current month in it
+      (yearDBContext.currentYear.name === moment().startOf('year').format('YYYY') &&
+        months.filter(month => month.name === moment().startOf('month').format('MM-YYYY')).length === 0) ||
+      months.length === 0
+    ) {
       const newMonth = await monthDBContext.addMonth(authContext.user, userDBContext.selectedConnection, yearDBContext.currentYear.name);
+
       if (newMonth !== undefined) {
         monthDBContext.saveCurrentMonth(newMonth);
         months.push(newMonth);
@@ -117,8 +105,13 @@ function Home() {
         monthDBContext.saveCurrentMonth(months[0]);
       }
 
-      monthDBContext.saveMonths(months);
+    } else if (yearDBContext.currentYear.name === moment().startOf('year').format('YYYY')) { // select current month of current year if it is selected
+      monthDBContext.saveCurrentMonth(months.filter(month => month.name === moment().startOf('month').format('MM-YYYY'))[0]);
+    } else {
+      monthDBContext.saveCurrentMonth(months[0]);
     }
+
+    monthDBContext.saveMonths(months);
   }
 
   async function fetchBills(selectedConnection: string, prevSelectedConnection?: string) {
@@ -164,7 +157,7 @@ function Home() {
   return (
     <Layout>
       <Content className={['applyHeaderOffset', 'dotted'].join(' ')}>
-        {!isLoading &&
+        {!isLoadingSite &&
           <Dashboard
             isLoadingBills={isLoadingBills}
             progress={progress}
@@ -175,7 +168,7 @@ function Home() {
       </Content>
       <ShareSyncTokenModal
         isModalOpen={isModalOpen}
-        setIsLoading={setIsLoading}
+        setIsLoading={setIsLoadingSite}
         setIsModalOpen={setIsModalOpen}
       />
     </Layout>
