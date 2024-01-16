@@ -3,7 +3,7 @@ import firebase_app from "../firebase";
 import { WhereFilterOp, collection, connectFirestoreEmulator, deleteDoc, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc, query, where } from "firebase/firestore";
 
 const firebase_db = getFirestore(firebase_app);
-connectFirestoreEmulator(firebase_db, '127.0.0.1', 8080); // TODO: remove in prod
+// connectFirestoreEmulator(firebase_db, '127.0.0.1', 8080); // TODO: remove in prod
 
 interface IDBNames {
     YEARS_DB_NAME: string,

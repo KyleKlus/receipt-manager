@@ -61,7 +61,7 @@ export async function addUserToDB(user: User | null): Promise<void> {
 }
 
 export async function addPendingSyncToken(user: User | null, token: string): Promise<void> {
-    if (user === null|| token.length < 1) { return; } // TODO: add error
+    if (user === null || token.length < 1) { return; } // TODO: add error
 
     const userData = await getUserDBDataByUid(user.uid);
     if (userData === undefined) { return } // TODO: add error
@@ -203,6 +203,37 @@ export async function getUserNameByToken(user: User | null, token: string): Prom
 
     return userName;
 }
+
+export async function getUserNameByUid(user: User | null, uid: string): Promise<string> {
+    if (user === null) { return ''; }
+
+    let userName: string = '';
+    const userDocsSnap = (await getDocs(collection(firebase_db, DB_ACCESS_NAMES.USERS_DB_NAME)));
+
+    userDocsSnap.forEach(doc => {
+        const userData = doc.data();
+
+        if (userData.uid === uid) {
+            userName = userData.name;
+
+            return userName
+        }
+    })
+
+    return userName;
+}
+
+export async function setUserNameByUid(user: User | null, uid: string, name: string): Promise<void> {
+    if (user === null || uid.length < 1 || name.length < 1) { return; } // TODO: add error
+
+    const userData = await getUserDBDataByUid(uid);
+    if (userData === undefined) { return } // TODO: add error
+
+
+    await updateDoc(doc(firebase_db, DB_ACCESS_NAMES.USERS_DB_NAME, uid), { name: name });
+}
+
+
 
 export async function getUserUidByToken(user: User | null, token: string): Promise<string> {
     if (user === null || token.length < 36) { return ''; }

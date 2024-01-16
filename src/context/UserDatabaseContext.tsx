@@ -20,6 +20,8 @@ export interface IUserDataBaseContext {
     getActiveConnections: (user: User | null) => Promise<IConnection[]>,
     moveActivePendingTokensToActiveTokens: (user: User | null) => Promise<IConnection[]>,
     hasUserTokenAccess: (user: User | null, token: string) => Promise<boolean>,
+    getUserNameByUid: (user: User | null, uid: string) => Promise<string>,
+    setUserNameByUid: (user: User | null, uid: string, name: string) => Promise<void>,
     getUserNameByToken: (user: User | null, token: string) => Promise<string>,
     getUserUidByToken: (user: User | null, token: string) => Promise<string>,
 }
@@ -39,6 +41,8 @@ const defaultValue: IUserDataBaseContext = {
     moveActivePendingTokensToActiveTokens: (user: User | null) => { return new Promise<IConnection[]>(() => { }); },
     hasUserTokenAccess: (user: User | null, token: string) => { return new Promise<boolean>(() => { }); },
     getUserNameByToken: (user: User | null, token: string) => { return new Promise<string>(() => { }); },
+    getUserNameByUid: (user: User | null, uid: string) => { return new Promise<string>(() => { }); },
+    setUserNameByUid: (user: User | null, uid: string, name: string) => { return new Promise<void>(() => { }); },
     getUserUidByToken: (user: User | null, token: string) => { return new Promise<string>(() => { }); }
 
 }
@@ -95,6 +99,14 @@ const UserDataBaseProvider: React.FC<{ children: React.ReactNode }> = (props) =>
         return await userDBService.getUserNameByToken(user, token)
     }
 
+    async function getUserNameByUid(user: User | null, uid: string): Promise<string> {
+        return await userDBService.getUserNameByUid(user, uid)
+    }
+
+    async function setUserNameByUid(user: User | null, uid: string, name: string): Promise<void> {
+        return await userDBService.setUserNameByUid(user, uid, name);
+    }
+
     async function getUserUidByToken(user: User | null, token: string): Promise<string> {
         return await userDBService.getUserUidByToken(user, token)
     }
@@ -114,6 +126,8 @@ const UserDataBaseProvider: React.FC<{ children: React.ReactNode }> = (props) =>
         getActiveConnections,
         hasUserTokenAccess,
         getUserNameByToken,
+        getUserNameByUid,
+        setUserNameByUid,
         getUserUidByToken
     }}>{props.children}</UserDataBaseContext.Provider>;
 };

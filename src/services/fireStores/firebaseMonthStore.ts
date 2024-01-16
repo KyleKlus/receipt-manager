@@ -161,7 +161,7 @@ export async function getMonth(user: User | null, token: string, year: string, m
 export async function addMonth(user: User | null, token: string, year: string): Promise<IMonth | undefined> {
     if (user === null || token.length < 36) { return undefined; } // TODO: add error
     const monthCollectionOfConnection = [DB_ACCESS_NAMES.CONNECTION_DB_NAME, token, DB_ACCESS_NAMES.YEARS_DB_NAME, year, DB_ACCESS_NAMES.MONTHS_DB_NAME].join('/');
-    const date = moment().startOf('month');
+    const date = moment().year(parseInt(year, 10)).startOf('month');
 
     const newMonth: IMonth = {
         name: date.format('MM-YYYY'),

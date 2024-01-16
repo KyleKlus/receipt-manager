@@ -5,7 +5,7 @@ import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import withAuth from '@/components/withAuth';
 import Layout from '@/components/Layout';
 import ReceiptManager from '@/components/receipt-manager/manager/ReceiptManager';
-import { use, useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
 import IBill from '@/interfaces/data/IBill';
@@ -25,53 +25,73 @@ function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    checkForErrors();
+    checkForErrorsAndLoadData();
   })
 
-  async function checkForErrors() {
-
-    if (router.query.date === undefined ||
-      router.query.token === undefined || router.query.year === undefined || router.query.month === undefined ||
+  async function checkForErrorsAndLoadData() {
+    if (
+      isRouterQueryDataWrong() ||
       (router.query.token !== undefined &&
-        !(await userDBContext.hasUserTokenAccess(authContext.user, router.query.token as string)))
+        !(await userDBContext.hasUserTokenAccess(authContext.user, router.query.token as string))
+      )
     ) {
-      router.push(redirectPaths[RedirectPathOptions.DashBoardPage])
-    } else if (billDBContext.currentBill === undefined && router.query.date !== undefined) {
-      userDBContext.saveSelectedConnection(router.query.token as string);
-      const currentBill: IBill | undefined = await billDBContext.getBill(
+      router.push(redirectPaths[RedirectPathOptions.DashBoardPage]) // Redirect to dashboard if any router query data is wrong
+    } else if (billDBContext.currentBill === undefined && router.query.date !== undefined) { // Setup data if it isn't setup
+      await loadData();
+    }
+  }
+
+  async function loadData() {
+    const token: string = router.query.token as string;
+    const year: string = router.query.year as string;
+    const month: string = router.query.month as string;
+    const date: string = router.query.date as string;
+
+    userDBContext.saveSelectedConnection(token);
+
+    if (yearDBContext.currentYear === undefined && router.query.year !== undefined) {
+      const currentYear: IYear | undefined = await yearDBContext.getYear(
         authContext.user,
-        router.query.token as string,
-        router.query.year as string,
-        router.query.month as string,
-        router.query.date as string
+        token,
+        year,
       );
-      if (currentBill !== undefined) {
-        billDBContext.saveCurrentBill(currentBill);
-      }
 
-      if (yearDBContext.currentYear === undefined && router.query.year !== undefined) {
-        const currentYear: IYear | undefined = await yearDBContext.getYear(
-          authContext.user,
-          router.query.token as string,
-          router.query.year as string
-        );
-        if (currentYear !== undefined) {
-          yearDBContext.saveCurrentYear(currentYear);
-        }
-      }
-
-      if (monthDBContext.currentMonth === undefined && router.query.month !== undefined) {
-        const currentMonth: IMonth | undefined = await monthDBContext.getMonth(
-          authContext.user,
-          router.query.token as string,
-          router.query.year as string,
-          router.query.month as string,
-        );
-        if (currentMonth !== undefined) {
-          monthDBContext.saveCurrentMonth(currentMonth);
-        }
+      if (currentYear !== undefined) {
+        yearDBContext.saveCurrentYear(currentYear);
       }
     }
+
+    if (monthDBContext.currentMonth === undefined && router.query.month !== undefined) {
+      const currentMonth: IMonth | undefined = await monthDBContext.getMonth(
+        authContext.user,
+        token,
+        year,
+        month,
+      );
+
+      if (currentMonth !== undefined) {
+        monthDBContext.saveCurrentMonth(currentMonth);
+      }
+    }
+
+    const currentBill: IBill | undefined = await billDBContext.getBill(
+      authContext.user,
+      token,
+      year,
+      month,
+      date
+    );
+
+    if (currentBill !== undefined) {
+      billDBContext.saveCurrentBill(currentBill);
+    }
+  }
+
+  function isRouterQueryDataWrong(): boolean {
+    return router.query.date === undefined ||
+      router.query.token === undefined ||
+      router.query.year === undefined ||
+      router.query.month === undefined;
   }
 
   return (
