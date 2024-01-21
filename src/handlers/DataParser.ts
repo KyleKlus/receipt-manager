@@ -251,9 +251,6 @@ function _prepCSVDataReceipts(myReceipts: IReceipt[], otherReceipts: IReceipt[],
         receipts.slice(0).forEach((receipt) => {
             for (let index = 0; index < receipt.items.length; index++) {
                 const item = receipt.items[index];
-                if (item.category == Category.Cleaning) {
-                    console.log(item)
-                }
                 if (isOthers(item, otherUid)) {
                     continue;
                 }

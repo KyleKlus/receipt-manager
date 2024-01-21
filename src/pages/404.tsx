@@ -1,19 +1,10 @@
 /** @format */
-import { useEffect, useRef, useState } from 'react';
 
 import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
-import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 
-import Content from '@/components/Content';
+import Content from '@/components/container/Content';
 import withAuth from '@/components/withAuth';
-import Layout from '@/components/Layout';
-import ShareSyncTokenModal from '@/components/receipt-manager/dashboard/ShareSyncTokenModal';
-
-import Dashboard from '@/components/receipt-manager/dashboard/Dashboard';
-import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
-import moment from 'moment';
-import { IMonthDataBaseContext, useMonthDB } from '@/context/MonthDatabaseContext';
-import { IYearDataBaseContext, useYearDB } from '@/context/YearDatabaseContext';
+import Layout from '@/components/layouts/ReceiptManagerLayout';
 import { useRouter } from 'next/router';
 
 function Home() {

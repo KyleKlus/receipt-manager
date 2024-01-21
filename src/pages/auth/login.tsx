@@ -2,14 +2,14 @@
 
 import Head from 'next/head';
 import Footer from '@/components/footer/Footer';
-import Content from '@/components/Content';
-import Main from '@/components/Main';
+import Content from '@/components/container/Content';
+import Main from '@/components/container/Main';
 
-import styles from '@/styles/Login.module.css'
+import styles from '@/styles/pages/Login.module.css'
 
 import Image from 'next/image';
 
-import Card from '@/components/Card';
+import Card from '@/components/container/Card';
 import { UserCredential } from 'firebase/auth';
 import { useRouter } from 'next/router';
 import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';

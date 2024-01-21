@@ -1,9 +1,9 @@
 /** @format */
-import Content from '@/components/Content';
+import Content from '@/components/container/Content';
 import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import withAuth from '@/components/withAuth';
-import Layout from '@/components/Layout';
+import Layout from '@/components/layouts/ReceiptManagerLayout';
 import ReceiptManager from '@/components/receipt-manager/manager/ReceiptManager';
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';

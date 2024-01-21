@@ -1,10 +1,10 @@
 /** @format */
-import Content from '@/components/Content';
+import Content from '@/components/container/Content';
 import { IAuthContext, useAuth } from '@/context/AuthContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import withAuth from '@/components/withAuth';
-import Layout from '@/components/Layout';
-import Card from '@/components/Card';
+import Layout from '@/components/layouts/ReceiptManagerLayout';
+import Card from '@/components/container/Card';
 import styles from '@/styles/components/receipt-manager/settings/SettingsPage.module.css';
 import { IAccountingDataBaseContext, useAccountingDB } from '@/context/AccountingDatabaseContext';
 import { useEffect, useState } from 'react';

@@ -2,7 +2,7 @@
 import styles from '@/styles/components/receipt-manager/dashboard/BillCard.module.css';
 import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
-import Card from '../../Card';
+import Card from '@/components/container/Card';
 import { Category } from '@/handlers/DataParser';
 import * as DataParser from '@/handlers/DataParser';
 import Image from 'next/image';
