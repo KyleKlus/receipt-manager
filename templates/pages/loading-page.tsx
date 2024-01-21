@@ -2,12 +2,12 @@
 import Head from 'next/head';
 import Footer from '@/components/footer/Footer';
 import Header from '@/components/header/Header';
-import Content from '@/components/Content';
+import Content from '@/components/container/Content';
 
-import Main from '@/components/Main';
+import Main from '@/components/container/Main';
 
 import headerStyles from '@/styles/components/header/Header.module.css'
-import styles from '@/styles/LoadingPage.module.css'
+import styles from '@/styles/pages/LoadingPage.module.css'
 
 import ScrollNavLink from '@/components/links/ScrollNavLink';
 import dynamic from 'next/dynamic';

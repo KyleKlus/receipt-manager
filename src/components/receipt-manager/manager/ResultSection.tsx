@@ -1,5 +1,5 @@
 /** @format */
-import Card from '@/components/Card';
+import Card from '@/components/container/Card';
 import styles from '@/styles/components/receipt-manager/manager/ResultSection.module.css';
 import ResultCard from './ResultCard';
 import * as Calculator from '@/handlers/Calculator';

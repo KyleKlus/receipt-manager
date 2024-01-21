@@ -1,5 +1,5 @@
 /** @format */
-import Card from '@/components/Card';
+import Card from '@/components/container/Card';
 import { IAccountingDataBaseContext, useAccountingDB } from '@/context/AccountingDatabaseContext';
 import { IAuthContext, useAuth } from '@/context/AuthContext';
 import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
@@ -17,14 +17,14 @@ export default function ResultCard(props: {
     const userDB: IUserDataBaseContext = useUserDB();
     const auth: IAuthContext = useAuth();
 
-    const myName: string = props.isFirstPerson?accountingDB.firstName: accountingDB.secondName;
-    const otherName: string = !props.isFirstPerson?accountingDB.firstName: accountingDB.secondName;
+    const myName: string = props.isFirstPerson ? accountingDB.firstName : accountingDB.secondName;
+    const otherName: string = !props.isFirstPerson ? accountingDB.firstName : accountingDB.secondName;
 
-    const myUid: string = props.isFirstPerson?accountingDB.firstUid:accountingDB.secondUid;
-    const otherUid: string = !props.isFirstPerson?accountingDB.firstUid:accountingDB.secondUid;
+    const myUid: string = props.isFirstPerson ? accountingDB.firstUid : accountingDB.secondUid;
+    const otherUid: string = !props.isFirstPerson ? accountingDB.firstUid : accountingDB.secondUid;
 
-    const myReceipts: IReceipt[] = props.isFirstPerson?accountingDB.firstReceipts:accountingDB.secondReceipts;
-    const otherReceipts: IReceipt[] = !props.isFirstPerson?accountingDB.firstReceipts:accountingDB.secondReceipts;
+    const myReceipts: IReceipt[] = props.isFirstPerson ? accountingDB.firstReceipts : accountingDB.secondReceipts;
+    const otherReceipts: IReceipt[] = !props.isFirstPerson ? accountingDB.firstReceipts : accountingDB.secondReceipts;
 
     const myPaidExpenses: number = Calculator.calcReceiptsExpenses(myReceipts);
     const otherPaidExpenses: number = Calculator.calcReceiptsExpenses(otherReceipts);

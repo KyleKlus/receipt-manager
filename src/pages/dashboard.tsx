@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 import { IAuthContext, useAuth } from '@/context/AuthContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 
-import Content from '@/components/Content';
+import Content from '@/components/container/Content';
 import withAuth from '@/components/withAuth';
-import Layout from '@/components/Layout';
+import Layout from '@/components/layouts/ReceiptManagerLayout';
 import ShareSyncTokenModal from '@/components/receipt-manager/dashboard/ShareSyncTokenModal';
 
 import Dashboard from '@/components/receipt-manager/dashboard/Dashboard';

@@ -52,6 +52,12 @@
     background-color: var(--color-accent-00);
 }
 
+.markdownSection .markdownImage {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
 /*
 .markdownSection td:first-child {
     text-align: center;
@@ -70,10 +76,14 @@
 
 
 /* Mobile */
-@media (max-width: 800px) {
+@media (max-width: 750px) {
 
     .markdownSection {
         padding: 0px 24px 18px 24px;
+    }
+
+    .markdownImage img {
+        width: 100%;
     }
 }
 

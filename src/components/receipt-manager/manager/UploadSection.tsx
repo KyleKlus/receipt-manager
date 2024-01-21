@@ -1,5 +1,5 @@
 /** @format */
-import Card from '@/components/Card';
+import Card from '@/components/container/Card';
 import { IAccountingDataBaseContext, useAccountingDB } from '@/context/AccountingDatabaseContext';
 import { IAuthContext, useAuth } from '@/context/AuthContext';
 import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';

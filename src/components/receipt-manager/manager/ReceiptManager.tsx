@@ -55,7 +55,7 @@ export default function ReceiptManager(props: React.PropsWithChildren<IReceiptMa
     async function loadNames() {
         if (authContext.user === null) { return; }
 
-        const name = await userDBContext.getUserNameByToken(authContext.user, authContext.user.uid)
+        const name = await userDBContext.getUserNameByUid(authContext.user, authContext.user.uid)
 
         accountingDBContext.saveName(name, true);
         const secondPersonName: string = await userDBContext.getUserNameByToken(authContext.user, props.token);

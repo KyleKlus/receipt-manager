@@ -1,5 +1,5 @@
 /** @format */
-import styles from '@/styles/components/MarkdownSection.module.css';
+import styles from '@/styles/components/markdown/MarkdownSection.module.css';
 
 interface IMarkdownSectionProps {
   className?: string

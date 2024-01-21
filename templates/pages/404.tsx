@@ -1,10 +1,9 @@
 /** @format */
-
-import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
+import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from 'templates/context/AuthContext';
 
 import Content from '@/components/container/Content';
 import withAuth from '@/components/withAuth';
-import Layout from '@/components/layouts/ReceiptManagerLayout';
+import Layout from '@/components/layouts/Layout';
 import { useRouter } from 'next/router';
 
 function Home() {
@@ -12,7 +11,7 @@ function Home() {
   const router = useRouter();
 
   if (authContext.user !== null) {
-    router.push(redirectPaths[RedirectPathOptions.DashBoardPage]);
+    router.push(redirectPaths[RedirectPathOptions.LockedPage]);
   }
 
   return (

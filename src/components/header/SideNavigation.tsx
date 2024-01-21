@@ -1,6 +1,6 @@
 /** @format */
 import styles from '@/styles/components/header/SideNavigation.module.css';
-import Card from '../Card';
+import Card from '../container/Card';
 import NavLink from '../links/NavLink';
 import ScrollNavLink from '../links/ScrollNavLink';
 
@@ -14,7 +14,7 @@ export default function SideNavigation(
 
 
   return (
-    <nav className={[styles.sideNavMenu,isActiveClassName, 'shadowElevation_5'].join(' ')}>
+    <nav className={[styles.sideNavMenu, isActiveClassName, 'shadowElevation_5'].join(' ')}>
       <Card className={[styles.menuCard].join(' ')}>
         <h4>Main Site</h4>
         <ScrollNavLink

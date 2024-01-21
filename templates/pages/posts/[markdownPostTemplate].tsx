@@ -1,16 +1,16 @@
 /** @format */
 import fs from 'fs';
 import matter from 'gray-matter';
-import MarkdownSection from '@/components/MarkdownSection';
+import MarkdownSection from '@/components/markdown/MarkdownSection';
 import Markdown from 'markdown-to-jsx';
 
 
 import Head from 'next/head';
 import Footer from '@/components/footer/Footer';
 import Header from '@/components/header/Header';
-import Content from '@/components/Content';
+import Content from '@/components/container/Content';
 
-import Main from '@/components/Main';
+import Main from '@/components/container/Main';
 
 import headerStyles from '@/styles/components/header/Header.module.css';
 
@@ -19,6 +19,7 @@ import dynamic from 'next/dynamic';
 
 import IPost from 'templates/interfaces/IPost';
 import { GetStaticPropsContext } from 'next/types';
+import MarkdownImage from '@/components/markdown/MarkdownImage';
 
 const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
   ssr: false,
@@ -82,7 +83,15 @@ export default function MarkdownPostListTemplate(props: IPost) {
       <Main>
         <div id={'top'}></div>
         <Content className={['applyHeaderOffset'].join(' ')}>
-          <Markdown options={{ wrapper: MarkdownSection, forceWrapper: true }}>{props.content}</Markdown>
+          <Markdown options={{
+            wrapper: MarkdownSection,
+            overrides: {
+              img: {
+                component: MarkdownImage,
+              },
+            },
+            forceWrapper: true
+          }}>{props.content}</Markdown>
         </Content>
         <Footer />
       </Main>

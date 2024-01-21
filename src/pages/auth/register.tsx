@@ -1,15 +1,15 @@
 /** @format */
 import Head from 'next/head';
 import Footer from '@/components/footer/Footer';
-import Content from '@/components/Content';
+import Content from '@/components/container/Content';
 
-import Main from '@/components/Main';
+import Main from '@/components/container/Main';
 
-import styles from '@/styles/Register.module.css'
+import styles from '@/styles/pages/Register.module.css'
 
 import Image from 'next/image';
 
-import Card from '@/components/Card';
+import Card from '@/components/container/Card';
 
 import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
 import { UserCredential } from 'firebase/auth';
@@ -44,7 +44,6 @@ export default function Home() {
   const handleSignIn = async () => {
     try {
       const userCredentials: UserCredential = await authContext.emailRegister(email, password);
-      console.log(userCredentials)
       if (userCredentials.user !== null) {
         setErrorMsg('');
         userCredentials

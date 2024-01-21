@@ -6,7 +6,7 @@ import React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import ScrollUpButton from '../buttons/ScrollUpButton';
 import SideNavigationButton from '../buttons/SideNavigationButton';
-import Card from '../Card';
+import Card from '../container/Card';
 import NavLink from '../links/NavLink';
 import HeaderNavigation from './HeaderNavigation';
 import Logo from './Logo';

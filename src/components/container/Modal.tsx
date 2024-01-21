@@ -1,6 +1,6 @@
 /** @format */
-import styles from '@/styles/components/Modal.module.css';
-import closeIcon from '../../public/close.png';
+import styles from '@/styles/components/container/Modal.module.css';
+import closeIcon from '../../../public/close.png';
 import Image from 'next/image';
 
 interface IModalProps {

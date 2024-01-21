@@ -3,7 +3,7 @@ import styles from '@/styles/components/receipt-manager/items-page/ItemsPage.mod
 import { IAuthContext, useAuth } from '@/context/AuthContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import Select from 'react-select';
-import Card from '../../Card';
+import Card from '@/components/container/Card';
 import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
 import { useEffect, useState } from 'react';
 import { IAccountingDataBaseContext, useAccountingDB } from '@/context/AccountingDatabaseContext';

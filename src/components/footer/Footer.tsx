@@ -17,7 +17,7 @@ export default function Footer(props: React.PropsWithChildren<IFooterProps>) {
           ? props.overrideContent
           : <div className={styles.footerContent}>
             <p>
-              {'Copyright © 2023 '}
+              {'Copyright © 2024 '}
               <Link href={'https://github.com/KyleKlus'} className={['hoverBGEffect'].join(' ')} style={{ padding: '0 2px' }}>Kyle Klus</Link>
             </p>
             <div className={styles.navLinkWrapper}>

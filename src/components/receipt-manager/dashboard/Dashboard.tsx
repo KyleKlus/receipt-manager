@@ -3,7 +3,7 @@ import styles from '@/styles/components/receipt-manager/dashboard/Dashboard.modu
 import { IAuthContext, useAuth } from '@/context/AuthContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import Select from 'react-select';
-import Card from '../../Card';
+import Card from '@/components/container/Card';
 import BillCard from './BillCard';
 import * as DataParser from '@/handlers/DataParser';
 import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
