@@ -2,22 +2,23 @@
 import Head from 'next/head';
 import Footer from '@/components/footer/Footer';
 import Header from '@/components/header/Header';
-import Content from '@/components/Content';
+import Content from '@/components/container/Content';
 
-import Main from '@/components/Main';
+import Main from '@/components/container/Main';
 
 import headerStyles from '@/styles/components/header/Header.module.css'
 import navLinkStyles from '@/styles/components/links/NavLink.module.css'
 
-import styles from '@/styles/LockedPage.module.css'
+import styles from '@/styles/pages/LockedPage.module.css'
 
 import ScrollNavLink from '@/components/links/ScrollNavLink';
 import dynamic from 'next/dynamic';
 
-import Card from '@/components/Card';
-import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
-import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
+import Card from '@/components/container/Card';
+import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from 'templates/context/AuthContext';
+import { IDataBaseContext, useDB } from 'templates/context/DatabaseContext';
 import withAuth from '@/components/withAuth';
+import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 
 const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
   ssr: false,

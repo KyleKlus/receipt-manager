@@ -1,5 +1,5 @@
 /** @format */
-import styles from '@/styles/components/Text.module.css';
+import styles from '@/styles/components/container/Text.module.css';
 
 interface ITextProps {
   className?: string
