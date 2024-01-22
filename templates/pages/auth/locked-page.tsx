@@ -17,12 +17,8 @@ import dynamic from 'next/dynamic';
 import Card from '@/lib/container/Card';
 import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from 'templates/context/AuthContext';
 import { IDataBaseContext, useDB } from 'templates/context/DatabaseContext';
-<<<<<<< HEAD
 import withAuth from '@/lib/withAuth';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
-=======
-import withAuth from '@/lib/withAuth';
->>>>>>> 6e811787d8f1abe1fe8f2e0a2d49383afeb71eee
 
 const ThemeButton = dynamic(() => import('@/lib/interaction/forms/buttons/ThemeButton'), {
   ssr: false,

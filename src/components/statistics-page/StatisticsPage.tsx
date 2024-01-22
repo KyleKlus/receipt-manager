@@ -1,5 +1,5 @@
 /** @format */
-import styles from '@/styles/components/statistics-page/StatisticsPage.module.css';
+import styles from '@/styles/pages/StatisticsPage.module.css';
 import { IAuthContext, useAuth } from '@/context/AuthContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import Select from 'react-select';

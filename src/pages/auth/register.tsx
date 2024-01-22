@@ -5,7 +5,7 @@ import Content from '@/lib/container/Content';
 
 import Main from '@/lib/container/Main';
 
-import styles from '@/styles/pages/Register.module.css'
+import styles from '@/styles/lib/pages/Register.module.css'
 
 import Image from 'next/image';
 

@@ -5,7 +5,7 @@ import Footer from '@/lib/layouts/footer/Footer';
 import Content from '@/lib/container/Content';
 import Main from '@/lib/container/Main';
 
-import styles from '@/styles/pages/Login.module.css'
+import styles from '@/styles/lib/pages/Login.module.css'
 
 import Image from 'next/image';
 
