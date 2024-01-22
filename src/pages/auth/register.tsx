@@ -1,15 +1,15 @@
 /** @format */
 import Head from 'next/head';
-import Footer from '@/components/footer/Footer';
-import Content from '@/components/container/Content';
+import Footer from '@/lib/footer/Footer';
+import Content from '@/lib/container/Content';
 
-import Main from '@/components/container/Main';
+import Main from '@/lib/container/Main';
 
 import styles from '@/styles/pages/Register.module.css'
 
 import Image from 'next/image';
 
-import Card from '@/components/container/Card';
+import Card from '@/lib/container/Card';
 
 import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
 import { UserCredential } from 'firebase/auth';

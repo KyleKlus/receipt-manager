@@ -1,20 +1,22 @@
 /** @format */
-import Content from '@/components/container/Content';
-import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
-import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
-import withAuth from '@/components/withAuth';
-import Layout from '@/components/layouts/ReceiptManagerLayout';
-import ReceiptManager from '@/components/receipt-manager/manager/ReceiptManager';
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
-import IBill from '@/interfaces/data/IBill';
-import * as DataParser from '@/handlers/DataParser';
-import { IMonthDataBaseContext, useMonthDB } from '@/context/MonthDatabaseContext';
+
+import Content from '@/lib/container/Content';
+import withAuth from '@/lib/withAuth';
+
+import Layout from '@/components/layouts/ReceiptManagerLayout';
+import ReceiptManager from '@/components/manager/ReceiptManager';
+
+import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
+import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import { IYearDataBaseContext, useYearDB } from '@/context/YearDatabaseContext';
+import { IMonthDataBaseContext, useMonthDB } from '@/context/MonthDatabaseContext';
+import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
+
+import IBill from '@/interfaces/data/IBill';
 import IYear from '@/interfaces/data/IYear';
 import IMonth from '@/interfaces/data/IMonth';
-
 
 function Home() {
   const authContext: IAuthContext = useAuth();

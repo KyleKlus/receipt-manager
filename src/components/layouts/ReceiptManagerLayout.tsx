@@ -1,18 +1,18 @@
 /** @format */
-import styles from '@/styles/components/layouts/Layout.module.css';
+import styles from '@/styles/lib/components/layouts/Layout.module.css';
 
 import Head from 'next/head';
-import Footer from '@/components/footer/Footer';
+import Footer from '@/lib/layouts/footer/Footer';
 import dynamic from 'next/dynamic';
-import Main from '@/components/container/Main';
+import Main from '@/lib/container/Main';
 import { RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
-import Content from '@/components/container/Content';
+import Content from '@/lib/container/Content';
 import { useRouter } from 'next/router';
 import { useUserDB } from '@/context/UserDatabaseContext';
 import { IYearDataBaseContext, useYearDB } from '@/context/YearDatabaseContext';
 import { IMonthDataBaseContext, useMonthDB } from '@/context/MonthDatabaseContext';
 
-const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
+const ThemeButton = dynamic(() => import('@/lib/interaction/forms/buttons/ThemeButton'), {
     ssr: false,
 });
 

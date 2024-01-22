@@ -1,14 +1,16 @@
 /** @format */
-import Content from '@/components/container/Content';
-import { IAuthContext, useAuth } from '@/context/AuthContext';
-import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
-import withAuth from '@/components/withAuth';
-import Layout from '@/components/layouts/ReceiptManagerLayout';
-import Card from '@/components/container/Card';
-import styles from '@/styles/components/receipt-manager/settings/SettingsPage.module.css';
-import { IAccountingDataBaseContext, useAccountingDB } from '@/context/AccountingDatabaseContext';
 import { useEffect, useState } from 'react';
 
+import withAuth from '@/lib/withAuth';
+import Content from '@/lib/container/Content';
+import Card from '@/lib/container/Card';
+
+import Layout from '@/components/layouts/ReceiptManagerLayout';
+import styles from '@/styles/components/settings/SettingsPage.module.css';
+
+import { IAuthContext, useAuth } from '@/context/AuthContext';
+import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
+import { IAccountingDataBaseContext, useAccountingDB } from '@/context/AccountingDatabaseContext';
 
 function Home() {
   const authContext: IAuthContext = useAuth();

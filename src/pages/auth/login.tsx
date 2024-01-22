@@ -1,15 +1,15 @@
 /** @format */
 
 import Head from 'next/head';
-import Footer from '@/components/footer/Footer';
-import Content from '@/components/container/Content';
-import Main from '@/components/container/Main';
+import Footer from '@/lib/footer/Footer';
+import Content from '@/lib/container/Content';
+import Main from '@/lib/container/Main';
 
 import styles from '@/styles/pages/Login.module.css'
 
 import Image from 'next/image';
 
-import Card from '@/components/container/Card';
+import Card from '@/lib/container/Card';
 import { UserCredential } from 'firebase/auth';
 import { useRouter } from 'next/router';
 import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';

@@ -1,19 +1,19 @@
 /** @format */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+import moment from 'moment';
+
+import Content from '@/lib/container/Content';
+import withAuth from '@/lib/withAuth';
+
+import Layout from '@/components/layouts/ReceiptManagerLayout';
+import ShareSyncTokenModal from '@/components/dashboard/ShareSyncTokenModal';
+import Dashboard from '@/components/dashboard/Dashboard';
 
 import { IAuthContext, useAuth } from '@/context/AuthContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
-
-import Content from '@/components/container/Content';
-import withAuth from '@/components/withAuth';
-import Layout from '@/components/layouts/ReceiptManagerLayout';
-import ShareSyncTokenModal from '@/components/receipt-manager/dashboard/ShareSyncTokenModal';
-
-import Dashboard from '@/components/receipt-manager/dashboard/Dashboard';
-import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
-import moment from 'moment';
-import { IMonthDataBaseContext, useMonthDB } from '@/context/MonthDatabaseContext';
 import { IYearDataBaseContext, useYearDB } from '@/context/YearDatabaseContext';
+import { IMonthDataBaseContext, useMonthDB } from '@/context/MonthDatabaseContext';
+import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
 
 function Home() {
   const authContext: IAuthContext = useAuth();
