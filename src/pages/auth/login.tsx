@@ -1,7 +1,7 @@
 /** @format */
 
 import Head from 'next/head';
-import Footer from '@/lib/footer/Footer';
+import Footer from '@/lib/layouts/footer/Footer';
 import Content from '@/lib/container/Content';
 import Main from '@/lib/container/Main';
 
