@@ -1,26 +1,30 @@
 /** @format */
 import Head from 'next/head';
-import Footer from '@/components/footer/Footer';
-import Header from '@/components/header/Header';
-import Content from '@/components/container/Content';
+import Footer from '@/lib/layouts/footer/Footer';
+import Header from '@/lib/layouts/header/Header';
+import Content from '@/lib/container/Content';
 
-import Main from '@/components/container/Main';
+import Main from '@/lib/container/Main';
 
-import headerStyles from '@/styles/components/header/Header.module.css'
-import navLinkStyles from '@/styles/components/links/NavLink.module.css'
+import headerStyles from '@/styles/lib/components/layouts/header/Header.module.css'
+import navLinkStyles from '@/styles/lib/components/interaction/links/NavLink.module.css'
 
-import styles from '@/styles/pages/LockedPage.module.css'
+import styles from '@/styles/lib/pages/LockedPage.module.css'
 
-import ScrollNavLink from '@/components/links/ScrollNavLink';
+import ScrollNavLink from '@/lib/interaction/links/ScrollNavLink';
 import dynamic from 'next/dynamic';
 
-import Card from '@/components/container/Card';
+import Card from '@/lib/container/Card';
 import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from 'templates/context/AuthContext';
 import { IDataBaseContext, useDB } from 'templates/context/DatabaseContext';
+<<<<<<< HEAD
 import withAuth from '@/components/withAuth';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
+=======
+import withAuth from '@/lib/withAuth';
+>>>>>>> 6e811787d8f1abe1fe8f2e0a2d49383afeb71eee
 
-const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
+const ThemeButton = dynamic(() => import('@/lib/interaction/forms/buttons/ThemeButton'), {
   ssr: false,
 });
 

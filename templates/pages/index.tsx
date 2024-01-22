@@ -1,7 +1,7 @@
 /** @format */
 
-import Content from "@/components/container/Content";
-import Layout from "@/components/layouts/Layout";
+import Content from "@/lib/container/Content";
+import Layout from "@/lib/layouts/Layout";
 
 export default function Home() {
   return (

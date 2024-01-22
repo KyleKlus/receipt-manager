@@ -2,22 +2,22 @@
 import fs from 'fs';
 
 import Head from 'next/head';
-import Footer from '@/components/footer/Footer';
-import Header from '@/components/header/Header';
-import Content from '@/components/container/Content';
+import Footer from '@/lib/layouts/footer/Footer';
+import Header from '@/lib/layouts/header/Header';
+import Content from '@/lib/container/Content';
 
-import Main from '@/components/container/Main';
+import Main from '@/lib/container/Main';
 
-import headerStyles from '@/styles/components/header/Header.module.css';
+import headerStyles from '@/styles/lib/components/layouts/header/Header.module.css';
 
-import ScrollNavLink from '@/components/links/ScrollNavLink';
+import ScrollNavLink from '@/lib/interaction/links/ScrollNavLink';
 import dynamic from 'next/dynamic';
 
 import Link from 'next/link';
 import matter from 'gray-matter';
 import IPost from 'templates/interfaces/IPost';
 
-const ThemeButton = dynamic(() => import('@/components/buttons/ThemeButton'), {
+const ThemeButton = dynamic(() => import('@/lib/interaction/forms/buttons/ThemeButton'), {
   ssr: false,
 });
 

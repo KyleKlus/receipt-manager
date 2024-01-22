@@ -1,9 +1,9 @@
 /** @format */
 import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from 'templates/context/AuthContext';
 
-import Content from '@/components/container/Content';
-import withAuth from '@/components/withAuth';
-import Layout from '@/components/layouts/Layout';
+import Content from '@/lib/container/Content';
+import withAuth from '@/lib/withAuth';
+import Layout from '@/lib/layouts/Layout';
 import { useRouter } from 'next/router';
 
 function Home() {
