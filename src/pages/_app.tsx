@@ -1,19 +1,10 @@
 /** @format */
-<<<<<<< HEAD
 // Info: uncomment if you want to use firebase
 'use client';
 import AuthProvider from '@/context/AuthContext';
 import UserDataBaseProvider from '@/context/UserDatabaseContext';
 import BillDataBaseProvider from '@/context/BillDatabaseContext';
 import AccountingDataBaseProvider from '@/context/AccountingDatabaseContext';
-=======
-// INFO: uncomment if you want to use firebase
-/*
-'use client';
-import AuthProvider from 'templates/context/AuthContext';
-import DataBaseProvider from 'templates/context/DatabaseContext';
-*/
->>>>>>> 6e811787d8f1abe1fe8f2e0a2d49383afeb71eee
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
 import { Fira_Code } from "next/font/google";
@@ -46,7 +37,6 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
           font-family: ${firaCode.style.fontFamily};
         }
       `}</style>
-<<<<<<< HEAD
       <AuthProvider>
         <UserDataBaseProvider>
           <YearDataBaseProvider>
@@ -61,14 +51,6 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
           </YearDataBaseProvider>
         </UserDataBaseProvider>
       </AuthProvider>
-=======
-      {/* INFO: Uncomment if you want to use firebase */}
-      {/* <AuthProvider>
-        <DataBaseProvider> */}
-      <Component {...pageProps} />
-      {/* </DataBaseProvider>
-      </AuthProvider> */}
->>>>>>> 6e811787d8f1abe1fe8f2e0a2d49383afeb71eee
     </>
 
   );

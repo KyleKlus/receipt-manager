@@ -18,7 +18,7 @@ import Card from '@/lib/container/Card';
 import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from 'templates/context/AuthContext';
 import { IDataBaseContext, useDB } from 'templates/context/DatabaseContext';
 <<<<<<< HEAD
-import withAuth from '@/components/withAuth';
+import withAuth from '@/lib/withAuth';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 =======
 import withAuth from '@/lib/withAuth';

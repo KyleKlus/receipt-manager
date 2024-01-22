@@ -1,9 +1,9 @@
 /** @format */
-import styles from '@/styles/components/receipt-manager/items-page/ItemsPage.module.css';
+import styles from '@/styles/components/items-page/ItemsPage.module.css';
 import { IAuthContext, useAuth } from '@/context/AuthContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import Select from 'react-select';
-import Card from '@/components/container/Card';
+import Card from '@/lib/container/Card';
 import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
 import { useEffect, useState } from 'react';
 import { IAccountingDataBaseContext, useAccountingDB } from '@/context/AccountingDatabaseContext';

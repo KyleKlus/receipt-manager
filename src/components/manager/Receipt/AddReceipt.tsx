@@ -1,8 +1,8 @@
 /** @format */
 import { IAccountingDataBaseContext, useAccountingDB } from '@/context/AccountingDatabaseContext';
 import { IReceipt } from '@/interfaces/data/IReceipt';
-import styles from '@/styles/components/receipt-manager/manager/receipt/Receipt.module.css';
-import itemStyles from '@/styles/components/receipt-manager/manager/receipt/Item.module.css';
+import styles from '@/styles/components/manager/receipt/Receipt.module.css';
+import itemStyles from '@/styles/components/manager/receipt/Item.module.css';
 import React, { useState } from 'react';
 
 import * as DataParser from '@/handlers/DataParser';

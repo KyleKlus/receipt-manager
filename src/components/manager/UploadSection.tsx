@@ -1,10 +1,10 @@
 /** @format */
-import Card from '@/components/container/Card';
+import Card from '@/lib/container/Card';
 import { IAccountingDataBaseContext, useAccountingDB } from '@/context/AccountingDatabaseContext';
 import { IAuthContext, useAuth } from '@/context/AuthContext';
 import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
-import styles from '@/styles/components/receipt-manager/manager/UploadSection.module.css';
+import styles from '@/styles/components/manager/UploadSection.module.css';
 import { ChangeEvent, useEffect, useState } from 'react';
 
 import * as DataParser from '@/handlers/DataParser';

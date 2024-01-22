@@ -1,10 +1,9 @@
 /** @format */
-import styles from '@/styles/components/receipt-manager/statistics-page/StatisticsPage.module.css';
+import styles from '@/styles/components/statistics-page/StatisticsPage.module.css';
 import { IAuthContext, useAuth } from '@/context/AuthContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import Select from 'react-select';
-import Card from '@/components/container/Card';
-import * as DataParser from '@/handlers/DataParser';
+import Card from '@/lib/container/Card';
 import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
 
 

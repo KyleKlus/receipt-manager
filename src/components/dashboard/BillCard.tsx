@@ -1,19 +1,24 @@
 /** @format */
-import styles from '@/styles/components/receipt-manager/dashboard/BillCard.module.css';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import Image from 'next/image';
+
+import Card from '@/lib/container/Card';
+
+import IBill from '@/interfaces/data/IBill';
+
 import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
-import Card from '@/components/container/Card';
-import { Category } from '@/handlers/DataParser';
-import * as DataParser from '@/handlers/DataParser';
-import Image from 'next/image';
-import plusIcon from '../../../../public/plus.png'
-import IBill from '@/interfaces/data/IBill';
-import { useRouter } from 'next/router';
-import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
 import { IYearDataBaseContext, useYearDB } from '@/context/YearDatabaseContext';
 import { IMonthDataBaseContext, useMonthDB } from '@/context/MonthDatabaseContext';
-import { useEffect, useState } from 'react';
+import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
 
+import styles from '@/styles/components/dashboard/BillCard.module.css';
+
+import { Category } from '@/handlers/DataParser';
+import * as DataParser from '@/handlers/DataParser';
+
+import plusIcon from '../../../public/plus.png'
 
 interface IShareSyncTokenModalProps {
     className?: string;

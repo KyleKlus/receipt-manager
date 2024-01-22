@@ -1,12 +1,13 @@
 /** @format */
+import React, { useState } from 'react';
+
 import { IAccountingDataBaseContext, useAccountingDB } from '@/context/AccountingDatabaseContext';
 import { IAuthContext, useAuth } from '@/context/AuthContext';
-import { Category } from '@/handlers/DataParser';
-import styles from '@/styles/components/receipt-manager/manager/receipt/Item.module.css';
-import React, { useEffect, useState } from 'react';
-import Select from 'react-select';
+
+import styles from '@/styles/components/manager/receipt/Item.module.css';
 
 import * as DataParser from '@/handlers/DataParser';
+
 import { IReceiptItem } from '@/interfaces/data/IReceiptItem';
 
 interface IAddItemRowProps {

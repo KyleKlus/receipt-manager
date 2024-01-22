@@ -1,17 +1,18 @@
 /** @format */
-import Content from '@/components/container/Content';
-import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
-import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
-import withAuth from '@/components/withAuth';
-import Layout from '@/components/layouts/ReceiptManagerLayout';
-import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
-import IBill from '@/interfaces/data/IBill';
-import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import StatisticsPage from '@/components/receipt-manager/statistics-page/StatisticsPage';
-import { IMonthDataBaseContext, useMonthDB } from '@/context/MonthDatabaseContext';
-import { IYearDataBaseContext, useYearDB } from '@/context/YearDatabaseContext';
 import moment from 'moment';
+import { useRouter } from 'next/router';
+
+import Content from '@/lib/container/Content';
+import withAuth from '@/lib/withAuth';
+
+import StatisticsPage from '@/components/statistics-page/StatisticsPage';
+import Layout from '@/components/layouts/ReceiptManagerLayout';
+
+import { IAuthContext, useAuth } from '@/context/AuthContext';
+import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
+import { IYearDataBaseContext, useYearDB } from '@/context/YearDatabaseContext';
+import { IMonthDataBaseContext, useMonthDB } from '@/context/MonthDatabaseContext';
 
 function Home() {
   const authContext: IAuthContext = useAuth();

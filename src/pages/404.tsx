@@ -2,8 +2,8 @@
 
 import { IAuthContext, RedirectPathOptions, redirectPaths, useAuth } from '@/context/AuthContext';
 
-import Content from '@/components/container/Content';
-import withAuth from '@/components/withAuth';
+import Content from '@/lib/container/Content';
+import withAuth from '@/lib/withAuth';
 import Layout from '@/components/layouts/ReceiptManagerLayout';
 import { useRouter } from 'next/router';
 

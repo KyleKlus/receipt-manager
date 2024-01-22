@@ -1,5 +1,5 @@
 /** @format */
-import styles from '@/styles/components/layouts/Layout.module.css';
+import styles from '@/styles/lib/components/layouts/Layout.module.css';
 
 import Head from 'next/head';
 import Footer from '@/lib/layouts/footer/Footer';

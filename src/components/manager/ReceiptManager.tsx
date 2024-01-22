@@ -1,5 +1,5 @@
 /** @format */
-import styles from '@/styles/components/receipt-manager/manager/ReceiptManager.module.css';
+import styles from '@/styles/components/manager/ReceiptManager.module.css';
 import { useEffect, useId, useState } from 'react';
 import { IReceipt } from '@/interfaces/data/IReceipt';
 import UploadSection from './UploadSection';
@@ -7,8 +7,6 @@ import ResultSection from './ResultSection';
 import { IAuthContext, useAuth } from '@/context/AuthContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import { IAccountingDataBaseContext, useAccountingDB } from '@/context/AccountingDatabaseContext';
-import { IMonthDataBaseContext, useMonthDB } from '@/context/MonthDatabaseContext';
-import { IYearDataBaseContext, useYearDB } from '@/context/YearDatabaseContext';
 
 interface IReceiptManagerProps {
     billDate: string;

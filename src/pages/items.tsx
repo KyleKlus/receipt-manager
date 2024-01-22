@@ -1,16 +1,17 @@
 /** @format */
-import Content from '@/components/container/Content';
+import { useState, useEffect } from 'react';
+import moment from 'moment';
+
+import Content from '@/lib/container/Content';
+import withAuth from '@/lib/withAuth';
+
+import Layout from '@/components/layouts/ReceiptManagerLayout';
+import ItemsPage from '@/components/items-page/ItemsPage';
+
 import { IAuthContext, useAuth } from '@/context/AuthContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
-import withAuth from '@/components/withAuth';
-import Layout from '@/components/layouts/ReceiptManagerLayout';
-import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import ItemsPage from '@/components/receipt-manager/items-page/ItemsPage';
-import { IMonthDataBaseContext, useMonthDB } from '@/context/MonthDatabaseContext';
 import { IYearDataBaseContext, useYearDB } from '@/context/YearDatabaseContext';
-import moment from 'moment';
+import { IMonthDataBaseContext, useMonthDB } from '@/context/MonthDatabaseContext';
 
 function Home() {
   const authContext: IAuthContext = useAuth();
@@ -19,7 +20,6 @@ function Home() {
   const monthDBContext: IMonthDataBaseContext = useMonthDB();
 
   const [isLoadingSite, setIsLoadingSite] = useState(true);
-  const router = useRouter();
 
   const selectConnectionsOptions = userDBContext.activeConnections.length > 0
     ? userDBContext.activeConnections.map(connection => {

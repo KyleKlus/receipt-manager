@@ -4,8 +4,8 @@ import { IAuthContext, useAuth } from '@/context/AuthContext';
 import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import { IReceipt } from '@/interfaces/data/IReceipt';
-import styles from '@/styles/components/receipt-manager/manager/receipt/Receipt.module.css';
-import itemStyles from '@/styles/components/receipt-manager/manager/receipt/Item.module.css';
+import styles from '@/styles/components/manager/receipt/Receipt.module.css';
+import itemStyles from '@/styles/components/manager/receipt/Item.module.css';
 import React, { useEffect, useState } from 'react';
 
 import { IReceiptItem } from '@/interfaces/data/IReceiptItem';
@@ -111,7 +111,7 @@ export default function Receipt(props: React.PropsWithChildren<IReceiptProps>) {
         if (auth.user === null || billDB.currentBill === undefined || yearDBContext.currentYear === undefined ||
             monthDBContext.currentMonth === undefined) { return; }
         const itemId = receipt.items[index].itemId;
-        
+
         await accountingDB.deleteItem(
             auth.user,
             userDB.selectedConnection,

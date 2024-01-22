@@ -1,6 +1,6 @@
 /** @format */
-import styles from '@/styles/components/receipt-manager/dashboard/ShareSyncTokenModal.module.css';
-import Modal from '@/components/container/Modal';
+import styles from '@/styles/components/dashboard/ShareSyncTokenModal.module.css';
+import Modal from '@/lib/container/Modal';
 import { IAuthContext, useAuth } from '@/context/AuthContext';
 import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import { useState } from 'react';

@@ -1,5 +1,5 @@
 /** @format */
-import Card from '@/components/container/Card';
+import Card from '@/lib/container/Card';
 import { IAccountingDataBaseContext, useAccountingDB } from '@/context/AccountingDatabaseContext';
 import { IAuthContext, useAuth } from '@/context/AuthContext';
 import { IBillDataBaseContext, useBillDB } from '@/context/BillDatabaseContext';
@@ -7,7 +7,7 @@ import { IUserDataBaseContext, useUserDB } from '@/context/UserDatabaseContext';
 import * as Calculator from '@/handlers/Calculator';
 import { IReceipt } from '@/interfaces/data/IReceipt';
 import { IResult } from '@/interfaces/data/IResult';
-import styles from '@/styles/components/receipt-manager/manager/ResultCard.module.css';
+import styles from '@/styles/components/manager/ResultCard.module.css';
 
 export default function ResultCard(props: {
     isFirstPerson: boolean

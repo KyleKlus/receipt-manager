@@ -1,6 +1,6 @@
 /** @format */
-import Card from '@/components/container/Card';
-import styles from '@/styles/components/receipt-manager/manager/ResultSection.module.css';
+import Card from '@/lib/container/Card';
+import styles from '@/styles/components/manager/ResultSection.module.css';
 import ResultCard from './ResultCard';
 import * as Calculator from '@/handlers/Calculator';
 import * as DataParser from '@/handlers/DataParser';
